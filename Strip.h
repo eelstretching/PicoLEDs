@@ -66,6 +66,10 @@ class Strip {
 
   uint getNumPixels() { return num_pixels; }
 
+  ColorOrder getColorOrder() {return color_order;}
+
+  void setColorOrder(ColorOrder co) {color_order = co;}
+
   void setFractionalBrightness(uint fractionalBrightness) {
     fracBrightness = fractionalBrightness;
   }
