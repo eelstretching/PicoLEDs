@@ -1,6 +1,9 @@
 #ifndef STRIP_H
 #define STRIP_H
 
+#pragma once
+
+#include "color.h"
 #include "hardware/pio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
@@ -24,7 +27,7 @@ class Strip {
 
   //
   // The bytes making up the data for this strip.
-  uint32_t *data;
+  RGB *data;
 
   //
   // How many pixels there are in the strip. For now, we're going to assume that
@@ -43,11 +46,14 @@ class Strip {
   Strip(uint pin, uint num_pixels);
 
   /// @brief Adds a pixel to this strip at the next position
-  /// @param r 0-255 red
-  /// @param g 0-255 green
-  /// @param b 0-255 blude
+  /// @param c The RGB color value to add for the pixel
   /// @return The position that the pixel was added.
-  uint addPixel(uint8_t r, uint8_t g, uint8_t b);
+  uint addPixel(RGB c);
+
+  /// @brief Adds a pixel to this strip at the next position
+  /// @param h The HSV color value to add for the pixel
+  /// @return The position that the pixel was added.
+  uint addPixel(HSV c);
 
   /// @brief Shows the strip, i.e., it sends the data out the PIO state machine.
   void show();

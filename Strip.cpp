@@ -2,15 +2,8 @@
 
 #include "ws2812.pio.h"
 
-static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
-    return
-            ((uint32_t) (g) << 8) |
-            ((uint32_t) (r) << 16) |
-            (uint32_t) (b);
-}
-
 Strip::Strip(uint pin, uint num_pixels) : pin(pin), num_pixels(num_pixels) {
-  data = new uint32_t[num_pixels];
+  data = new RGB[num_pixels];
   pos = 0;
 
   // find an unclaimed PIO state machine and put the program there. Looks like
@@ -35,14 +28,20 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), num_pixels(num_pixels) {
   ws2812_program_init(pio, sm, offset, pin, 800000);
 }
 
-uint Strip::addPixel(uint8_t r, uint8_t g, uint8_t b) {
+uint Strip::addPixel(RGB c) {
     uint p = pos;
-    data[pos++] = urgb_u32(r, g, b);
+    data[pos++] = c;
+    return p;
+}
+
+uint Strip::addPixel(HSV c) {
+    uint p = pos;
+    hsv2rgb_raw(c, data[pos++]);
     return p;
 }
 
 void Strip::show() {
     for(int i = 0; i < num_pixels; i++) {
-        pio_sm_put_blocking(pio, sm, (data[i] * fracBrightness) >> 8u);
+        pio_sm_put_blocking(pio, sm, data[i].getColor());
     }
 }
