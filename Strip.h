@@ -59,6 +59,8 @@ class Strip {
   /// @return The position that the pixel was added.
   uint addPixel(HSV c);
 
+  void fill(RGB c);
+
   /// @brief Shows the strip, i.e., it sends the data out the PIO state machine.
   void show();
 
@@ -66,6 +68,10 @@ class Strip {
 
   void setFractionalBrightness(uint fractionalBrightness) {
     fracBrightness = fractionalBrightness;
+  }
+
+  void reset() {
+    pos = 0;
   }
 };
 

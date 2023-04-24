@@ -40,6 +40,12 @@ uint Strip::addPixel(HSV c) {
     return p;
 }
 
+void Strip::fill(RGB c) {
+  for(int i = 0; i < num_pixels; i++) {
+    data[i] = c;
+  }
+}
+
 void Strip::show() {
     for(int i = 0; i < num_pixels; i++) {
         pio_sm_put_blocking(pio, sm, data[i].getColor(color_order));

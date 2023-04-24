@@ -416,32 +416,33 @@ struct RGB {
   uint32_t getColor(ColorOrder order) {
     switch (order) {
       case ORGB:
-        return uint32_t{0xff000000} | (uint32_t{r} << 16) | (uint32_t{g} << 8) |
-               uint32_t{b};
-        break;
+        return ((uint32_t) (r) << 8) |
+            ((uint32_t) (g) << 16) |
+            (uint32_t) (b);
       case ORBG:
-        return uint32_t{0xff000000} | (uint32_t{r} << 16) | (uint32_t{b} << 8) |
-               uint32_t{g};
-        break;
+        return ((uint32_t) (r) << 8) |
+            ((uint32_t) (b) << 16) |
+            (uint32_t) (g);
       case OGRB:
-        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{r} << 8) |
-               uint32_t{b};
-        break;
+        return ((uint32_t) (g) << 8) |
+            ((uint32_t) (r) << 16) |
+            (uint32_t) (b);
       case OGBR:
-        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{b} << 8) |
-               uint32_t{r};
-        break;
+        return ((uint32_t) (g) << 8) |
+            ((uint32_t) (b) << 16) |
+            (uint32_t) (r);
       case OBRG:
-        return uint32_t{0xff000000} | (uint32_t{b} << 16) | (uint32_t{r} << 8) |
-               uint32_t{g};
-        break;
+        return ((uint32_t) (b) << 8) |
+            ((uint32_t) (r) << 16) |
+            (uint32_t) (g);
       case OBGR:
-        return uint32_t{0xff000000} | (uint32_t{b} << 16) | (uint32_t{g} << 8) |
-               uint32_t{r};
-        break;
+        return ((uint32_t) (b) << 8) |
+            ((uint32_t) (g) << 16) |
+            (uint32_t) (r);
       default:
-        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{r} << 8) |
-               uint32_t{b};
+        return ((uint32_t) (g) << 8) |
+            ((uint32_t) (r) << 16) |
+            (uint32_t) (b);
     }
   }
 
