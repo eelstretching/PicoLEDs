@@ -12,6 +12,19 @@ struct HSV;
 
 static void hsv2rgb_rainbow(const HSV& hsv, RGB& rgb);
 
+/// RGB color channel orderings, used when instantiating controllers to
+/// determine what order the controller should send data out in. The default
+/// ordering is RGB. Within this enum, the red channel is 0, the green channel
+/// is 1, and the blue chanel is 2.
+enum ColorOrder {
+  ORGB = 0012,  ///< Red,   Green, Blue  (0012)
+  ORBG = 0021,  ///< Red,   Blue,  Green (0021)
+  OGRB = 0102,  ///< Green, Red,   Blue  (0102)
+  OGBR = 0120,  ///< Green, Blue,  Red   (0120)
+  OBRG = 0201,  ///< Blue,  Red,   Green (0201)
+  OBGR = 0210   ///< Blue,  Green, Red   (0210)
+};
+
 struct HSV {
   union {
     struct {
@@ -398,6 +411,38 @@ struct RGB {
   uint32_t getColor() {
     return uint32_t{0xff000000} | (uint32_t{r} << 16) | (uint32_t{g} << 8) |
            uint32_t{b};
+  }
+
+  uint32_t getColor(ColorOrder order) {
+    switch (order) {
+      case ORGB:
+        return uint32_t{0xff000000} | (uint32_t{r} << 16) | (uint32_t{g} << 8) |
+               uint32_t{b};
+        break;
+      case ORBG:
+        return uint32_t{0xff000000} | (uint32_t{r} << 16) | (uint32_t{b} << 8) |
+               uint32_t{g};
+        break;
+      case OGRB:
+        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{r} << 8) |
+               uint32_t{b};
+        break;
+      case OGBR:
+        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{b} << 8) |
+               uint32_t{r};
+        break;
+      case OBRG:
+        return uint32_t{0xff000000} | (uint32_t{b} << 16) | (uint32_t{r} << 8) |
+               uint32_t{g};
+        break;
+      case OBGR:
+        return uint32_t{0xff000000} | (uint32_t{b} << 16) | (uint32_t{g} << 8) |
+               uint32_t{r};
+        break;
+      default:
+        return uint32_t{0xff000000} | (uint32_t{g} << 16) | (uint32_t{r} << 8) |
+               uint32_t{b};
+    }
   }
 
   /// Invert each channel
