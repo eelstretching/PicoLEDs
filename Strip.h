@@ -31,7 +31,7 @@ class Strip {
 
   //
   // The color order for this strip. Default is GRB.
-  ColorOrder color_order = ColorOrder::OGRB;
+  ColorOrder color_order = ColorOrder::ORGB;
 
   //
   // How many pixels there are in the strip. For now, we're going to assume that

@@ -50,4 +50,5 @@ void Strip::show() {
     for(int i = 0; i < num_pixels; i++) {
         pio_sm_put_blocking(pio, sm, data[i].getColor(color_order) << 8u);
     }
+    pos = 0;
 }
