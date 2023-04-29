@@ -39,7 +39,7 @@ int main() {
   while (1) {
     strip.fill(RGB::Black);
     strip.show();
-    sleep_ms(500);
+    sleep_ms(20000);
     RGB val;
     switch (n % 3) {
       case 0:
@@ -55,6 +55,6 @@ int main() {
     n++;
 
     strip.show();
-    sleep_ms(1000);
+    sleep_ms(20000);
   }
 }

@@ -40,7 +40,7 @@ class Strip {
 
   //
   // We'll keep things dim by default.
-  uint fracBrightness = 0x20;
+  uint8_t fracBrightness = 0x20;
 
   //
   // Where the next pixel will be added.
@@ -59,6 +59,24 @@ class Strip {
   /// @return The position that the pixel was added.
   uint addPixel(HSV c);
 
+  /// @brief Puts a color at a specific pixel in the strip.
+  /// @param p The position where the pixel should be placed. If this is not within the bounds of the array, then no change will happen
+  /// @param c The RGB color value to put in the strip.
+  void putPixel(uint p, RGB c);
+
+  /// @brief Puts n pixels from the given array into the strip, starting at position 0.
+  /// @param pixels The data that we want to copy into our strip
+  /// @param n The number of pixels to copy.
+  void putPixels(RGB *pixels, uint n);
+
+  /// @brief Puts n pixels from the given array into the strip, starting at position p.
+  /// @param p The position in the strip where pixels should be copied.
+  /// @param pixels The data that we want to copy into our strip
+  /// @param n The number of pixels to copy.
+  void putPixels(uint p, RGB *pixels, uint n);
+
+  /// @brief Fills the strip with the given color.
+  /// @param c The color to fill the strip with.
   void fill(RGB c);
 
   /// @brief Shows the strip, i.e., it sends the data out the PIO state machine.
@@ -70,8 +88,15 @@ class Strip {
 
   void setColorOrder(ColorOrder co) {color_order = co;}
 
-  void setFractionalBrightness(uint fractionalBrightness) {
+  /// @brief Sets the fractional brightness for the whole strip. 
+  /// @param fractionalBrightness A value between 0 and 255 
+  /// that specifies the brightness level of the LEDs in the strip between 0 (off) and 255 (all the way on).
+  void setFractionalBrightness(uint8_t fractionalBrightness) {
     fracBrightness = fractionalBrightness;
+  }
+
+  uint8_t getFractionalBrightness() {
+    return fracBrightness;
   }
 
   void reset() {

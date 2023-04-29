@@ -2,6 +2,8 @@
 
 #include "ws2812.pio.h"
 
+#include <string.h>
+
 Strip::Strip(uint pin, uint num_pixels) : pin(pin), num_pixels(num_pixels) {
   data = new RGB[num_pixels];
   pos = 0;
@@ -38,6 +40,28 @@ uint Strip::addPixel(HSV c) {
     uint p = pos;
     hsv2rgb_raw(c, data[pos++]);
     return p;
+}
+
+void Strip::putPixel(uint p, RGB c) {
+  if(p >= num_pixels) {
+    return;
+  }
+  data[p] = c;
+}
+
+void Strip::putPixels(RGB* pixels, uint n) {
+  putPixels(0, pixels, n);
+}
+
+void Strip::putPixels(uint p, RGB* pixels, uint n) {
+  if(p >= num_pixels) {
+    return;
+  }
+  if(p + n >= num_pixels) {
+    n = num_pixels - p;
+  }
+  memcpy(&data[p], pixels, n * sizeof(RGB));
+
 }
 
 void Strip::fill(RGB c) {
