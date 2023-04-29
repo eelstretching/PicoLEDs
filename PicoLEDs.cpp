@@ -35,24 +35,26 @@ int main() {
 
   Strip strip(3, 32);
   printf("Started strip with having %d LEDs\n", strip.getNumPixels());
+  uint n = 0;
   while (1) {
     strip.fill(RGB::Black);
     strip.show();
     sleep_ms(500);
-    for (int i = 0; i < strip.getNumPixels(); i++) {
-      switch (i % 3) {
-        case 0:
-          strip.addPixel(RGB::Red);
-          break;
-        case 1:
-          strip.addPixel(RGB::Green);
-          break;
-        case 2:
-          strip.addPixel(RGB::Blue);
-          break;
-      }
+    RGB val;
+    switch (n % 3) {
+      case 0:
+        strip.fill(RGB::Red);
+        break;
+      case 1:
+        strip.fill(RGB::Green);
+        break;
+      case 2:
+        strip.fill(RGB::Blue);
+        break;
     }
+    n++;
+
     strip.show();
-    sleep_ms(2000);
+    sleep_ms(1000);
   }
 }
