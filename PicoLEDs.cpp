@@ -38,10 +38,13 @@ int main() {
   int t = 0;
   while (1) {
     int dir = (rand() >> 30) & 1 ? 1 : -1;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 200; ++i) {
       pattern_snakes(strip, t);
       sleep_ms(10);
       t += dir;
     }
+
+    StripStats stats = strip.getStripStats();
+    printf("%d shows %d time %.3fus per show\n", stats.showCount, stats.showTime, (double) stats.showTime / stats.showCount);
   }
 }

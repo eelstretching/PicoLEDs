@@ -13,9 +13,10 @@
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
 /// light up.
-struct StripResetDelay {
-  alarm_id_t reset_delay_alarm;
-  semaphore reset_delay_sem;
+class StripResetDelay {
+ public:
+  alarm_id_t alarm = 0;
+  semaphore sem;
 };
 
 /// @brief A static array of pointers to strip resets, one per DMA channel, as
@@ -28,16 +29,14 @@ static StripResetDelay *strip_delays[NUM_DMA_CHANNELS];
 
 class StripStats {
  public:
-  uint showCount;
-  uint showTime;
-  uint dmaTime;
+  uint showCount = 0;
+  uint64_t showTime = 0;
 };
 
 /*
- * RES time, specification says it needs at least 50 us. Need to pause bit
- * stream for this time at the end to latch the values into the LED
+ * RES time, specification says it needs at least 50 us, but 30 seems to work?
  */
-#define RESET_TIME_US (60)
+#define RESET_TIME_US (30)
 
 class Strip {
  protected:
@@ -63,11 +62,11 @@ class Strip {
 
   //
   // A delay timer for this strip.
-  StripResetDelay delay;
+  StripResetDelay *delay;
 
   //
   // Stats for this strip.
-  StripStats stats;
+  StripStats *stats;
 
   //
   // The offset of the PIO program to run the strip.
@@ -150,6 +149,8 @@ class Strip {
   uint8_t getFractionalBrightness() { return fracBrightness; }
 
   void reset() { pos = 0; }
+
+  StripStats getStripStats() { return *stats; }
 };
 
 #endif

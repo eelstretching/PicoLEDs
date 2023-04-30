@@ -18,8 +18,8 @@
 static int64_t reset_delay_complete(alarm_id_t id, void* strip_delay) {
   //
   // Reset the alarm, and release the semaphore.
-  ((StripResetDelay*)strip_delay)->reset_delay_alarm = 0;
-  sem_release(&((StripResetDelay*)strip_delay)->reset_delay_sem);
+  ((StripResetDelay*)strip_delay)->alarm = 0;
+  sem_release(&((StripResetDelay*)strip_delay)->sem);
   return 0;
 }
 
@@ -36,13 +36,13 @@ static inline void __isr dma_complete_handler() {
     if ((dma_hw->ints0 & (1 << i)) && strip_delays[i]) {
       dma_hw->ints0 = (1 << i);  // clear/ack IRQ
       /* safety check: is there somehow an alarm already running? */
-      if (strip_delays[i]->reset_delay_alarm != 0) {
-        cancel_alarm(strip_delays[i]->reset_delay_alarm); /* cancel it */
+      if (strip_delays[i]->alarm != 0) {
+        cancel_alarm(strip_delays[i]->alarm); /* cancel it */
       }
       //
       // Set up alarm to wait for the required latch-in time for the LES at the
       // end of the transfer, which will release the associated semaphore.
-      strip_delays[i]->reset_delay_alarm = add_alarm_in_us(
+      strip_delays[i]->alarm = add_alarm_in_us(
           RESET_TIME_US, reset_delay_complete, strip_delays[i], true);
       return;
     }
@@ -53,7 +53,9 @@ static bool isr_installed = false;
 Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
   data = new RGB[num_pixels];
   pos = 0;
-  delay.reset_delay_alarm = 0;
+
+  stats = new StripStats();
+  delay = new StripResetDelay();
 
   //
   // Find an unclaimed PIO state machine and put the program there. We won't
@@ -91,8 +93,8 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
   // Set up the semaphore that we'll use to decide when it's OK to send data the
   // next time. We'll leave it posted for the first time through so that we can
   // send data without delay.
-  sem_init(&delay.reset_delay_sem, 1, 1);
-  strip_delays[dma_channel] = &delay;
+  sem_init(&delay->sem, 1, 1);
+  strip_delays[dma_channel] = delay;
 
   //
   // Now we'll need a buffer where we can put the pixels while they're being
@@ -158,6 +160,7 @@ void Strip::fill(RGB c) {
 }
 
 void Strip::show() {
+  uint64_t start = time_us_64();
   if (dma_channel != -1) {
     //
     // Put the data into the DMA buffer. Maybe there's a fancy memcpy-esque way
@@ -168,7 +171,7 @@ void Strip::show() {
     //
     // Acquire the semaphore that we're using for this strip's delay, and then
     // start the DMA. The semaphore will be released in the interrupt handler.
-    sem_acquire_blocking(&delay.reset_delay_sem);
+    sem_acquire_blocking(&delay->sem);
     dma_channel_set_read_addr(dma_channel, (void*)dma_buff, false);
     dma_channel_set_trans_count(dma_channel, numPixels, true);
   } else {
@@ -179,6 +182,7 @@ void Strip::show() {
           pio, sm, data[i].scale8(fracBrightness).getColor(colorOrder) << 8u);
     }
   }
+  stats->showTime += (time_us_64() - start);
+  stats->showCount++;
   pos = 0;
-  stats.showCount++;
 }
