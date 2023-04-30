@@ -34,7 +34,7 @@ void pattern_snakes(Strip strip, uint t) {
 int main() {
   stdio_init_all();
 
-  Strip strip(3, 32);
+  Strip strip(3, 276);
   int t = 0;
   while (1) {
     int dir = (rand() >> 30) & 1 ? 1 : -1;
@@ -45,6 +45,6 @@ int main() {
     }
 
     StripStats stats = strip.getStripStats();
-    printf("%d shows %d time %.3fus per show\n", stats.showCount, stats.showTime, (double) stats.showTime / stats.showCount);
+    printf("%d shows %.3fus per show\n", stats.showCount, (double) stats.showTime / stats.showCount);
   }
 }
