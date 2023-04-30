@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdlib.h>
 #include "Strip.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -34,27 +35,13 @@ int main() {
   stdio_init_all();
 
   Strip strip(3, 32);
-  printf("Started strip with having %d LEDs\n", strip.getNumPixels());
-  uint n = 0;
+  int t = 0;
   while (1) {
-    strip.fill(RGB::Black);
-    strip.show();
-    sleep_ms(20000);
-    RGB val;
-    switch (n % 3) {
-      case 0:
-        strip.fill(RGB::Red);
-        break;
-      case 1:
-        strip.fill(RGB::Green);
-        break;
-      case 2:
-        strip.fill(RGB::Blue);
-        break;
+    int dir = (rand() >> 30) & 1 ? 1 : -1;
+    for (int i = 0; i < 1000; ++i) {
+      pattern_snakes(strip, t);
+      sleep_ms(10);
+      t += dir;
     }
-    n++;
-
-    strip.show();
-    sleep_ms(20000);
   }
 }

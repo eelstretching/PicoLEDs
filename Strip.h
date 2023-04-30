@@ -4,11 +4,43 @@
 #pragma once
 
 #include "color.h"
+#include "hardware/clocks.h"
 #include "hardware/pio.h"
+#include "pico/sem.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+/// @brief A struct to store a semaphore and a delay alarm that will allow us to
+/// delay after sending data to the LEDs to give the strip time to actually
+/// light up.
+struct StripResetDelay {
+  alarm_id_t reset_delay_alarm;
+  semaphore reset_delay_sem;
+};
+
+/// @brief A static array of pointers to strip resets, one per DMA channel, as
+/// the IRQ handler will have to reset alarms as nescesary for any of the
+/// channels, since the IRQ handler is a global function, not a member one.
+///
+/// An element of this array will be non-null if we're doing DMA on that
+/// channel.
+static StripResetDelay *strip_delays[NUM_DMA_CHANNELS];
+
+class StripStats {
+ public:
+  uint showCount;
+  uint showTime;
+  uint dmaTime;
+};
+
+/*
+ * RES time, specification says it needs at least 50 us. Need to pause bit
+ * stream for this time at the end to latch the values into the LED
+ */
+#define RESET_TIME_US (60)
+
 class Strip {
+ protected:
   //
   // The pin this strip is on.
   uint pin;
@@ -22,6 +54,22 @@ class Strip {
   int sm;
 
   //
+  // The DMA channel we'll use for transfers to the strip.
+  int dma_channel;
+
+  //
+  // The DMA buffer where we'll put our pixels for showing.
+  uint32_t *dma_buff;
+
+  //
+  // A delay timer for this strip.
+  StripResetDelay delay;
+
+  //
+  // Stats for this strip.
+  StripStats stats;
+
+  //
   // The offset of the PIO program to run the strip.
   int offset;
 
@@ -31,12 +79,12 @@ class Strip {
 
   //
   // The color order for this strip. Default is GRB.
-  ColorOrder color_order = ColorOrder::ORGB;
+  ColorOrder colorOrder = ColorOrder::ORGB;
 
   //
   // How many pixels there are in the strip. For now, we're going to assume that
   // strips are RGB.
-  uint num_pixels;
+  uint numPixels;
 
   //
   // We'll keep things dim by default.
@@ -60,16 +108,19 @@ class Strip {
   uint addPixel(HSV c);
 
   /// @brief Puts a color at a specific pixel in the strip.
-  /// @param p The position where the pixel should be placed. If this is not within the bounds of the array, then no change will happen
+  /// @param p The position where the pixel should be placed. If this is not
+  /// within the bounds of the array, then no change will happen
   /// @param c The RGB color value to put in the strip.
   void putPixel(uint p, RGB c);
 
-  /// @brief Puts n pixels from the given array into the strip, starting at position 0.
+  /// @brief Puts n pixels from the given array into the strip, starting at
+  /// position 0.
   /// @param pixels The data that we want to copy into our strip
   /// @param n The number of pixels to copy.
   void putPixels(RGB *pixels, uint n);
 
-  /// @brief Puts n pixels from the given array into the strip, starting at position p.
+  /// @brief Puts n pixels from the given array into the strip, starting at
+  /// position p.
   /// @param p The position in the strip where pixels should be copied.
   /// @param pixels The data that we want to copy into our strip
   /// @param n The number of pixels to copy.
@@ -82,26 +133,23 @@ class Strip {
   /// @brief Shows the strip, i.e., it sends the data out the PIO state machine.
   void show();
 
-  uint getNumPixels() { return num_pixels; }
+  uint getNumPixels() { return numPixels; }
 
-  ColorOrder getColorOrder() {return color_order;}
+  ColorOrder getColorOrder() { return colorOrder; }
 
-  void setColorOrder(ColorOrder co) {color_order = co;}
+  void setColorOrder(ColorOrder co) { colorOrder = co; }
 
-  /// @brief Sets the fractional brightness for the whole strip. 
-  /// @param fractionalBrightness A value between 0 and 255 
-  /// that specifies the brightness level of the LEDs in the strip between 0 (off) and 255 (all the way on).
+  /// @brief Sets the fractional brightness for the whole strip.
+  /// @param fractionalBrightness A value between 0 and 255
+  /// that specifies the brightness level of the LEDs in the strip between 0
+  /// (off) and 255 (all the way on).
   void setFractionalBrightness(uint8_t fractionalBrightness) {
     fracBrightness = fractionalBrightness;
   }
 
-  uint8_t getFractionalBrightness() {
-    return fracBrightness;
-  }
+  uint8_t getFractionalBrightness() { return fracBrightness; }
 
-  void reset() {
-    pos = 0;
-  }
+  void reset() { pos = 0; }
 };
 
 #endif
