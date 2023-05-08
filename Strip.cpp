@@ -186,3 +186,8 @@ void Strip::show() {
   stats->showCount++;
   pos = 0;
 }
+
+void StripStats::combine(StripStats other) {
+  showCount += other.showCount;
+  showTime += other.showCount;
+}

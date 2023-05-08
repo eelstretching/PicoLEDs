@@ -42,12 +42,21 @@ int main() {
                      RGB::Purple, RGB::DeepPink, RGB::White};
 
     int c = 0;
+    int n = 0;
     while (1) {
         for (int i = 0; i < 4; i++) {
             strips[i].fill(colors[c]);
             strips[i].show();
             c = (c + 1) % 6;
+            n++;
         }
         sleep_ms(500);
+        if(n % 500 == 0) {
+            StripStats cs;
+            for(int i = 0; i < 4; i++) {
+                cs.combine(strips[i].getStripStats());
+            }
+            printf("%d shows, %.2f us per show\n", cs.showCount, ((double) cs.showTime)/cs.showCount);
+        }
     }
 }
