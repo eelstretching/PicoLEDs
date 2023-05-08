@@ -5,6 +5,7 @@
  */
 
 #include <stdlib.h>
+
 #include "Strip.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -15,36 +16,38 @@
 #include "ws2812.pio.h"
 
 void pattern_snakes(Strip strip, uint t) {
-  strip.reset();
-  for (uint i = 0; i < strip.getNumPixels(); ++i) {
-    uint x = (i + (t >> 1)) % 64;
-    if (x < 10) {
-      strip.addPixel(RGB::Red);
-    } else if (x >= 15 && x < 25) {
-      strip.addPixel(RGB::Green);
-    } else if (x >= 30 && x < 40) {
-      strip.addPixel(RGB::Blue);
-    } else {
-      strip.addPixel(RGB::Black);
+    strip.reset();
+    for (uint i = 0; i < strip.getNumPixels(); ++i) {
+        uint x = (i + (t >> 1)) % 64;
+        if (x < 10) {
+            strip.addPixel(RGB::Red);
+        } else if (x >= 15 && x < 25) {
+            strip.addPixel(RGB::Green);
+        } else if (x >= 30 && x < 40) {
+            strip.addPixel(RGB::Blue);
+        } else {
+            strip.addPixel(RGB::Black);
+        }
     }
-  }
-  strip.show();
+    strip.show();
 }
 
 int main() {
-  stdio_init_all();
+    stdio_init_all();
 
-  Strip strip(3, 276);
-  int t = 0;
-  while (1) {
-    int dir = (rand() >> 30) & 1 ? 1 : -1;
-    for (int i = 0; i < 200; ++i) {
-      pattern_snakes(strip, t);
-      sleep_ms(10);
-      t += dir;
+    Strip strips[4] = {Strip(2, 276), Strip(3, 276), Strip(4, 276),
+                       Strip(5, 276)};
+
+    RGB colors[6] = {RGB::Red,    RGB::Green,    RGB::Blue,
+                     RGB::Purple, RGB::DeepPink, RGB::White};
+
+    int c = 0;
+    while (1) {
+        for (int i = 0; i < 4; i++) {
+            strips[i].fill(colors[c]);
+            strips[i].show();
+            c = (c + 1) % 6;
+        }
+        sleep_ms(500);
     }
-
-    StripStats stats = strip.getStripStats();
-    printf("%d shows %.3fus per show\n", stats.showCount, (double) stats.showTime / stats.showCount);
-  }
 }
