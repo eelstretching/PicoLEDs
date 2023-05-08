@@ -45,6 +45,11 @@ class Canvas {
     /// @param p the color the pixel should be set to.
     void set(uint x, uint y, RGB p);
 
+    /// @brief Fills a row with the given color.
+    /// @param row the row to fill
+    /// @param p the color
+    void fill(uint row, RGB p);
+
     /// @brief Gets the position in our data array for a given x and y. Just here so friends can figure it out
     /// @param x the x co-ordinate
     /// @param y the y co-ordinate

@@ -33,7 +33,9 @@ void View::add(Strip strip) {
 
     int start = 0;
     Direction dir = Direction::FORWARDS;
+    printf("Before rows is %d long\n", rows.size());
     while (np > 0) {
+        printf("Adding row: start %d width %d\n", start, width);
         rows.push_back(Row(&strip, start, width, dir));
         start += width;
         np -= width;
@@ -43,6 +45,7 @@ void View::add(Strip strip) {
             dir = Direction::FORWARDS;
         }
     }
+    printf("After rows is %d long\n", rows.size());
 }
 
 void View::render() {
@@ -64,6 +67,7 @@ void View::render() {
     uint rw = MIN(width, canvas->width - canvas->viewX);
     uint rh = MIN(height, canvas->height - canvas->viewY);
 
+    printf("Render w: %d height: %d\n", rw, rh);
     //
     // We'll loop through the rows, rendering as we go. Note that we're assuming
     // that rows are added in order from the origin up.
@@ -88,5 +92,8 @@ void View::render() {
             }
         }
         cy++;
+    }
+    for(auto r : rows) {
+        r.strip->show();
     }
 }

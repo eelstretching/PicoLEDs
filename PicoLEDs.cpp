@@ -6,7 +6,9 @@
 
 #include <stdlib.h>
 
+#include "Canvas.h"
 #include "Strip.h"
+#include "View.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "pico/printf.h"
@@ -35,28 +37,31 @@ void pattern_snakes(Strip strip, uint t) {
 int main() {
     stdio_init_all();
 
-    Strip strips[4] = {Strip(2, 276), Strip(3, 276), Strip(4, 276),
-                       Strip(5, 276)};
+    //
+    // A canvas and a view made out of strips.
+    Canvas canvas(138, 8);
+    View view(138);
+    view.add(Strip(2, 276));
+    view.add(Strip(3, 276));
+    view.add(Strip(4, 276));
+    view.add(Strip(5, 276));
+    canvas.setView(&view, 0, 0);
 
-    RGB colors[6] = {RGB::Red,    RGB::Green,    RGB::Blue,
-                     RGB::Purple, RGB::DeepPink, RGB::White};
-
-    int c = 0;
-    int n = 0;
+    RGB colors[8] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+                     RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White};
+    uint n = 0;
     while (1) {
-        for (int i = 0; i < 4; i++) {
-            strips[i].fill(colors[c]);
-            strips[i].show();
-            c = (c + 1) % 6;
-            n++;
-        }
-        sleep_ms(500);
-        if(n % 500 == 0) {
-            StripStats cs;
-            for(int i = 0; i < 4; i++) {
-                cs.combine(strips[i].getStripStats());
+        if (n % 2 == 0) {
+            for (int i = 0; i < 8; i++) {
+                canvas.fill(i, colors[i]);
             }
-            printf("%d shows, %.2f us per show\n", cs.showCount, ((double) cs.showTime)/cs.showCount);
+        } else {
+            for (int i = 0, c = 7; i < 8; i++, c--) {
+                canvas.fill(i, colors[c]);
+            }
         }
+        n++;
+        canvas.show();
+        sleep_ms(5000);
     }
 }
