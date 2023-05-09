@@ -2,15 +2,10 @@
 
 #include <stdio.h>
 
+#include "Canvas.h"
 #include "pico/platform.h"
 
-#include "Canvas.h"
-
-void View::setCanvas(Canvas* canvas, uint x, uint y) {
-    this->canvas = canvas;
-    this->x = x;
-    this->y = y;
-}
+void View::setCanvas(Canvas* canvas) { this->canvas = canvas; }
 
 void View::add(Strip strip) {
     uint np = strip.getNumPixels();
@@ -33,9 +28,7 @@ void View::add(Strip strip) {
 
     int start = 0;
     Direction dir = Direction::FORWARDS;
-    printf("Before rows is %d long\n", rows.size());
     while (np > 0) {
-        printf("Adding row: start %d width %d\n", start, width);
         rows.push_back(Row(&strip, start, width, dir));
         start += width;
         np -= width;
@@ -45,13 +38,12 @@ void View::add(Strip strip) {
             dir = Direction::FORWARDS;
         }
     }
-    printf("After rows is %d long\n", rows.size());
 }
 
 void View::render() {
     //
     // Are we even on the canvas?
-    if (x > canvas->width || y > canvas->height) {
+    if (canvas->viewX > canvas->width || canvas->viewY > canvas->height) {
         //
         // Everything off the canvas is black.
         for (auto r : rows) {
@@ -65,35 +57,40 @@ void View::render() {
     // Let's figure out the actual width and height that we will render, in
     // terms of width and height.
     uint rw = MIN(width, canvas->width - canvas->viewX);
-    uint rh = MIN(height, canvas->height - canvas->viewY);
+    uint rh = MIN(rows.size(), canvas->height - canvas->viewY);
 
     printf("Render w: %d height: %d\n", rw, rh);
     //
     // We'll loop through the rows, rendering as we go. Note that we're assuming
     // that rows are added in order from the origin up.
-    uint cy = y;
+    uint cy = canvas->viewY;
+    uint rc = 0;
     for (auto r : rows) {
         if (r.dir == Direction::FORWARDS) {
             //
             // Forward, so we can use memcpy behavior. We'll start at the
             // provided position in the underlying strip for this row, and copy
             // out the number of pixels in our rendered width.
-            r.strip->putPixels(r.start, &canvas->data[canvas->getPos(x, cy)],
-                               rw);
+            r.strip->putPixels(&canvas->data[canvas->getPos(canvas->viewX, cy)],
+                               r.start, rw);
         } else {
             //
             // No backwards memcpy, so here we are. we're going to add pixels
             // one-by-one. The view may be "hanging off the end" of the canvas,
             // so we want to make sure that we start at the first pixel that's
-            // actuall on the canvas when we start putting pixels in the strip.
+            // actually on the canvas when we start putting pixels in the strip.
             uint dp = canvas->getPos(canvas->viewX + rw, cy);
             for (uint p = r.start + (width - rw); p < r.start + width; p++) {
                 r.strip->putPixel(p, canvas->data[dp--]);
             }
         }
         cy++;
+        rc++;
+        if (rc >= rh) {
+            break;
+        }
     }
-    for(auto r : rows) {
+    for (auto r : rows) {
         r.strip->show();
     }
 }

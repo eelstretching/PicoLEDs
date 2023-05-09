@@ -129,11 +129,17 @@ class Strip {
     /// @param p The position in the strip where pixels should be copied.
     /// @param pixels The data that we want to copy into our strip
     /// @param n The number of pixels to copy.
-    void putPixels(uint p, RGB *pixels, uint n);
+    void putPixels(RGB *pixels, uint p, uint n);
 
     /// @brief Fills the strip with the given color.
     /// @param c The color to fill the strip with.
     void fill(RGB c);
+
+    /// @brief Fills a range of the strip with a given color
+    /// @param c The color to fill with
+    /// @param start the index where to start
+    /// @param n the number of pixels to fill
+    void fill(RGB c, uint start, uint n);
 
     /// @brief Shows the strip, i.e., it sends the data out the PIO state
     /// machine.

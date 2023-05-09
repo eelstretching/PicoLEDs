@@ -141,9 +141,9 @@ void Strip::putPixel(uint p, RGB c) {
   data[p] = c;
 }
 
-void Strip::putPixels(RGB* pixels, uint n) { putPixels(0, pixels, n); }
+void Strip::putPixels(RGB* pixels, uint n) { putPixels(pixels, 0, n); }
 
-void Strip::putPixels(uint p, RGB* pixels, uint n) {
+void Strip::putPixels(RGB* pixels, uint p, uint n) {
   if (p >= numPixels) {
     return;
   }
@@ -154,7 +154,11 @@ void Strip::putPixels(uint p, RGB* pixels, uint n) {
 }
 
 void Strip::fill(RGB c) {
-  for (int i = 0; i < numPixels; i++) {
+  fill(c, 0, numPixels);
+}
+
+void Strip::fill(RGB c, uint start, uint n) {
+  for(int i = start; i < start + n && i < numPixels; i++) {
     data[i] = c;
   }
 }

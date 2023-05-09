@@ -21,7 +21,7 @@ void Canvas::fill(uint row, RGB c) {
     if(row >= height) {
         return;
     }
-    uint pos = row * height;
+    uint pos = row * width;
     for(int i = 0; i < width; i++) {
         data[pos++] = c;
     }
@@ -39,7 +39,7 @@ void Canvas::clear() {
 
 void Canvas::setView(View *v, uint x, uint y) {
     view = v;
-    view->setCanvas(this, x, y);
+    view->setCanvas(this);
     viewX = x;
     viewY = y;
 }

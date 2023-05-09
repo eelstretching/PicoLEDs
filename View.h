@@ -39,15 +39,14 @@ class Row {
 /// integer multiple of the width of the View.
 class View {
 
-    uint height;
+    /// @brief The width of this view. 
     uint width;
+    
     /// @brief The canvas that we're a view of.
     Canvas *canvas;
-    /// @brief The x position of the origin of this view in the canvas that we're a view of.
-    uint x;
-    /// @brief The y position of the origin of this view in the canvas that we're a view of.
-    uint y;
 
+    /// @brief The rows that make up this view, which are distributed across the
+    /// strips that were added.
     std::vector<Row> rows;
 
    public:
@@ -57,7 +56,7 @@ class View {
     /// @param canvas The canvas we're a view of
     /// @param x The x position of the origin of this view on the canvas
     /// @param y The y position of the origin of this view on the canvas
-    void setCanvas(Canvas *canvas, uint x, uint y);
+    void setCanvas(Canvas *canvas);
 
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
