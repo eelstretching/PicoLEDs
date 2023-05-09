@@ -68,6 +68,8 @@ int main() {
         strips[i].show();
     }
     uint n = 0;
+
+    printf("Starting canvas\n");
     while (1) {
         if (n % 2 == 0) {
             for (int i = 0; i < 8; i++) {
@@ -80,6 +82,6 @@ int main() {
         }
         n++;
         canvas.show();
-        sleep_ms(5000);
+        sleep_ms(500000);
     }
 }

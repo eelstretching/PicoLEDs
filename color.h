@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include "math8.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
@@ -119,6 +121,10 @@ struct RGB {
     /// * `raw[2]` is the blue value
     uint8_t raw[3];
   };
+
+  void toString(char *b, uint bs) {
+    snprintf(b, bs, "%X %X %X", raw[0], raw[1], raw[2]);
+  }
 
   /// Array access operator to index into the RGB object
   /// @param x the index to retrieve (0-2)

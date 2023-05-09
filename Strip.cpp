@@ -147,10 +147,9 @@ void Strip::putPixels(RGB* pixels, uint p, uint n) {
   if (p >= numPixels) {
     return;
   }
-  if (p + n >= numPixels) {
-    n = numPixels - p;
+  for(int i = p, j = 0; i < MIN(p+n, numPixels); i++, j++) {
+    data[i] = pixels[j];
   }
-  memcpy(&data[p], pixels, n * sizeof(RGB));
 }
 
 void Strip::fill(RGB c) {
