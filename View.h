@@ -45,6 +45,10 @@ class View {
     /// @brief The canvas that we're a view of.
     Canvas *canvas;
 
+    /// @brief The strips that make up this view, so we can show each one just once
+    /// when rendering.
+    std::vector<Strip> strips;
+
     /// @brief The rows that make up this view, which are distributed across the
     /// strips that were added.
     std::vector<Row> rows;
@@ -60,7 +64,7 @@ class View {
 
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
-    void add(Strip strip);
+    void add(Strip &strip);
 
     ///
     /// @brief Renders this view of the given canvas.

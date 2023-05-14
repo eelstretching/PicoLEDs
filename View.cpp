@@ -7,7 +7,7 @@
 
 void View::setCanvas(Canvas* canvas) { this->canvas = canvas; }
 
-void View::add(Strip strip) {
+void View::add(Strip &strip) {
     uint np = strip.getNumPixels();
 
     if (np == width) {
@@ -38,6 +38,8 @@ void View::add(Strip strip) {
             dir = Direction::FORWARDS;
         }
     }
+
+    strips.push_back(strip);
 }
 
 void View::render() {
@@ -95,7 +97,7 @@ void View::render() {
             break;
         }
     }
-    for (auto r : rows) {
-        r.strip->show();
+    for (auto s : strips) {
+        s.show();
     }
 }
