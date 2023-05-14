@@ -11,6 +11,8 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+#include "ShowStats.h"
+
 class View;
 
 class Canvas {
@@ -35,6 +37,9 @@ class Canvas {
 
     /// @brief A view that we can use to render some or all of this canvas.
     View *view = nullptr;
+
+    /// @brief stats for our show operations.
+    ShowStats stats;
 
    public:
     Canvas(uint width, uint height);

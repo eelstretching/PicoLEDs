@@ -10,6 +10,8 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+#include "ShowStats.h"
+
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
 /// light up.
@@ -26,18 +28,6 @@ class StripResetDelay {
 /// An element of this array will be non-null if we're doing DMA on that
 /// channel.
 static StripResetDelay *strip_delays[NUM_DMA_CHANNELS];
-
-class StripStats {
-   public:
-    /// @brief The number of times that show has been called
-    uint showCount = 0;
-    /// @brief The number of microseoncds spent in the show method.
-    uint64_t showTime = 0;
-    /// @brief Combines another set of stats with this one, so we can average
-    /// over a bunch of strips.
-    /// @param other the stats to combine withours.
-    void combine(StripStats other);
-};
 
 /*
  * RES time, specification says it needs at least 50 us, but 30 seems to work?
@@ -72,7 +62,7 @@ class Strip {
 
     //
     // Stats for this strip.
-    StripStats *stats;
+    ShowStats *stats;
 
     //
     // The offset of the PIO program to run the strip.
@@ -163,7 +153,7 @@ class Strip {
 
     void reset() { pos = 0; }
 
-    StripStats getStripStats() { return *stats; }
+    ShowStats getStripStats() { return *stats; }
 };
 
 #endif

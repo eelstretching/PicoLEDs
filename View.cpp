@@ -61,7 +61,6 @@ void View::render() {
     uint rw = MIN(width, canvas->width - canvas->viewX);
     uint rh = MIN(rows.size(), canvas->height - canvas->viewY);
 
-    printf("Render w: %d height: %d\n", rw, rh);
     //
     // We'll loop through the rows, rendering as we go. Note that we're assuming
     // that rows are added in order from the origin up.
@@ -69,13 +68,11 @@ void View::render() {
     uint rc = 0;
     for (auto r : rows) {
         if (r.dir == Direction::FORWARDS) {
-            printf("Row %d at y coord %d forwards\n", rc, cy);
             //
             // Forward, so we can use memcpy behavior. We'll start at the
             // provided position in the underlying strip for this row, and copy
             // out the number of pixels in our rendered width.
             uint dp = canvas->getPos(canvas->viewX, cy);
-            printf("x %d y %d data position in canvas %d\n", canvas->viewX, cy, dp);
             r.strip->putPixels(&canvas->data[dp], r.start, rw);
         } else {
             //
@@ -83,10 +80,7 @@ void View::render() {
             // one-by-one. The view may be "hanging off the end" of the canvas,
             // so we want to make sure that we start at the first pixel that's
             // actually on the canvas when we start putting pixels in the strip.
-            printf("Row %d at y coord %d backwards\n", rc, cy);
             uint dp = canvas->getPos(canvas->viewX + rw, cy)-1;
-            printf("start %d data position in canvas %d\n", r.start +(width-rw), dp);
-
             for (uint p = r.start + (width - rw); p < r.start + width; p++) {
                 r.strip->putPixel(canvas->data[dp--], p);
             }

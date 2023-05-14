@@ -45,5 +45,7 @@ void Canvas::setView(View *v, uint x, uint y) {
 }
 
 void Canvas::show() {
+    stats.start();
     view->render();
+    stats.finish();
 }

@@ -54,7 +54,7 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
   data = new RGB[num_pixels];
   pos = 0;
 
-  stats = new StripStats();
+  stats = new ShowStats();
   delay = new StripResetDelay();
 
   //
@@ -164,7 +164,7 @@ void Strip::fill(RGB c, uint start, uint n) {
 }
 
 void Strip::show() {
-  uint64_t start = time_us_64();
+  stats->start();
   if (dma_channel != -1) {
     //
     // Put the data into the DMA buffer. Maybe there's a fancy memcpy-esque way
@@ -186,12 +186,7 @@ void Strip::show() {
           pio, sm, data[i].scale8(fracBrightness).getColor(colorOrder) << 8u);
     }
   }
-  stats->showTime += (time_us_64() - start);
-  stats->showCount++;
+  stats->finish();
   pos = 0;
 }
 
-void StripStats::combine(StripStats other) {
-  showCount += other.showCount;
-  showTime += other.showCount;
-}
