@@ -134,7 +134,7 @@ uint Strip::addPixel(HSV c) {
   return p;
 }
 
-void Strip::putPixel(uint p, RGB c) {
+void Strip::putPixel(RGB c, uint p) {
   if (p >= numPixels) {
     return;
   }

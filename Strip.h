@@ -116,7 +116,7 @@ class Strip {
     /// @param p The position where the pixel should be placed. If this is not
     /// within the bounds of the array, then no change will happen
     /// @param c The RGB color value to put in the strip.
-    void putPixel(uint p, RGB c);
+    void putPixel(RGB c, uint p);
 
     /// @brief Puts n pixels from the given array into the strip, starting at
     /// position 0.

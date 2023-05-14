@@ -86,7 +86,7 @@ void View::render() {
             printf("start %d data position in canvas %d\n", r.start +(width-rw), dp);
 
             for (uint p = r.start + (width - rw); p < r.start + width; p++) {
-                r.strip->putPixel(p, canvas->data[dp--]);
+                r.strip->putPixel(canvas->data[dp--], p);
             }
         }
         cy++;
