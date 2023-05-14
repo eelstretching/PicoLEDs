@@ -82,6 +82,6 @@ int main() {
         }
         n++;
         canvas.show();
-        sleep_ms(500000);
+        sleep_ms(4000);
     }
 }
