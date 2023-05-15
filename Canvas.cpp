@@ -49,3 +49,7 @@ void Canvas::show() {
     view->render();
     stats.finish();
 }
+
+ShowStats *Canvas::getShowStats() {
+    return &stats;
+}

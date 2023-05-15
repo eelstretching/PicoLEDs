@@ -54,4 +54,3 @@ dkms.conf
 # Pi Pico
 build/*
 generated/*
-.vscode/*

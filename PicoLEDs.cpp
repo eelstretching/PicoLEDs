@@ -49,11 +49,13 @@ int main() {
     view.add(strips[3]);
     canvas.setView(&view, 0, 0);
 
-    RGB colors[8] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
-                     RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White};
+    RGB colors[11] = {RGB::Red,   RGB::Orange,    RGB::Yellow,   RGB::Green,
+                      RGB::Blue,  RGB::Indigo,    RGB::Violet,   RGB::White,
+                      RGB::Black, RGB::CadetBlue, RGB::Chocolate};
 
     //
-    // Init to clear the strips and show they're working while rendering's busted.
+    // Init to clear the strips and show they're working while rendering's
+    // busted.
     for (int i = 0; i < 4; i++) {
         strips[i].fill(RGB::Coral);
         strips[i].show();
@@ -69,19 +71,17 @@ int main() {
     }
     uint n = 0;
 
-    printf("Starting canvas\n");
     while (1) {
-        if (n % 2 == 0) {
-            for (int i = 0; i < 8; i++) {
-                canvas.fill(i, colors[i]);
-            }
-        } else {
-            for (int i = 0, c = 7; i < 8; i++, c--) {
-                canvas.fill(i, colors[c]);
-            }
+        for (int i = 0; i < 8; i++) {
+            canvas.fill(i, colors[n % 11]);
+            n++;
         }
-        n++;
         canvas.show();
-        sleep_ms(4000);
+        if (n % 200 == 0) {
+            ShowStats *stats = canvas.getShowStats();
+            printf("Average show time is %.2f us\n",
+                   stats->getAverageShowTime());
+        }
+        sleep_ms(500);
     }
 }

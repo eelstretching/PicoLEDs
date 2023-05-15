@@ -72,6 +72,8 @@ class Canvas {
 
     /// @brief Shows the data on the canvas in the view provided by the strips.
     void show();
+
+    ShowStats *getShowStats();
 };
 
 #endif

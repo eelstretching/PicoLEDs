@@ -24,6 +24,8 @@ class ShowStats {
 
     /// @brief  Tell the stats that a show operation completed.
     void finish();
+
+    float getAverageShowTime();
 };
 
 #endif

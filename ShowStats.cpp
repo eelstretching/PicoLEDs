@@ -15,3 +15,7 @@ void ShowStats::finish() {
     showTime += time_us_64() - currStart;
     showCount++;
 }
+
+float ShowStats::getAverageShowTime() {
+    return (float) showTime / showCount;
+}
