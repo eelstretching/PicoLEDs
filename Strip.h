@@ -10,7 +10,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#include "ShowStats.h"
+#include "StopWatch.h"
 
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
@@ -62,7 +62,7 @@ class Strip {
 
     //
     // Stats for this strip.
-    ShowStats *stats;
+    StopWatch *stats;
 
     //
     // The offset of the PIO program to run the strip.
@@ -153,7 +153,7 @@ class Strip {
 
     void reset() { pos = 0; }
 
-    ShowStats getStripStats() { return *stats; }
+    StopWatch getStripStats() { return *stats; }
 };
 
 #endif

@@ -57,7 +57,7 @@ int main() {
     // Init to clear the strips and show they're working while rendering's
     // busted.
     for (int i = 0; i < 4; i++) {
-        strips[i].fill(RGB::Coral);
+        strips[i].fill(RGB::Green);
         strips[i].show();
     }
     for (int i = 0; i < 4; i++) {
@@ -69,19 +69,29 @@ int main() {
         strips[i].fill(RGB::Black, 138, 276);
         strips[i].show();
     }
-    uint n = 0;
 
+    //
+    // Rotating rainbow.
+    for (int i = 0; i < 8; i++) {
+        canvas.fill(i, colors[i]);
+    }
+    int n = 0;
+    bool dir = true;
     while (1) {
-        for (int i = 0; i < 8; i++) {
-            canvas.fill(i, colors[n % 11]);
-            n++;
-        }
         canvas.show();
-        if (n % 200 == 0) {
-            ShowStats *stats = canvas.getShowStats();
-            printf("Average show time is %.2f us\n",
-                   stats->getAverageShowTime());
-        }
         sleep_ms(500);
+        if (dir) {
+            canvas.rotateUp();
+            canvas.debugPrint();
+        } else {
+            canvas.rotateDown();
+            canvas.debugPrint();
+        }
+        n++;
+        if (n % 20 == 0) {
+            StopWatch *stats = canvas.getStopWatch();
+            printf("Average show time is %.2f us\n", stats->getAverageTime());
+            dir = !dir;
+        }
     }
 }

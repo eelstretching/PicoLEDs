@@ -54,7 +54,7 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
   data = new RGB[num_pixels];
   pos = 0;
 
-  stats = new ShowStats();
+  stats = new StopWatch();
   delay = new StripResetDelay();
 
   //

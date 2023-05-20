@@ -122,8 +122,9 @@ struct RGB {
     uint8_t raw[3];
   };
 
-  void toString(char *b, uint bs) {
+  char *toString(char *b, uint bs) {
     snprintf(b, bs, "%X %X %X", raw[0], raw[1], raw[2]);
+    return b;
   }
 
   /// Array access operator to index into the RGB object
