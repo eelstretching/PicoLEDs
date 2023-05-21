@@ -119,6 +119,20 @@ class Canvas {
     /// @param c the column to mirror on.
     void mirrorRightToLeft(int c);
 
+    /// @brief Mirror the top of the canvas onto the bottom, reflecting through the center.
+    void mirrorTopToBottom();
+
+    /// @brief Mirrors the top of the canvas onto the bottom, reflecting through the given row.
+    /// @param r the row we'll reflect though
+    void mirrorTopToBottom(int r);
+
+    /// @brief  Mirrors the bottom of the canvas onto the top, reflecting through the center.
+    void mirrorBottomToTop();
+
+    /// @brief mirrors the bottom of the canvas onto the top, reflecting through the given row.
+    /// @param r the row we'll reflect through.
+    void mirrorBottomToTop(int r);
+
     /// @brief Gets the position in our data array for a given x and y. Just
     /// here so friends can figure it out
     /// @param x the x co-ordinate

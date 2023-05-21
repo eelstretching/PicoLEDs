@@ -82,10 +82,8 @@ int main() {
         sleep_ms(500);
         if (dir) {
             canvas.rotateUp();
-            canvas.debugPrint();
         } else {
             canvas.rotateDown();
-            canvas.debugPrint();
         }
         n++;
         if (n % 20 == 0) {

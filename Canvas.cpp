@@ -54,7 +54,7 @@ void Canvas::scrollUp(uint n, RGB f) {
     for (int sr = height - n - 1, dr = height - 1; sr >= 0; sr--, dr--) {
         copyRow(sr, dr);
     }
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         fill(i, f);
     }
 }
@@ -69,17 +69,16 @@ void Canvas::scrollDown(int n, RGB f) {
         return;
     }
 
-    for(int sr = n, dr = 0; sr < height; sr++, dr++) {
+    for (int sr = n, dr = 0; sr < height; sr++, dr++) {
         copyRow(sr, dr);
     }
 
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         fill(height - i - 1, f);
-    }           
+    }
 }
 
 void Canvas::copyRow(uint src, uint dst) {
-    printf("Copying %d onto %d\n", src, dst);
     if (src == dst) {
         //
         // Don't copy a row onto itself.
@@ -104,7 +103,6 @@ void Canvas::rotateUp() {
     //
     // A place to put the data from the top row.
     RGB tmp[width];
-    printf("Rotate up tmp is %d bytes, rowBytes: %d\n", sizeof(tmp), rowBytes);
     memcpy(&tmp[0], &data[getPos(0, height - 1)], rowBytes);
     scrollUp();
     memcpy(&data[0], &tmp[0], rowBytes);
@@ -114,7 +112,6 @@ void Canvas::rotateDown() {
     //
     // A place to put the data from the bottom row.
     RGB tmp[width];
-    printf("Rotate down tmp is %d bytes, rowBytes: %d\n", sizeof(tmp), rowBytes);
     memcpy(&tmp[0], &data[0], rowBytes);
     scrollDown();
     memcpy(&data[getPos(0, height - 1)], &tmp[0], rowBytes);
@@ -171,16 +168,40 @@ void Canvas::mirrorRightToLeft(int c) {
     // we're mirroring through. Note that we need to account for the case when
     // the mirror column is beyond the halfway mark, in which case we only want
     // to mirror to the end of the row!
-    int n = MAX(width - c - 1, c+1);
+    int n = MAX(width - c - 1, c + 1);
     for (int i = 0; i < height; i) {
         //
         // We'll start mirroring at the column itself and mirror onto the next
         // pixel over.
-        int sp = getPos(c+1, i);
+        int sp = getPos(c + 1, i);
         int dp = getPos(c, i);
         for (int j = 0; j < n; j++) {
             data[dp--] = data[sp++];
         }
+    }
+}
+
+void Canvas::mirrorTopToBottom() { mirrorTopToBottom(height / 2); }
+
+void Canvas::mirrorTopToBottom(int r) {
+    if (r > height) {
+        return;
+    }
+
+    for (int sp = r, dp = r - 1; sp < height && dp >= 0; sp++, dp--) {
+        copyRow(sp, dp);
+    }
+}
+
+void Canvas::mirrorBottomToTop() { mirrorBottomToTop(height / 2); }
+
+void Canvas::mirrorBottomToTop(int r) {
+    if (r > height) {
+        return;
+    }
+
+    for (int sp = r - 1, dp = r; sp >= 0 && dp < height; sp--, dp++) {
+        copyRow(sp, dp);
     }
 }
 
@@ -208,10 +229,9 @@ void Canvas::show() {
 StopWatch *Canvas::getStopWatch() { return &stats; }
 
 void Canvas::debugPrint() {
-
     char b[30];
-    for(int i = 0; i < height; i++) {
-        int p =getPos(0, i);
+    for (int i = 0; i < height; i++) {
+        int p = getPos(0, i);
         printf("row %d pos %d %s\n", i, p, data[p].toString(b, 30));
     }
 }
