@@ -58,10 +58,25 @@ class Canvas {
     /// @param p the color the pixel should be set to.
     void set(uint x, uint y, RGB p);
 
+    /// @brief Gets the value of the pixel at the given coordinates
+    RGB get(uint x, uint y);
+
+    /// @brief Copy the given data into the canvas, starting at position x,y.
+    /// @param d the array of data to copy from
+    /// @param n the number of pixels to copy in
+    /// @param x the x coordinate where we want to do the copying.
+    /// @param y the y coordinate where we want to do the copying.
+    void copy(RGB* d, int n, int x, int y);
+
     /// @brief Fills a row with the given color.
     /// @param row the row to fill
     /// @param p the color
-    void fill(uint row, RGB p);
+    void fillRow(uint row, RGB p);
+
+    /// @brief Fills a column with the given color.
+    /// @param col the column to fill
+    /// @param p the color to fill with.
+    void fillColumn(uint col, RGB p);
 
     /// @brief Fill the canvas with a given color
     /// @param c the color to fill with.
@@ -112,26 +127,44 @@ class Canvas {
     /// @param c the column where the mirroring will happen.
     void mirrorLeftToRight(int c);
 
-    /// @brief Mirrors the right side of the canvas onto the left through the middle column.
+    /// @brief Mirrors the right side of the canvas onto the left through the
+    /// middle column.
     void mirrorRightToLeft();
 
-    /// @brief Mirrors the right side of the canvas onto the left, where we mirror on column c.
+    /// @brief Mirrors the right side of the canvas onto the left, where we
+    /// mirror on column c.
     /// @param c the column to mirror on.
     void mirrorRightToLeft(int c);
 
-    /// @brief Mirror the top of the canvas onto the bottom, reflecting through the center.
+    /// @brief Mirror the top of the canvas onto the bottom, reflecting through
+    /// the center.
     void mirrorTopToBottom();
 
-    /// @brief Mirrors the top of the canvas onto the bottom, reflecting through the given row.
+    /// @brief Mirrors the top of the canvas onto the bottom, reflecting through
+    /// the given row.
     /// @param r the row we'll reflect though
     void mirrorTopToBottom(int r);
 
-    /// @brief  Mirrors the bottom of the canvas onto the top, reflecting through the center.
+    /// @brief  Mirrors the bottom of the canvas onto the top, reflecting
+    /// through the center.
     void mirrorBottomToTop();
 
-    /// @brief mirrors the bottom of the canvas onto the top, reflecting through the given row.
+    /// @brief mirrors the bottom of the canvas onto the top, reflecting through
+    /// the given row.
     /// @param r the row we'll reflect through.
     void mirrorBottomToTop(int r);
+
+    /// @brief Shifts a rectangle of pixels to the left by n pixels.
+    void shiftLeft(uint x, uint y, uint w, uint h, int n);
+
+    /// @brief Shifts a rectangle of pixels to the left by n pixels.
+    void shiftRight(uint x, uint y, uint w, uint h, int n);
+
+    /// @brief Shifts a rectangle of pixels to the left by n pixels.
+    void shiftUp(uint x, uint y, uint w, uint h, int n) {};
+
+    /// @brief Shifts a rectangle of pixels to the left by n pixels.
+    void shiftDown(uint x, uint y, uint w, uint h, int n){};
 
     /// @brief Gets the position in our data array for a given x and y. Just
     /// here so friends can figure it out
@@ -153,6 +186,8 @@ class Canvas {
     void show();
 
     void debugPrint();
+
+    void printRect(int x, int y, int w, int h);
 
     StopWatch *getStopWatch();
 };

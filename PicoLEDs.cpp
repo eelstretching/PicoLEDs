@@ -9,6 +9,7 @@
 #include "Canvas.h"
 #include "Strip.h"
 #include "View.h"
+#include "colorutil.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "pico/printf.h"
@@ -49,10 +50,6 @@ int main() {
     view.add(strips[3]);
     canvas.setView(&view, 0, 0);
 
-    RGB colors[11] = {RGB::Red,   RGB::Orange,    RGB::Yellow,   RGB::Green,
-                      RGB::Blue,  RGB::Indigo,    RGB::Violet,   RGB::White,
-                      RGB::Black, RGB::CadetBlue, RGB::Chocolate};
-
     //
     // Init to clear the strips and show they're working while rendering's
     // busted.
@@ -61,35 +58,62 @@ int main() {
         strips[i].show();
     }
     for (int i = 0; i < 4; i++) {
-        sleep_ms(500);
+        sleep_ms(250);
         strips[i].fill(RGB::Black, 0, 138);
-
         strips[i].show();
-        sleep_ms(500);
+
+        sleep_ms(250);
         strips[i].fill(RGB::Black, 138, 276);
         strips[i].show();
     }
 
+    canvas.clear();
+
     //
-    // Rotating rainbow.
-    for (int i = 0; i < 8; i++) {
-        canvas.fill(i, colors[i]);
-    }
+    // Make a gradient that's 16 wide.
+    RGB grad1[16];
+    fill_gradient_RGB(grad1, 0, RGB::Blue, 16, RGB::Green);
+    RGB grad2[16];
+    fill_gradient_RGB(grad2, 0, RGB::Yellow, 16, RGB::Red);
+
+    //
+    // Make a 4x16 block of the gradients
     int n = 0;
-    bool dir = true;
+
+    canvas.clear();
+    canvas.copy(grad1, 16, 40, 0);
+    canvas.copy(grad2, 16, 40, 1);
+    canvas.copy(grad1, 16, 40, 2);
+    canvas.copy(grad2, 16, 40, 3);
+
+    canvas.show();
+    sleep_ms(200);
     while (1) {
-        canvas.show();
-        sleep_ms(500);
-        if (dir) {
-            canvas.rotateUp();
-        } else {
-            canvas.rotateDown();
+        int rx = 40;
+        int ry = 0;
+        for (int i = 0; i < 40; i++) {
+            canvas.shiftRight(40 + i, 0, 16, 4, 1);
+            canvas.show();
+            sleep_ms(50);
         }
+
+        for (int i = 0; i < 40; i++) {
+            canvas.shiftLeft(80 - i, 0, 16, 4, 1);
+            canvas.show();
+            sleep_ms(50);
+        }
+
+        // canvas.shiftLeft(61, 1, 16, 4, 1);
+        // canvas.show();
+        // sleep_ms(500);
+        // canvas.shiftDown(60, 1, 16, 4, 1);
+        // canvas.show();
+        // sleep_ms(500);
+
         n++;
         if (n % 20 == 0) {
             StopWatch *stats = canvas.getStopWatch();
             printf("Average show time is %.2f us\n", stats->getAverageTime());
-            dir = !dir;
         }
     }
 }

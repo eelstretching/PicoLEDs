@@ -29,7 +29,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(PicoLEDs PicoLEDs.cpp Strip.cpp Canvas.cpp View.cpp StopWatch.cpp Animation.cpp)
+add_executable(PicoLEDs PicoLEDs.cpp Strip.cpp Canvas.cpp View.cpp StopWatch.cpp Animation.cpp colorutil.cpp)
 
 # generate the header file into the source tree as it is included in the RP2040 datasheet
 pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/generated)

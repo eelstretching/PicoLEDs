@@ -15,6 +15,7 @@
                },
     },
     "files.associations": {
-      "type_traits": "cpp"
+      "type_traits": "cpp",
+      "compare": "cpp"
     },
 }
