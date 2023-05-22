@@ -58,11 +58,11 @@ int main() {
         strips[i].show();
     }
     for (int i = 0; i < 4; i++) {
-        sleep_ms(250);
+        sleep_ms(50);
         strips[i].fill(RGB::Black, 0, 138);
         strips[i].show();
 
-        sleep_ms(250);
+        sleep_ms(50);
         strips[i].fill(RGB::Black, 138, 276);
         strips[i].show();
     }
@@ -92,23 +92,28 @@ int main() {
         int rx = 40;
         int ry = 0;
         for (int i = 0; i < 40; i++) {
-            canvas.shiftRight(40 + i, 0, 16, 4, 1);
+            canvas.shiftRight(rx++, 0, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
         }
 
         for (int i = 0; i < 40; i++) {
-            canvas.shiftLeft(80 - i, 0, 16, 4, 1);
+            canvas.shiftLeft(rx--, 0, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
         }
 
-        // canvas.shiftLeft(61, 1, 16, 4, 1);
-        // canvas.show();
-        // sleep_ms(500);
-        // canvas.shiftDown(60, 1, 16, 4, 1);
-        // canvas.show();
-        // sleep_ms(500);
+        if(ry + 5 < canvas.getHeight()) {
+            canvas.shiftUp(rx, ry, 16, 4, 1);
+            canvas.show();
+            sleep_ms(50);
+            ry++;
+        } else {
+            canvas.shiftDown(rx, ry, 16, 4, 1);
+            canvas.show();
+            sleep_ms(50);
+            ry--;
+        }
 
         n++;
         if (n % 20 == 0) {

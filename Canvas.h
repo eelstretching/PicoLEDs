@@ -48,6 +48,10 @@ class Canvas {
    public:
     Canvas(uint width, uint height);
 
+    uint getHeight() {return height;};
+
+    uint getWidth() {return width;};
+
     /// @brief Set the background color.
     /// @param b the color to use.
     void setBackground(RGB b);
@@ -161,10 +165,10 @@ class Canvas {
     void shiftRight(uint x, uint y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftUp(uint x, uint y, uint w, uint h, int n) {};
+    void shiftUp(uint x, int y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftDown(uint x, uint y, uint w, uint h, int n){};
+    void shiftDown(uint x, uint y, uint w, uint h, int n);
 
     /// @brief Gets the position in our data array for a given x and y. Just
     /// here so friends can figure it out

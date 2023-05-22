@@ -25,9 +25,7 @@ void Canvas::set(uint x, uint y, RGB c) {
     data[getPos(x, y)] = c;
 }
 
-RGB Canvas::get(uint x, uint y) {
-    return data[getPos(x,y)];
-}
+RGB Canvas::get(uint x, uint y) { return data[getPos(x, y)]; }
 
 void Canvas::fillRow(uint row, RGB c) {
     if (row >= height) {
@@ -40,9 +38,9 @@ void Canvas::fillRow(uint row, RGB c) {
 }
 
 void Canvas::copy(RGB *d, int n, int x, int y) {
-    int dp = getPos(x,y);
+    int dp = getPos(x, y);
     int sp = 0;
-    for(dp = getPos(x,y), sp = 0; sp < n && dp < numPixels; sp++, dp++) {
+    for (dp = getPos(x, y), sp = 0; sp < n && dp < numPixels; sp++, dp++) {
         data[dp] = d[sp];
     }
 }
@@ -255,10 +253,10 @@ void Canvas::shiftLeft(uint x, uint y, uint w, uint h, int n) {
         int sp = getPos(x, row);
         int ep = getPos(xf, row);
         int dp = getPos(xn, row);
-        for(int i = sp; i < ep; i++) {
+        for (int i = sp; i < ep; i++) {
             data[dp++] = data[sp++];
         }
-        dp = getPos(xf-n, row);
+        dp = getPos(xf - n, row);
         //
         // Fill in the pixels we vacated with the background.
         for (int i = 0; i < n && dp < numPixels; i++) {
@@ -278,13 +276,53 @@ void Canvas::shiftRight(uint x, uint y, uint w, uint h, int n) {
         int sp = getPos(xf-1, row);
         int dp = getPos(xn-1, row);
         int ep = getPos(x, row);
-        for(int i = sp; i >= ep; i--) {
+        for (int i = sp; i >= ep; i--) {
             data[dp--] = data[sp--];
         }
         dp = getPos(x, row);
         //
         // Fill in the pixels we vacated with the background.
         for (int i = 0; i < n && dp < numPixels; i++) {
+            data[dp++] = background;
+        }
+    }
+}
+
+void Canvas::shiftUp(uint x, int y, uint w, uint h, int n) {
+    if (x >= width || y >= height) {
+        return;
+    }
+    int yf = MIN(y + h, height);
+    for(int row = yf - 1; row >= y; --row) {
+        printf("Row %d y %d\n", row, y);
+        int sp = getPos(x, row);
+        int dp = getPos(x, row+n);
+        for(int i = 0; i < w; i++) {
+            data[dp++] = data[sp++];
+        }
+    }
+    for(int row = y; row < y+n; row++) {
+        int dp = getPos(x, row);
+        for(int i = 0; i < w; i++) {
+            data[dp++] = background;
+        }
+    }
+}
+
+void Canvas::shiftDown(uint x, uint y, uint w, uint h, int n) {
+    if (x >= width || y >= height) {
+        return;
+    }
+    uint yf = MIN(y + h, height);
+    uint xf = MIN(x + w, width);
+    for(int row = y; row < yf; row++) {
+        int sp = getPos(x, row);
+        int dp = getPos(x, row-n);
+        memcpy(&data[dp], &data[sp], w);
+    }
+    for(int row = yf + n - 1; row >= yf; row--) {
+        int dp = getPos(x, row);
+        for(int i = 0; i < w; i++) {
             data[dp++] = background;
         }
     }
@@ -301,9 +339,9 @@ StopWatch *Canvas::getStopWatch() { return &stats; }
 void Canvas::printRect(int x, int y, int w, int h) {
     char b[30];
     printf("(%d,%d\n", x, y);
-    for(int i = 0; i < h; i++) {
-        int dp = getPos(x,y+i);
-        for(int j = 0; j < w; j++) {
+    for (int i = 0; i < h; i++) {
+        int dp = getPos(x, y + i);
+        for (int j = 0; j < w; j++) {
             printf("%s ", data[dp++].toString(b, 30));
         }
         printf("\n");
