@@ -49,6 +49,7 @@ int main() {
     view.add(strips[2]);
     view.add(strips[3]);
     canvas.setView(&view, 0, 0);
+    int delay = 30;
 
     //
     // Init to clear the strips and show they're working while rendering's
@@ -58,11 +59,11 @@ int main() {
         strips[i].show();
     }
     for (int i = 0; i < 4; i++) {
-        sleep_ms(50);
+        sleep_ms(delay);
         strips[i].fill(RGB::Black, 0, 138);
         strips[i].show();
 
-        sleep_ms(50);
+        sleep_ms(delay);
         strips[i].fill(RGB::Black, 138, 276);
         strips[i].show();
     }
@@ -90,32 +91,55 @@ int main() {
     sleep_ms(200);
     int rx = 40;
     int ry = 0;
+    bool dir = true;
     while (1) {
         printf("Bounce %d %d\n", rx, ry);
         for (int i = 0; i < 40; i++) {
             canvas.shiftRight(rx++, ry, 16, 4, 1);
             canvas.show();
-            sleep_ms(50);
+            sleep_ms(delay);
+        }
+
+        if (dir) {
+            canvas.shiftUp(rx, ry, 16, 4, 1);
+            canvas.show();
+            sleep_ms(delay);
+            ry++;
+            if (ry == canvas.getHeight() - 4) {
+                dir = false;
+            }
+        } else {
+            canvas.shiftDown(rx, ry, 16, 4, 1);
+            canvas.show();
+            sleep_ms(delay);
+            ry--;
+            if (ry == 0) {
+                dir = true;
+            }
         }
 
         for (int i = 0; i < 40; i++) {
             canvas.shiftLeft(rx--, ry, 16, 4, 1);
             canvas.show();
-            sleep_ms(50);
+            sleep_ms(delay);
         }
 
-        if (ry + 4 < canvas.getHeight()) {
-            printf("Up %d %d\n", rx, ry);
+        if (dir) {
             canvas.shiftUp(rx, ry, 16, 4, 1);
             canvas.show();
-            sleep_ms(50);
+            sleep_ms(delay);
             ry++;
+            if (ry == canvas.getHeight() - 4) {
+                dir = false;
+            }
         } else {
-            printf("Down %d %d\n", rx, ry);
             canvas.shiftDown(rx, ry, 16, 4, 1);
             canvas.show();
-            sleep_ms(50);
+            sleep_ms(delay);
             ry--;
+            if (ry == 0) {
+                dir = true;
+            }
         }
 
         n++;
