@@ -273,8 +273,8 @@ void Canvas::shiftRight(uint x, uint y, uint w, uint h, int n) {
     uint xf = MIN(x + w, width);
     uint xn = MIN(xf + n, width);
     for (int row = y; row < yf; row++) {
-        int sp = getPos(xf-1, row);
-        int dp = getPos(xn-1, row);
+        int sp = getPos(xf - 1, row);
+        int dp = getPos(xn - 1, row);
         int ep = getPos(x, row);
         for (int i = sp; i >= ep; i--) {
             data[dp--] = data[sp--];
@@ -288,22 +288,23 @@ void Canvas::shiftRight(uint x, uint y, uint w, uint h, int n) {
     }
 }
 
-void Canvas::shiftUp(uint x, int y, uint w, uint h, int n) {
+void Canvas::shiftUp(uint x, uint y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
     int yf = MIN(y + h, height);
-    for(int row = yf - 1; row >= y; --row) {
-        printf("Row %d y %d\n", row, y);
+    for (int row = yf - 1; row >= (int)y; row--) {
         int sp = getPos(x, row);
-        int dp = getPos(x, row+n);
-        for(int i = 0; i < w; i++) {
-            data[dp++] = data[sp++];
-        }
+        int dp = getPos(x, row + n);
+        printf("Up row %d to %dsp %d dp %d\n", row, row + n, sp, dp);
+        memcpy(&data[dp], &data[sp], w * sizeof(RGB));
     }
-    for(int row = y; row < y+n; row++) {
+    //
+    // Fill the rows we vacated with the background.
+    for (int row = y; row < y + n; row++) {
+        printf("Blank row %d\n", row);
         int dp = getPos(x, row);
-        for(int i = 0; i < w; i++) {
+        for (int j = 0; j < w; j++) {
             data[dp++] = background;
         }
     }
@@ -313,16 +314,16 @@ void Canvas::shiftDown(uint x, uint y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
-    uint yf = MIN(y + h, height);
-    uint xf = MIN(x + w, width);
-    for(int row = y; row < yf; row++) {
+    int yf = MIN(y + h, height);
+    int xf = MIN(x + w, width);
+    for (int row = y; row < yf; row++) {
         int sp = getPos(x, row);
-        int dp = getPos(x, row-n);
-        memcpy(&data[dp], &data[sp], w);
+        int dp = getPos(x, row - n);
+        memcpy(&data[dp], &data[sp], w * sizeof(RGB));
     }
-    for(int row = yf + n - 1; row >= yf; row--) {
+    for (int row = yf - 1; row >= yf-n; row--) {
         int dp = getPos(x, row);
-        for(int i = 0; i < w; i++) {
+        for (int i = 0; i < w; i++) {
             data[dp++] = background;
         }
     }

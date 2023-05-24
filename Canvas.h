@@ -165,7 +165,7 @@ class Canvas {
     void shiftRight(uint x, uint y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftUp(uint x, int y, uint w, uint h, int n);
+    void shiftUp(uint x, uint y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
     void shiftDown(uint x, uint y, uint w, uint h, int n);

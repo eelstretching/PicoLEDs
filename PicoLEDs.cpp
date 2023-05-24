@@ -88,27 +88,30 @@ int main() {
 
     canvas.show();
     sleep_ms(200);
+    int rx = 40;
+    int ry = 0;
     while (1) {
-        int rx = 40;
-        int ry = 0;
+        printf("Bounce %d %d\n", rx, ry);
         for (int i = 0; i < 40; i++) {
-            canvas.shiftRight(rx++, 0, 16, 4, 1);
+            canvas.shiftRight(rx++, ry, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
         }
 
         for (int i = 0; i < 40; i++) {
-            canvas.shiftLeft(rx--, 0, 16, 4, 1);
+            canvas.shiftLeft(rx--, ry, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
         }
 
-        if(ry + 5 < canvas.getHeight()) {
+        if (ry + 4 < canvas.getHeight()) {
+            printf("Up %d %d\n", rx, ry);
             canvas.shiftUp(rx, ry, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
             ry++;
         } else {
+            printf("Down %d %d\n", rx, ry);
             canvas.shiftDown(rx, ry, 16, 4, 1);
             canvas.show();
             sleep_ms(50);
