@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <cstdlib>
+
 #include "View.h"
 #include "pico/platform.h"
 
@@ -60,6 +62,59 @@ void Canvas::fill(RGB c) {
     for (int i = 0; i < numPixels; i++) {
         data[i] = c;
     }
+}
+
+void Canvas::drawLine(uint x0, uint y0, uint x1, uint y1, RGB c) {
+    int dx = abs((int) x1 - (int) x0);
+    int sx = x0 < x1 ? 1 : -1;
+    int dy = -abs((int) y1 - (int) y0);
+    int sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy, e2; /* error value e_xy */
+
+    for (;;) { /* loop */
+        printf("Set (%d,%d)\n", x0, y0);
+        set(x0, y0, c);
+        if (x0 == x1 && y0 == y1) {
+            break;
+        }
+        e2 = err + err;
+        if (e2 >= dy) {
+            err += dy;
+            x0 += sx;
+        } /* e_xy+e_x > 0 */
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        } /* e_xy+e_y < 0 */
+    }
+
+    // int dx = abs((int)x1 - (int)x0);
+    // int sx = x0 < x1 ? 1 : -1;
+    // int dy = -abs((int)y1 - (int)y0);
+    // int sy = y0 < y1 ? 1 : -1;
+    // int error = dx + dy;
+
+    // while (true) {
+    //     set(x0, y0, c);
+    //     if (x0 == x1 && y0 == y1) {
+    //         break;
+    //     }
+    //     int e2 = 2 * error;
+    //     if (e2 >= dy) {
+    //         if (x0 == x1) {
+    //             break;
+    //         }
+    //         error = error + dy;
+    //         x0 = x0 + sx;
+    //     }
+    //     if (e2 <= dx) {
+    //         if (y0 == y1) {
+    //             break;
+    //         }
+    //         error = error + dx;
+    //         y0 = y0 + sy;
+    //     }
+    // }
 }
 
 void Canvas::scrollUp() { scrollUp(1, background); }
@@ -296,13 +351,11 @@ void Canvas::shiftUp(uint x, uint y, uint w, uint h, int n) {
     for (int row = yf - 1; row >= (int)y; row--) {
         int sp = getPos(x, row);
         int dp = getPos(x, row + n);
-        printf("Up row %d to %dsp %d dp %d\n", row, row + n, sp, dp);
         memcpy(&data[dp], &data[sp], w * sizeof(RGB));
     }
     //
     // Fill the rows we vacated with the background.
     for (int row = y; row < y + n; row++) {
-        printf("Blank row %d\n", row);
         int dp = getPos(x, row);
         for (int j = 0; j < w; j++) {
             data[dp++] = background;
@@ -321,7 +374,7 @@ void Canvas::shiftDown(uint x, uint y, uint w, uint h, int n) {
         int dp = getPos(x, row - n);
         memcpy(&data[dp], &data[sp], w * sizeof(RGB));
     }
-    for (int row = yf - 1; row >= yf-n; row--) {
+    for (int row = yf - 1; row >= yf - n; row--) {
         int dp = getPos(x, row);
         for (int i = 0; i < w; i++) {
             data[dp++] = background;

@@ -86,6 +86,14 @@ class Canvas {
     /// @param c the color to fill with.
     void fill(RGB c);
 
+    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's algorithm.
+    /// @param x0 The x coordinate of the first point.
+    /// @param y0 The y coordinate of the first point.
+    /// @param x1 The x coordinate of the second point.
+    /// @param y1 The y coordinate of the second point.
+    /// @param c The color the line should be.
+    void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c);
+
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.
     void scrollUp();
