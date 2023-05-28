@@ -71,7 +71,7 @@ class Font {
     Canvas *canvas;
     uint8_t fontWidth, fontHeight, fontSpaceWidth, fontBase, fontUpper, fWBytes,
         fCBytes;
-    uint8_t spacing = 2;
+    uint8_t spacing = 1;
     const uint8_t *fontData;
     uint8_t dbp;
 };

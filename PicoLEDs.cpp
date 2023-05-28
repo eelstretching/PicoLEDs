@@ -72,7 +72,7 @@ int main() {
     uint tw = robo.render("TROOP 103", 5, 0, RGB::Green);
     canvas.show();
     sleep_ms(10000);
-    robo.render("BTON", 10+tw+robo.getSpacing(), 0, RGB::Red);
+    robo.render("BTON", tw+robo.getSpacing(), 0, RGB::Red);
     canvas.show();
     sleep_ms(10000);
 
