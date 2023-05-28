@@ -65,9 +65,9 @@ void Canvas::fill(RGB c) {
 }
 
 void Canvas::drawLine(uint x0, uint y0, uint x1, uint y1, RGB c) {
-    int dx = abs((int) x1 - (int) x0);
+    int dx = abs((int)x1 - (int)x0);
     int sx = x0 < x1 ? 1 : -1;
-    int dy = -abs((int) y1 - (int) y0);
+    int dy = -abs((int)y1 - (int)y0);
     int sy = y0 < y1 ? 1 : -1;
     int err = dx + dy, e2; /* error value e_xy */
 
@@ -87,34 +87,32 @@ void Canvas::drawLine(uint x0, uint y0, uint x1, uint y1, RGB c) {
             y0 += sy;
         } /* e_xy+e_y < 0 */
     }
+}
 
-    // int dx = abs((int)x1 - (int)x0);
-    // int sx = x0 < x1 ? 1 : -1;
-    // int dy = -abs((int)y1 - (int)y0);
-    // int sy = y0 < y1 ? 1 : -1;
-    // int error = dx + dy;
+void Canvas::drawRect(uint x0, uint y0, uint x1, uint y1, RGB c) {
+    drawLine(x0, y0, x1, y0, c);
+    drawLine(x0, y0, x0, y1, c);
+    drawLine(x0, y1, x1, y1, c);
+    drawLine(x1, y1, x1, y0, c);
+}
 
-    // while (true) {
-    //     set(x0, y0, c);
-    //     if (x0 == x1 && y0 == y1) {
-    //         break;
-    //     }
-    //     int e2 = 2 * error;
-    //     if (e2 >= dy) {
-    //         if (x0 == x1) {
-    //             break;
-    //         }
-    //         error = error + dy;
-    //         x0 = x0 + sx;
-    //     }
-    //     if (e2 <= dx) {
-    //         if (y0 == y1) {
-    //             break;
-    //         }
-    //         error = error + dx;
-    //         y0 = y0 + sy;
-    //     }
-    // }
+void Canvas::drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f) {
+    drawRect(x0, y0, x1, y1, l);
+    if(x1 < x0) {
+        uint tmp = x1;
+        x1 = x0; 
+        x0 = tmp;
+    }
+    if(y1 < y0) {
+        uint tmp = y1;
+        y1 = y0;
+        y0 = y1;
+    }
+    for(int x = x0 + 1; x < x1; x++) {
+        for(int y = y0 + 1; y < y1; y++) {
+            set(x, y, f);
+        }
+    }
 }
 
 void Canvas::scrollUp() { scrollUp(1, background); }

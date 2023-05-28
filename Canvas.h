@@ -94,6 +94,23 @@ class Canvas {
     /// @param c The color the line should be.
     void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c);
 
+    /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1)
+    /// @param x0 The x coordinate of one corner
+    /// @param y0 The y coordinate of one corner
+    /// @param x1 The x coordinate of the other corner
+    /// @param y1 The y coordinate of the other corner
+    /// @param c The color of the line to draw with.
+    void drawRect(uint x0, uint y0, uint x1, uint y1, RGB c);
+
+     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1), filled with the given color.
+    /// @param x0 The x coordinate of one corner
+    /// @param y0 The y coordinate of one corner
+    /// @param x1 The x coordinate of the other corner
+    /// @param y1 The y coordinate of the other corner
+    /// @param l The color of the line to draw with.
+    /// @param f The color to fill the rectangle with.
+   void drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f);
+
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.
     void scrollUp();

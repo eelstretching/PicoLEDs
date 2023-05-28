@@ -6,41 +6,27 @@
 
 #include <stdlib.h>
 
-#include "Canvas.h"
-#include "Strip.h"
-#include "View.h"
-#include "colorutil.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "pico/printf.h"
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
-#include "ws2812.pio.h"
 
-void pattern_snakes(Strip strip, uint t) {
-    strip.reset();
-    for (uint i = 0; i < strip.getNumPixels(); ++i) {
-        uint x = (i + (t >> 1)) % 64;
-        if (x < 10) {
-            strip.addPixel(RGB::Red);
-        } else if (x >= 15 && x < 25) {
-            strip.addPixel(RGB::Green);
-        } else if (x >= 30 && x < 40) {
-            strip.addPixel(RGB::Blue);
-        } else {
-            strip.addPixel(RGB::Black);
-        }
-    }
-    strip.show();
-}
+#include "Canvas.h"
+#include "Font.h"
+#include "FontRobotron.h"
+#include "Strip.h"
+#include "View.h"
+#include "colorutil.h"
 
 int main() {
     stdio_init_all();
 
     //
-    // A canvas and a view made out of strips.
-    Canvas canvas(138, 8);
+    // A canvas and a view made out of strips. Note that the canvas is larger
+    // than the view! The view only covers the lower half of the canvas!
+    Canvas canvas(138, 16);
     View view(138);
     Strip strips[] = {Strip(2, 276), Strip(3, 276), Strip(4, 276),
                       Strip(5, 276)};
@@ -76,6 +62,21 @@ int main() {
     fill_gradient_RGB(grad1, 0, RGB::Blue, 16, RGB::Green);
     RGB grad2[16];
     fill_gradient_RGB(grad2, 0, RGB::Yellow, 16, RGB::Red);
+
+    RGB simple[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+                    RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White};
+    char b[30];
+
+    Font robo(&canvas, RobotronFontData);
+
+    uint tw = robo.render("TROOP 103", 5, 0, RGB::Green);
+    canvas.show();
+    sleep_ms(10000);
+    robo.render("BTON", 10+tw+robo.getSpacing(), 0, RGB::Red);
+    canvas.show();
+    sleep_ms(10000);
+
+ 
 
     //
     // Make a 4x16 block of the gradients
