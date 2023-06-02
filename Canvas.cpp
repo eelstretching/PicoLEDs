@@ -211,13 +211,13 @@ void Canvas::mirrorLeftToRight(int c) {
     // we're mirroring through. Note that we need to account for the case when
     // the mirror column is beyond the halfway mark, in which case we only want
     // to mirror to the end of the row!
-    int n = MAX(c + 1, width - c);
-    for (int i = 0; i < height; i) {
+    int n = MAX(c, width - c);
+    for (int i = 0; i < height; i++) {
         //
         // We'll start mirroring at the column itself and mirror onto the next
         // pixel over.
-        int sp = getPos(c, i);
-        int dp = getPos(c + 1, i);
+        int sp = getPos(c-1, i);
+        int dp = getPos(c, i);
         for (int j = 0; j < n; j++) {
             data[dp++] = data[sp--];
         }
@@ -243,13 +243,13 @@ void Canvas::mirrorRightToLeft(int c) {
     // we're mirroring through. Note that we need to account for the case when
     // the mirror column is beyond the halfway mark, in which case we only want
     // to mirror to the end of the row!
-    int n = MAX(width - c - 1, c + 1);
-    for (int i = 0; i < height; i) {
+    int n = MAX(width - c - 1, c);
+    for (int i = 0; i < height; i++) {
         //
         // We'll start mirroring at the column itself and mirror onto the next
         // pixel over.
-        int sp = getPos(c + 1, i);
-        int dp = getPos(c, i);
+        int sp = getPos(c, i);
+        int dp = getPos(c-1, i);
         for (int j = 0; j < n; j++) {
             data[dp--] = data[sp++];
         }
