@@ -20,7 +20,7 @@ class Animation {
     Animation(Canvas *canvas);
 
     /// @brief Takes one step in the animation. Someone in charge of the
-    /// animations will call this funciton. The default implementation doesn't
+    /// animations will call this function. The default implementation doesn't
     /// do anything.
     virtual void step(){};
 };

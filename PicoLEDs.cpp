@@ -11,7 +11,7 @@
 #include "FontRobotron.h"
 #include "Strip.h"
 #include "View.h"
-#include "colorutil.h"
+#include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "pico/printf.h"
