@@ -72,7 +72,6 @@ void Canvas::drawLine(uint x0, uint y0, uint x1, uint y1, RGB c) {
     int err = dx + dy, e2; /* error value e_xy */
 
     for (;;) { /* loop */
-        printf("Set (%d,%d)\n", x0, y0);
         set(x0, y0, c);
         if (x0 == x1 && y0 == y1) {
             break;

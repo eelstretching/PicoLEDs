@@ -12,13 +12,13 @@ set(PICO_SDK_PATH "/home/stgreen/pico/pico-sdk")
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
-include(pico_sdk_import.cmake)
+include(../../pico_sdk_import.cmake)
 
 if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
   message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
-project(PicoLEDs C CXX ASM)
+project(Fire C CXX ASM)
 
 set(PICO_CXX_ENABLE_EXCEPTIONS 1)
 
@@ -27,23 +27,28 @@ pico_sdk_init()
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
-# Add a library.
-file( GLOB FILES src/*.h src/*.cpp)
+# Add executable. Default name is the project name, version 0.1
 
-add_library(PicoLEDs ${FILES})
+add_executable(Fire FireDemo.cpp Fire.cpp)
 
-# generate the header file into the source tree as it is included in the RP2040 datasheet
-pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/generated)
+add_subdirectory(../.. build)
+
+pico_set_program_name(Fire "Fire")
+pico_set_program_version(Fire "0.1")
+
+pico_enable_stdio_uart(Fire 1)
+pico_enable_stdio_usb(Fire 0)
 
 # Add the standard include files to the build
-target_include_directories(PicoLEDs PUBLIC
+target_include_directories(Fire PRIVATE
+  ../../src
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )
-target_sources(PicoLEDs PUBLIC ${FILES})
 
 # Add any user requested libraries
-target_link_libraries(PicoLEDs PUBLIC
+target_link_libraries(Fire 
+  PicoLEDs
   hardware_dma
   hardware_pio
   hardware_timer
@@ -51,4 +56,6 @@ target_link_libraries(PicoLEDs PUBLIC
   pico_cyw43_arch_none
   pico_stdlib
 )
+
+pico_add_extra_outputs(Fire)
 
