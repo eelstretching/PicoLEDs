@@ -12,10 +12,15 @@ void StopWatch::start() {
 }
 
 void StopWatch::finish() {
-    totalTime += time_us_64() - currStart;
+    lastTime = time_us_64() - currStart;
+    totalTime += lastTime;
     count++;
 }
 
 float StopWatch::getAverageTime() {
     return (float) totalTime / count;
 }
+
+uint64_t StopWatch::getLastTime() { return lastTime; }
+
+uint64_t StopWatch::getLastTimeMS() { return lastTime/1000; }

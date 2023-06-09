@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 #include <stdlib.h>
 
 #include "Canvas.h"
@@ -23,8 +17,7 @@ int main() {
     stdio_init_all();
 
     //
-    // A canvas and a view made out of strips. Note that the canvas is larger
-    // than the view! The view only covers the lower half of the canvas!
+    // A canvas and a view made out of strips.
     Canvas canvas(138, 8);
     View view(138);
     Strip strips[] = {Strip(2, 276), Strip(3, 276), Strip(4, 276),

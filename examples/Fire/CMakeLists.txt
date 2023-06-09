@@ -31,8 +31,6 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 add_executable(Fire FireDemo.cpp Fire.cpp)
 
-add_subdirectory(../.. build)
-
 pico_set_program_name(Fire "Fire")
 pico_set_program_version(Fire "0.1")
 
@@ -53,8 +51,8 @@ target_link_libraries(Fire
   hardware_pio
   hardware_timer
   hardware_clocks
-  pico_cyw43_arch_none
   pico_stdlib
+  pico_rand
 )
 
 pico_add_extra_outputs(Fire)

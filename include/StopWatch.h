@@ -7,10 +7,14 @@
 
 class StopWatch {
    public:
-    /// @brief The number of times that show has been called
+    /// @brief The number of times that the watch has been clicked.
     uint count = 0;
-    /// @brief The number of microseoncds spent in the show method.
+
+    /// @brief The number of microseconds spent.
     uint64_t totalTime = 0;
+
+    /// @brief The duration of the last timing.
+    uint64_t lastTime = 0;
 
     uint64_t currStart = 0;
 
@@ -25,7 +29,16 @@ class StopWatch {
     /// @brief  Tell the stats that a show operation completed.
     void finish();
 
+    /// @brief Gets the average time that the watch has run for.
+    /// @return the average time.
     float getAverageTime();
+
+    /// @brief Gets the last time in nanoseconds
+    /// @return the last time in nanoseconds.
+    uint64_t getLastTime();
+
+    /// @brief Gets the last time in milliseconds.
+    uint64_t getLastTimeMS();
 };
 
 #endif

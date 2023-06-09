@@ -18,15 +18,6 @@ extern const RGBPalette16 CloudColors(
 
      RGB::LightBlue, RGB::White, RGB::LightBlue, RGB::SkyBlue});
 
-extern const RGBPalette16 LavaColors(
-    {RGB::Black, RGB::Maroon, RGB::Black, RGB::Maroon,
-
-     RGB::DarkRed, RGB::Maroon, RGB::DarkRed,
-
-     RGB::DarkRed, RGB::DarkRed, RGB::Red, RGB::Orange,
-
-     RGB::White, RGB::Orange, RGB::Red, RGB::DarkRed});
-
 extern const RGBPalette16 OceanColors(
     {RGB::MidnightBlue, RGB::DarkBlue, RGB::MidnightBlue, RGB::Navy,
 

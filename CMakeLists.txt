@@ -1,9 +1,20 @@
-# Generated Cmake Pico project file
-
 cmake_minimum_required(VERSION 3.13)
+
+# Pull in Raspberry Pi Pico SDK (must be before project)
+include(pico_sdk_import.cmake)
+
+project(PicoLEDsBuild
+  VERSION 0.1
+  DESCRIPTION "Building PicoLEDs and examples"
+  LANGUAGES C CXX ASM)
+
+pico_sdk_init()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
 
 # Initialise pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
@@ -11,44 +22,10 @@ set(PICO_SDK_PATH "/home/stgreen/pico/pico-sdk")
 
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
-# Pull in Raspberry Pi Pico SDK (must be before project)
-include(pico_sdk_import.cmake)
-
-if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
+if(PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
   message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
-project(PicoLEDs C CXX ASM)
+add_subdirectory(src)
 
-set(PICO_CXX_ENABLE_EXCEPTIONS 1)
-
-# Initialise the Raspberry Pi Pico SDK
-pico_sdk_init()
-
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
-
-# Add a library.
-file( GLOB FILES src/*.h src/*.cpp)
-
-add_library(PicoLEDs ${FILES})
-
-# generate the header file into the source tree as it is included in the RP2040 datasheet
-pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/generated)
-
-# Add the standard include files to the build
-target_include_directories(PicoLEDs PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
-)
-target_sources(PicoLEDs PUBLIC ${FILES})
-
-# Add any user requested libraries
-target_link_libraries(PicoLEDs PUBLIC
-  hardware_dma
-  hardware_pio
-  hardware_timer
-  hardware_clocks
-  pico_cyw43_arch_none
-  pico_stdlib
-)
-
+add_subdirectory(examples)
