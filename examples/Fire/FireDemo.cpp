@@ -47,9 +47,9 @@ int main() {
     canvas.clear();
     StopWatch sw;
 
-    Fire fire1(&canvas, 1, 20, 80, 55, 120);
-    Fire fire2(&canvas, 3, 20, 80, 55, 120);
-    Fire fire3(&canvas, 5, 20, 80, 55, 120);
+    Fire fire1(&canvas, 20, 80, 1, 55, 120);
+    Fire fire2(&canvas, 20, 80, 3, 30, 120);
+    Fire fire3(&canvas, 20, 80, 5, 55, 80);
     int n = 0;
     while (1) {
         sw.start();

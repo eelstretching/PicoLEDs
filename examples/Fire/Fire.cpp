@@ -1,27 +1,31 @@
 #include "Fire.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "colorpalettes.h"
 #include "math8.h"
 #include "pico.h"
 #include "pico/platform.h"
 
-Fire::Fire(Canvas *canvas, uint x, uint n, uint row, uint cooling,
+Fire::Fire(Canvas *canvas, 
+            uint x, 
+            uint n, 
+            uint row, 
+            uint cooling,
            uint sparking)
     : canvas(canvas),
-      row(row),
       x(x),
       n(n),
+      row(row),
       cooling(cooling),
       sparking(sparking) {
     end = MIN(x + n, canvas->getWidth());
     heat = (uint8_t *)malloc(n * sizeof(uint8_t));
+    memset(heat, 0, n * sizeof(uint8_t));
 }
 
-Fire::~Fire() {
-    free(heat);
-}
+Fire::~Fire() { free(heat); }
 
 void Fire::step() {
     aw.start();
