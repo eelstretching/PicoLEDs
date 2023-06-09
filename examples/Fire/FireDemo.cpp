@@ -24,7 +24,7 @@ int main() {
 
     int delay = 30;
 
-    int msPerFrame = 1000/30;
+    int msPerFrame = 1000 / 30;
 
     //
     // Init to clear the strips and show they're working while rendering's
@@ -47,24 +47,30 @@ int main() {
     canvas.clear();
     StopWatch sw;
 
-    Fire fire1(&canvas, 20, 80, 1, 55, 120);
-    Fire fire2(&canvas, 20, 80, 3, 30, 120);
-    Fire fire3(&canvas, 20, 80, 5, 55, 80);
+    int nf = 6;
+    Fire fires[6] = {Fire(&canvas, 10, 95, 1, 55, 120),
+                     Fire(&canvas, 10, 100, 2, 80, 150),
+                     Fire(&canvas, 10, 110, 3, 30, 120),
+                     Fire(&canvas, 10, 90, 4, 20, 50),
+                     Fire(&canvas, 10, 105, 5, 55, 110),
+                     Fire(&canvas, 10, 100, 6, 100, 200)};
+
     int n = 0;
     while (1) {
         sw.start();
-        fire1.step();
-        fire2.step();
-        fire3.step();
+        for (int i = 0; i < 6; i++) {
+            fires[i].step();
+        }
         canvas.show();
         sw.finish();
         uint64_t lms = sw.getLastTimeMS();
-        if(lms < msPerFrame) {
+        if (lms < msPerFrame) {
             sleep_ms(msPerFrame - lms);
         }
         n++;
-        if(n % 100 == 0) {
-            printf("Stepped %d times, %.2f ms/iteration\n", n, sw.getAverageTime() / 1000);
+        if (n % 100 == 0) {
+            printf("Stepped %d times, %.2f ms/iteration\n", n,
+                   sw.getAverageTime() / 1000);
         }
     }
 }
