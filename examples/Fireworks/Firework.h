@@ -62,9 +62,6 @@ class Firework : Animation {
     /// @brief The state of the animation.
     State state = RESET;
 
-    /// @brief How bright our flare should be.
-    float brightness;
-
     /// @brief Our good old friend gravity. Gravity will be subtracted from
     /// spark velocity as time increases.
     float gravity = 0.004;

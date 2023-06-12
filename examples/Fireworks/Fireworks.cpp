@@ -48,13 +48,22 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
-    int nf = 1;
-    Firework fw[1] = {Firework(&canvas, 1)};
+    int nf = 6;
+    Firework fw[6] = {
+        Firework(&canvas, 1),
+        Firework(&canvas, 2),
+        Firework(&canvas, 3),
+        Firework(&canvas, 4),
+        Firework(&canvas, 5),
+        Firework(&canvas, 6),
+    };
 
     int n = 0;
     while (1) {
         aw.start();
-        fw[0].step();
+        for(int i = 0; i < nf; i++) {
+            fw[i].step();
+        }
         aw.finish();
         sw.start();
         canvas.show();

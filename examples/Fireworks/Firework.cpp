@@ -28,21 +28,20 @@ Firework::Firework(Canvas* canvas, uint row)
 
 void Firework::reset() {
     //
-    // Set the initial position and velocity for the head of the flare.
-    flare->pos = 0;
-    flare->vel = float(random16(70, 90)) / 100;
-    brightness = 1;
-
-    for (int i = 1; i < flareSize; i++) {
+    // Set the flare to trail along.
+    for (int i = 0; i < flareSize; i++) {
         //
-        // The particles in the tail of the flare have their velocity based on
-        // the velocity of the head, each one's a little slower than the
+        // The particles in the flare have their velocity based on
+        // the previous one in the flare, each one's a little slower than the
         // previous one. The color's based on the speed.
         flare[i].pos = 0;
-        flare[i].vel = 0.95 * flare[i - 1].vel;
+        if (i == 0) {
+            flare[i].vel = float(random16(80, 90)) / 100;
+        } else {
+            flare[i].vel = 0.95 * flare[i - 1].vel;
+        }
         flare[i].val = constrain(flare[i].vel * 1000, 0, 255);
     }
-    canvas->clearRow(row);
     state = RISING;
 }
 
@@ -61,13 +60,9 @@ void Firework::rise() {
     //
     // The position increases according to the velocity, and the velocity
     // decreases according to gravity.
-    canvas->set(int(flare[0].pos), row, RGB(HSV(0, 0, int(brightness * 255))));
-    flare[0].pos += flare[0].vel;
-    flare[0].vel -= gravity;
-
     //
     // Trail of sparks behind the rising flare.
-    for (int i = 1; i < flareSize; i++) {
+    for (int i = 0; i < flareSize; i++) {
         Spark* s = &flare[i];
         s->pos = constrain(s->pos + s->vel, 0, canvas->getWidth());
         s->vel -= gravity;
@@ -76,7 +71,6 @@ void Firework::rise() {
         sc %= 50;
         canvas->set(s->pos, row, sc);
     }
-    brightness *= 0.985;
 }
 
 void Firework::startExplosion() {
@@ -98,7 +92,8 @@ void Firework::startExplosion() {
         s->vel = (float(random16(0, 20000)) / 10000.0) - 1.0;
         // set colors before scaling velocity to keep them bright
         s->val = constrain(abs(s->vel) * 500, 0, 255);
-        s->vel *= s->pos / canvas->getWidth();  // proportional to height
+        // proportional to height
+        s->vel *= s->pos / canvas->getWidth();
     }
     explosion[0].val = 255;  // this will be our known spark
     dyingGravity = gravity;
