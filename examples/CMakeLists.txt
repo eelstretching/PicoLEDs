@@ -1,2 +1,3 @@
-add_subdirectory(Fire)
 add_subdirectory(SimpleLEDs)
+add_subdirectory(Fire)
+add_subdirectory(Fireworks)

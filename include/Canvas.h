@@ -205,6 +205,14 @@ class Canvas {
     /// @brief Clears the canvas.
     void clear();
 
+    /// @brief Clears a row of the canvas.
+    /// @param row the row to clear.
+    void clearRow(uint row);
+
+    /// @brief Clears a column of the canvas.
+    /// @param column the column to clear.
+    void clearColumn(uint column);
+
     /// @brief Sets the origin of the view in this canvas. This lets us make a
     /// larger canvas and shift things by moving the view.
     /// @param x the x position of the view origin

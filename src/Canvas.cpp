@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cstdlib>
-
 #include "View.h"
 #include "pico/platform.h"
 
@@ -284,6 +282,18 @@ uint Canvas::getPos(uint x, uint y) { return y * width + x; }
 void Canvas::clear() {
     for (int i = 0; i < numPixels; i++) {
         data[i] = background;
+    }
+}
+
+void Canvas::clearRow(uint row) {
+    for(int dp = getPos(0, row), i = 0; i < width; i++, dp++) {
+        data[dp] = background;
+    }
+}
+
+void Canvas::clearColumn(uint column) {
+    for(int dp = getPos(column, 0), i = 0; i < height; i++, dp += width) {
+        data[dp] = background;
     }
 }
 
