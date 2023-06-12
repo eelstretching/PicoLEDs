@@ -24,7 +24,7 @@ int main() {
 
     int delay = 30;
 
-    int msPerFrame = 1000 / 30;
+    int msPerFrame = 1000 / 60;
 
     //
     // Init to clear the strips and show they're working while rendering's
