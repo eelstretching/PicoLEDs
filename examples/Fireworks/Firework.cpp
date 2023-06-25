@@ -23,7 +23,7 @@ Firework::Firework(Canvas* canvas, uint row)
     : canvas(canvas), row(row), numSparks(numSparks) {
     state = RESET;
     flare = new Spark[flareSize];
-    explosion = NULL;
+    explosion = new Spark[canvas->getWidth() / 2];
 }
 
 void Firework::reset() {
@@ -44,6 +44,7 @@ void Firework::reset() {
     }
     state = RISING;
 }
+    
 
 void Firework::rise() {
     canvas->clearRow(row);
@@ -77,11 +78,7 @@ void Firework::startExplosion() {
     //
     // We want a number of sparks proportional to the position of the head of
     // the flare. This looks about right.
-    numSparks = flare[0].pos / 2;
-    if (explosion != NULL) {
-        delete[] explosion;
-    }
-    explosion = new Spark[numSparks];
+    numSparks = MAX(canvas->getWidth() / 2, flare[0].pos / 2);
     explosionSteps = 0;
 
     // initialize sparks
@@ -95,7 +92,6 @@ void Firework::startExplosion() {
         // proportional to height
         s->vel *= s->pos / canvas->getWidth();
     }
-    explosion[0].val = 255;  // this will be our known spark
     dyingGravity = gravity;
     c1 = 120;
     c2 = 50;

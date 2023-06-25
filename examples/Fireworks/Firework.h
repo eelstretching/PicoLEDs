@@ -48,6 +48,9 @@ class Firework : Animation {
     /// @brief The sparks that make up the explosion of the flare.
     Spark *explosion;
 
+    /// @brief The size of the explosion that we're using this time around.
+    uint explosionSize;
+
     /// @brief How many sparks we'll generate when exploding.
     uint numSparks;
 
