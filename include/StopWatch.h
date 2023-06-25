@@ -10,7 +10,7 @@ class StopWatch {
     /// @brief The number of times that the watch has been clicked.
     uint count = 0;
 
-    /// @brief The number of microseconds spent.
+    /// @brief The number of microseconds spent running.
     uint64_t totalTime = 0;
 
     /// @brief The duration of the last timing.
@@ -23,18 +23,18 @@ class StopWatch {
     /// @param other the stats to combine withours.
     void combine(StopWatch other);
 
-    /// @brief Tell the stats that a show operation is starting.
+    /// @brief Tell the watch that an operation is starting.
     void start();
 
-    /// @brief  Tell the stats that a show operation completed.
+    /// @brief  Tell the watch that an operation completed.
     void finish();
 
     /// @brief Gets the average time that the watch has run for.
-    /// @return the average time.
+    /// @return the average time, in microseconds.
     float getAverageTime();
 
-    /// @brief Gets the last time in nanoseconds
-    /// @return the last time in nanoseconds.
+    /// @brief Gets the last time in microseconds.
+    /// @return the last time in microseconds.
     uint64_t getLastTime();
 
     /// @brief Gets the last time in milliseconds.
