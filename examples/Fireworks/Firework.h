@@ -92,5 +92,7 @@ class Firework : Animation {
     void explode();
 
     void step();
+
+    
 };
 #endif

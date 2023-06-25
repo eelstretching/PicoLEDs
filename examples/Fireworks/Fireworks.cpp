@@ -48,14 +48,16 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
-    int nf = 6;
-    Firework fw[6] = {
+    int nf = 8;
+    Firework fw[8] = {
+        Firework(&canvas, 0),
         Firework(&canvas, 1),
         Firework(&canvas, 2),
         Firework(&canvas, 3),
         Firework(&canvas, 4),
         Firework(&canvas, 5),
         Firework(&canvas, 6),
+        Firework(&canvas, 7),
     };
 
     int n = 0;
