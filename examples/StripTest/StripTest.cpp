@@ -15,7 +15,9 @@ int main() {
 
     //
     // Simple test for a single strip of pixels.
-    Strip strip(2, 600);
+    Strip strip(2, 552);
+
+    strip.setFractionalBrightness(16);
 
     int delay = 500;
     int n = 0;
@@ -34,7 +36,7 @@ int main() {
         sleep_ms(delay);
 
         n++;
-        if(n % 50 == 0) {
+        if(n % 10 == 0) {
             StopWatch sw = strip.getStripStats();
             printf("%d loops, %.2f us per show\n", n, sw.getAverageTime());
         }
