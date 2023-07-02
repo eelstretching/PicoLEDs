@@ -69,6 +69,10 @@ class View {
     ///
     /// @brief Renders this view of the given canvas.
     void render();
+
+    uint getWidth() {return width;}
+
+    uint getHeight() {return rows.size();}
 };
 
 #endif

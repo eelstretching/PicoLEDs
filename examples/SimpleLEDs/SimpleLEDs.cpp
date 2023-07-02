@@ -18,10 +18,10 @@ int main() {
 
     //
     // A canvas and a view made out of strips.
-    Canvas canvas(138, 8);
+    Canvas canvas(138, 16);
     View view(138);
-    Strip strips[] = {Strip(2, 276), Strip(3, 276), Strip(4, 276),
-                      Strip(5, 276)};
+    Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
+                      Strip(5, 552)};
     view.add(strips[0]);
     view.add(strips[1]);
     view.add(strips[2]);
@@ -29,9 +29,11 @@ int main() {
     canvas.setView(&view, 0, 0);
     int delay = 30;
 
+    printf("View is %d rows %d columns\n", view.getHeight(), view.getWidth());
+
     //
-    // Init to clear the strips and show they're working while rendering's
-    // busted.
+    // Init to clear the strips and show they're working without relying on
+    // rendering.
     for (int i = 0; i < 4; i++) {
         strips[i].fill(RGB::Green);
         strips[i].show();
@@ -43,6 +45,14 @@ int main() {
 
         sleep_ms(delay);
         strips[i].fill(RGB::Black, 138, 276);
+        strips[i].show();
+
+        sleep_ms(delay);
+        strips[i].fill(RGB::Black, 276, 414);
+        strips[i].show();
+
+        sleep_ms(delay);
+        strips[i].fill(RGB::Black, 414, 552);
         strips[i].show();
     }
 
