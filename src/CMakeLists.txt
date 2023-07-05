@@ -11,7 +11,7 @@ pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio OUTPUT_DI
 target_include_directories(PicoLEDs PUBLIC
   ../include
   ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+  ${CMAKE_CURRENT_LIST_DIR}/.. 
 )
 # target_sources(PicoLEDs PUBLIC ${FILES})
 

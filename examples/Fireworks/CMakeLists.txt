@@ -29,7 +29,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Fireworks Fireworks.cpp Firework.cpp)
+add_executable(Fireworks Fireworks.cpp)
 
 pico_set_program_name(Fireworks "Fireworks")
 pico_set_program_version(Fireworks "0.1")

@@ -23,4 +23,4 @@ float StopWatch::getAverageTime() {
 
 uint64_t StopWatch::getLastTime() { return lastTime; }
 
-uint64_t StopWatch::getLastTimeMS() { return lastTime/1000; }
+float StopWatch::getLastTimeMS() { return (float) lastTime/1000; }

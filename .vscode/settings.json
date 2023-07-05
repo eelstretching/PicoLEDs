@@ -16,6 +16,14 @@
     },
     "files.associations": {
       "type_traits": "cpp",
-      "compare": "cpp"
+      "compare": "cpp",
+      "pbuf.h": "c",
+      "time.h": "c",
+      "resets.h": "c",
+      "rtc.h": "c",
+      "dns.h": "c",
+      "altcp_tls.h": "c",
+      "altcp_tcp.h": "c",
+      "altcp.h": "c"
     },
 }

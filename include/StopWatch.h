@@ -38,7 +38,7 @@ class StopWatch {
     uint64_t getLastTime();
 
     /// @brief Gets the last time in milliseconds.
-    uint64_t getLastTimeMS();
+    float getLastTimeMS();
 };
 
 #endif
