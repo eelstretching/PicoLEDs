@@ -1,3 +1,8 @@
+#ifndef NTP_CLIENT_H
+#define NTP_CLIENT_H
+
+#pragma once
+
 //
 // Lat and long of the camp, for sunrise and sunset.
 #define TR_LAT 41.527320
@@ -9,3 +14,7 @@
                                  "Connection: close\r\n" \
                                  "\r\n"
 #define SUN_CLIENT_TIMEOUT_SECS  15
+
+
+
+#endif
