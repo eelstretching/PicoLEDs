@@ -1,0 +1,47 @@
+#ifndef ANIMATOR_H
+#define ANIMATOR_H
+
+#pragma once
+
+#include "Animation.h"
+#include "StopWatch.h"
+
+class Animator : public Animation {
+
+    protected:
+        Animation *animations;
+        Animation *last;
+        Animation *curr;
+
+        int fps = 30;
+
+        float msPerFrame;
+
+        uint missedFrames;
+
+        StopWatch aw;
+
+    public:
+        /// @brief Creates an animator for the given canvas.
+        /// @param canvas 
+        Animator(Canvas *canvas);
+        /// @brief Creates an animator for the given canvas that will run at the given number of frames per second.
+        /// @param canvas the canvas we're animating on
+        /// @param fps the number of frames per second to display.
+        Animator(Canvas *canvas, int fps);
+        /// @brief Adds an animation to the end of our list.
+        /// @param a the animation to add.
+        void add(Animation *a);
+        void setFPS(int fps) {this->fps = fps; msPerFrame = 1000.0 / fps;};
+        /// @brief Steps through whatever animation that we're currently working on.
+        /// @return 
+        bool step();
+        void init();
+        uint getMissedFrames() {return missedFrames;};
+        /// @brief Gets the average frame animation and display time, in microseconds.
+        float getAverageFrameTimeUS() {
+           return aw.getAverageTime(); 
+        }
+};
+
+#endif

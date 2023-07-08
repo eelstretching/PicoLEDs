@@ -33,9 +33,7 @@ enum State {
     RESET,
 };
 
-class Firework : Animation {
-    /// @brief the canvas that we'll render our fire onto.
-    Canvas *canvas;
+class Firework : public Animation {
 
     /// @brief The row that we'll be animating
     uint row;
@@ -96,7 +94,7 @@ class Firework : Animation {
     /// @brief The flare explodes.
     void explode();
 
-    void step();
+    bool step();
 
     
 };

@@ -135,7 +135,7 @@ void Canvas::scrollDown() { scrollDown(1, background); }
 
 void Canvas::scrollDown(int n, RGB f) {
     //
-    // Scorll it all away?
+    // Scroll it all away?
     if (n > height) {
         fill(background);
         return;

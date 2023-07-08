@@ -5,7 +5,7 @@
 
 #include "Animation.h"
 
-class Fire : Animation {
+class Fire : public Animation {
     /// @brief the canvas that we'll render our fire onto.
     Canvas *canvas;
 
@@ -42,6 +42,6 @@ class Fire : Animation {
 
     ~Fire();
 
-    void step();
+    bool step();
 };
 #endif

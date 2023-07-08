@@ -19,8 +19,8 @@ static float constrain(float f, int min, int max) {
     return f;
 }
 
-Firework::Firework(Canvas* canvas, uint row)
-    : canvas(canvas), row(row), numSparks(numSparks) {
+Firework::Firework(Canvas* canvas, uint row) : Animation(canvas) {
+    this->row = row;
     state = RESET;
     flare = new Spark[flareSize];
     explosion = new Spark[canvas->getWidth() / EXPLOSION_DIVISOR];
@@ -127,7 +127,7 @@ void Firework::explode() {
     explosionSteps++;
 }
 
-void Firework::step() {
+bool Firework::step() {
     switch (state) {
         case RESET:
             reset();
@@ -142,4 +142,7 @@ void Firework::step() {
             explode();
             break;
     }
+    //
+    // By default, we're a never ending animation.
+    return false;
 }

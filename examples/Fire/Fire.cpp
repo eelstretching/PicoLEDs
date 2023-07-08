@@ -27,7 +27,7 @@ Fire::Fire(Canvas *canvas,
 
 Fire::~Fire() { free(heat); }
 
-void Fire::step() {
+bool Fire::step() {
     aw.start();
     for (int i = 0; i < n; i++) {
         heat[i] = qsub8(heat[i], random8(0, ((cooling * 10) / n) + 2));
@@ -49,4 +49,5 @@ void Fire::step() {
         canvas->set(x + j, row, HeatColor(heat[j]));
     }
     aw.finish();
+    return true;
 };

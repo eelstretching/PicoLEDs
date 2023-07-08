@@ -7,6 +7,7 @@
 #include "lwip/tcp.h"
 #include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
+#include "pico/printf.h"
 
 #define TCP_SERVER_IP "192.168.1.217"
 #define TCP_PORT 1030

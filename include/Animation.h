@@ -8,12 +8,17 @@
 /// @brief Animation base class with a virtual function for stepping the
 /// animation.
 class Animation {
+    friend class Animator;
+
    protected:
     /// @brief The canvas that we're animating on.
     Canvas *canvas;
 
     /// @brief A stop watch to count our animation time.
     StopWatch aw;
+
+    /// @brief We can make a list of animations and go from one to the next.
+    Animation *next;
 
    public:
     /// @brief Default constructor
@@ -25,10 +30,26 @@ class Animation {
     /// @brief Virtual destructor!
     virtual ~Animation(){};
 
+    /// @brief Initializes the animation, possibly after it has run to
+    /// completion previously.
+    virtual void init(){};
+
     /// @brief Takes one step in the animation. Someone in charge of the
     /// animations will call this function. The default implementation doesn't
     /// do anything.
-    virtual void step(){};
+    /// @returns true if the animation will continue after this step, false if
+    /// the animation is complete.
+    virtual bool step() { return true; };
+
+    /// @brief Gets the next animation in the list.
+    /// @return The next animation in the list.
+    Animation *getNext() { return next; };
+
+    void setNext(Animation *a) {
+        next = a;
+    }
+
+    Canvas *getCanvas() { return canvas; };
 };
 
 #endif
