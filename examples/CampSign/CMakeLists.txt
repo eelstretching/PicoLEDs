@@ -33,7 +33,7 @@ pico_sdk_init()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add executable. Default name is the project name, version 0.1
-add_executable(CampSign ntp_client.c tls_http.c CampSign.cpp)
+add_executable(CampSign CampSign.cpp data.cpp)
 
 pico_set_program_name(CampSign "CampSign")
 pico_set_program_version(CampSign "0.1")
@@ -56,9 +56,7 @@ target_compile_definitions(CampSign PRIVATE
 # Add any user requested libraries
 target_link_libraries(CampSign
   PicoLEDs
-  pico_cyw43_arch_lwip_threadsafe_background
-  pico_lwip_mbedtls
-  pico_mbedtls
+  pico_cyw43_arch_lwip_poll
   hardware_dma
   hardware_pio
   hardware_rtc
