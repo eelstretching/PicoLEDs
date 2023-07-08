@@ -6,6 +6,8 @@
 #include "Animation.h"
 #include "Canvas.h"
 
+#define EXPLOSION_DIVISOR 4
+
 class Spark {
     friend class Firework;
 
@@ -43,7 +45,7 @@ class Firework : Animation {
     Spark *flare;
 
     /// @brief The size of the trail for a rising flare.
-    uint flareSize = 6;
+    uint flareSize = 3;
 
     /// @brief The sparks that make up the explosion of the flare.
     Spark *explosion;

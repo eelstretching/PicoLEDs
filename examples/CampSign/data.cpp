@@ -17,32 +17,12 @@
 #define TEST_ITERATIONS 10
 #define POLL_TIME_S 5
 
-#if 0
-static void dump_bytes(const uint8_t *bptr, uint32_t len) {
-    unsigned int i = 0;
-
-    printf("dump_bytes %d", len);
-    for (i = 0; i < len;) {
-        if ((i & 0x0f) == 0) {
-            printf("\n");
-        } else if ((i & 0x07) == 0) {
-            printf(" ");
-        }
-        printf("%02x ", bptr[i++]);
-    }
-    printf("\n");
-}
-#define DUMP_BYTES dump_bytes
-#else
-#define DUMP_BYTES(A, B)
-#endif
-
 typedef struct TCP_CLIENT_T_ {
     struct tcp_pcb *tcp_pcb;
     ip_addr_t remote_addr;
     uint8_t sendBuff[SEND_BUFF_SIZE];
     uint8_t recvBuff[RECV_BUFF_SIZE];
-    int recv_buffer_len;
+    uint16_t recv_buffer_len;
     bool complete;
     bool connected;
 } TCP_CLIENT_T;
@@ -128,7 +108,10 @@ err_t tcp_client_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p,
                       err_t err) {
     TCP_CLIENT_T *state = (TCP_CLIENT_T *)arg;
     if (!p) {
-        return tcp_result(arg, -1);
+        //
+        // lwip docs say this will be called with a null pbuf when the server
+        // has closed the connection, which we'll interpret as success.
+        return tcp_result(arg, ERR_OK);
     }
     // this method is callback from lwIP, so cyw43_arch_lwip_begin is not
     // required, however you can use this method to cause an assertion in debug
@@ -136,9 +119,9 @@ err_t tcp_client_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p,
     cyw43_arch_lwip_check();
     if (p->tot_len > 0) {
         DEBUG_printf("recv %d err %d\n", p->tot_len, err);
-        for (struct pbuf *q = p; q != NULL; q = q->next) {
-            DUMP_BYTES(q->payload, q->len);
-        }
+        // for (struct pbuf *q = p; q != NULL; q = q->next) {
+        //     DUMP_BYTES(q->payload, q->len);
+        // }
         // Receive the buffer
         const uint16_t buffer_left = RECV_BUFF_SIZE - state->recv_buffer_len;
         state->recv_buffer_len += pbuf_copy_partial(
@@ -176,12 +159,10 @@ static bool tcp_client_open(void *arg) {
     // Note that when using pico_cyw_arch_poll these calls are a no-op and can
     // be omitted, but it is a good practice to use them in case you switch the
     // cyw43_arch type later.
-    printf("Ready to connect\n");
     cyw43_arch_lwip_begin();
     err_t err = tcp_connect(state->tcp_pcb, &state->remote_addr, TCP_PORT,
                             tcp_client_connected);
     cyw43_arch_lwip_end();
-    printf("Connected\n");
 
     return err == ERR_OK;
 }
@@ -258,7 +239,7 @@ data_t *fetch_data() {
                 case 8:
                     memcpy(ret->sunset, &state->recvBuff[ps], i - ps);
                     ret->sunset[i - ps] = 0;
-                   break;
+                    break;
                 case 9:
                     ret->pop = atoi((const char *)&(state->recvBuff[ps]));
                     break;

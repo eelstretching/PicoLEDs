@@ -23,7 +23,7 @@ Firework::Firework(Canvas* canvas, uint row)
     : canvas(canvas), row(row), numSparks(numSparks) {
     state = RESET;
     flare = new Spark[flareSize];
-    explosion = new Spark[canvas->getWidth() / 2];
+    explosion = new Spark[canvas->getWidth() / EXPLOSION_DIVISOR];
 }
 
 void Firework::reset() {
@@ -78,7 +78,7 @@ void Firework::startExplosion() {
     //
     // We want a number of sparks proportional to the position of the head of
     // the flare. This looks about right.
-    numSparks = MAX(canvas->getWidth() / 2, flare[0].pos / 2);
+    numSparks = MAX(canvas->getWidth() / EXPLOSION_DIVISOR, flare[0].pos / EXPLOSION_DIVISOR);
     explosionSteps = 0;
 
     // initialize sparks
