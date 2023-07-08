@@ -81,41 +81,48 @@ int main() {
     }
 
     data_t *signData = fetch_data();
-    
+
     rtc_init();
     rtc_set_datetime(&signData->dt);
 
     cyw43_arch_deinit();
 
-    // StopWatch aw;
-    // StopWatch sw;
+    StopWatch aw;
+    StopWatch sw;
 
-    // int nf = canvas.getHeight();
-    // Firework **fw = new Firework *[nf];
-    // for (int i = 0; i < nf; i++) {
-    //     fw[i] = new Firework(&canvas, i);
-    // }
+    int nf = canvas.getHeight();
+    Firework **fw = new Firework *[nf];
+    for (int i = 0; i < nf; i++) {
+        fw[i] = new Firework(&canvas, i);
+    }
 
     datetime_t dt;
     int n = 0;
     while (1) {
-        sleep_ms(4000);
-        rtc_get_datetime(&dt);
-        printf("RTC running: %s RTC time is: %04d/%02d/%02d %02d:%02d:%02d\n",
-               rtc_running() ? "yes" : "no", dt.year, dt.month, dt.day, dt.hour,
-               dt.min, dt.sec);
+        aw.start();
+        for (int i = 0; i < nf; i++) {
+            fw[i]->step();
+        }
+        aw.finish();
+        sw.start();
+        canvas.show();
+        sw.finish();
+        n++;
+        if (n % 500 == 0) {
+            rtc_get_datetime(&dt);
+            printf("Time is: %04d/%02d/%02d %02d:%02d:%02d\n", dt.year,
+                   dt.month, dt.day, dt.hour, dt.min, dt.sec);
+            printf("Stepped %d times, %.2f avg animation ms %.2f avg show ms\n",
+                   n, aw.getAverageTime() / 1000, sw.getAverageTime() / 1000);
+            for (int i = 0; i < 4; i++) {
+                printf(" Strip %d avg show time %.2f us\n", i,
+                       strips[i].getStripStats().getAverageTime());
+            }
+        }
 
-        // aw.start();
-        // for(int i = 0; i < nf; i++) {
-        //     fw[i]->step();
-        // }
-        // aw.finish();
-        // sw.start();
-        // canvas.show();
-        // sw.finish();
-        // uint64_t lms = sw.getLastTimeMS();
-        // if (lms < msPerFrame) {
-        //     sleep_ms(msPerFrame - lms);
-        // }
+        uint64_t lms = sw.getLastTimeMS();
+        if (lms < msPerFrame) {
+            sleep_ms(msPerFrame - lms);
+        }
     }
 }

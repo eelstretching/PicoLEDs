@@ -5,14 +5,13 @@
 
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
-
 #include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
 
 #define TCP_SERVER_IP "192.168.1.217"
 #define TCP_PORT 1030
 
-#define SEND_BUFF_SIZE 3
+#define SEND_BUFF_SIZE 4
 #define RECV_BUFF_SIZE 64
 #define DEBUG_printf printf
 #define TEST_ITERATIONS 10
@@ -195,10 +194,9 @@ static TCP_CLIENT_T *tcp_client_init(void) {
         return NULL;
     }
     //
-    // Send "foo", in bytes.
-    state->sendBuff[0] = 146;
-    state->sendBuff[1] = 157;
-    state->sendBuff[2] = 157;
+    // Send "foo" and a trailing newline, in bytes. The server expects to read a
+    // whole line before returning anything.
+    memcpy(state->sendBuff, "foo\n", 4);
     ip4addr_aton(TCP_SERVER_IP, &state->remote_addr);
     return state;
 }
@@ -225,7 +223,8 @@ data_t *fetch_data() {
     data_t *ret = (data_t *)calloc(1, sizeof(data_t));
     int el = 0;
     int ps = 0;
-    for (int i = 0; i < state->recv_buffer_len && el < 11; i++) {
+    state->recvBuff[state->recv_buffer_len] = 0;
+    for (int i = 0; i < state->recv_buffer_len && el < 12; i++) {
         if (state->recvBuff[i] == '\n') {
             //
             // Null terminate this substring.
@@ -241,29 +240,32 @@ data_t *fetch_data() {
                     ret->dt.day = atoi((const char *)&(state->recvBuff[ps]));
                     break;
                 case 3:
-                    ret->dt.hour = atoi((const char *)&(state->recvBuff[ps]));
+                    ret->dt.dotw = atoi((const char *)&(state->recvBuff[ps]));
                     break;
                 case 4:
-                    ret->dt.min = atoi((const char *)&(state->recvBuff[ps]));
+                    ret->dt.hour = atoi((const char *)&(state->recvBuff[ps]));
                     break;
                 case 5:
-                    ret->dt.sec = atoi((const char *)&(state->recvBuff[ps]));
+                    ret->dt.min = atoi((const char *)&(state->recvBuff[ps]));
                     break;
                 case 6:
+                    ret->dt.sec = atoi((const char *)&(state->recvBuff[ps]));
+                    break;
+                case 7:
                     memcpy(ret->sunrise, &state->recvBuff[ps], i - ps);
                     ret->sunrise[i - ps] = 0;
                     break;
-                case 7:
+                case 8:
                     memcpy(ret->sunset, &state->recvBuff[ps], i - ps);
                     ret->sunset[i - ps] = 0;
-                    break;
-                case 8:
+                   break;
+                case 9:
                     ret->pop = atoi((const char *)&(state->recvBuff[ps]));
                     break;
-                case 9:
+                case 10:
                     ret->high = atoi((const char *)&(state->recvBuff[ps]));
                     break;
-                case 10:
+                case 11:
                     ret->low = atoi((const char *)&(state->recvBuff[ps]));
                     break;
             }
