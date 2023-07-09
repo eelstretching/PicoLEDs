@@ -59,8 +59,9 @@ uint Font::render(char c, uint bx, uint by, RGB color) {
 
     //
     // Our origin is at the lower left (i.e., Cartesian), so we need to render
-    // from the top down with a character.
-    uint y = by + fontHeight;
+    // from the top down with a character. Note that we want to end on this row,
+    // so we need to subtract 1
+    uint y = by + fontHeight - 1;
 
     //
     // Loop over the rows of pixels in the character.
