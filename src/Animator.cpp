@@ -28,6 +28,7 @@ bool Animator::step() {
     // the list if we've reached the end.
     aw.start();
     if (!animations[pos]->step()) {
+        animations[pos]->finish();
         pos = (pos + 1) % animations.size();
         animations[pos]->init();
     }

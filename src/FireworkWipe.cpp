@@ -35,3 +35,7 @@ bool FireworkWipe::step() {
     }
     return keepGoing;
 }
+
+void FireworkWipe::finish() {
+    canvas->clear();
+}

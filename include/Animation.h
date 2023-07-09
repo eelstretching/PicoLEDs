@@ -38,6 +38,9 @@ class Animation {
     /// the animation is complete.
     virtual bool step() { return true; };
 
+    /// @brief Finishes the animation. Can be used to clear up, etc.
+    virtual void finish() {};
+
     Canvas *getCanvas() { return canvas; };
 };
 

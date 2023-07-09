@@ -15,5 +15,6 @@ class FireworkWipe : public Animation {
     FireworkWipe(Canvas *canvas);
     void init();
     bool step();
+    void finish();
 };
 #endif

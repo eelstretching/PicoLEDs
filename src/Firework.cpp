@@ -115,7 +115,7 @@ void Firework::explode() {
         return;
     }
 
-    canvas->clearRow(row);
+    // canvas->clearRow(row);
     for (int i = 0; i < numSparks; i++) {
         Spark* s = &explosion[i];
         s->pos += s->vel;
