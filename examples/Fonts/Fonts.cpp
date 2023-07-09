@@ -78,8 +78,8 @@ int main() {
     animator.add(&text);
     animator.add(&downWipe);
     
-    animator.init();
     canvas.clear();
+    animator.init();
 
     int n = 0;
     while (1) {

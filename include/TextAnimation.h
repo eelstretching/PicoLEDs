@@ -3,33 +3,34 @@
 
 #pragma once
 
+#include <vector>
+
+#include "Animator.h"
 #include "Canvas.h"
 #include "Font.h"
-#include "Animator.h"
 
 /// @brief A text element that can appear in a text animation.
 class TextElement {
-    public:
+   public:
     TextElement(const char *text, uint x, uint y, RGB color);
     const char *text;
     uint x;
     uint y;
     RGB color;
-    TextElement *next;
 };
 
 class TextAnimation : public Animation {
-    protected:
+   protected:
     /// @brief How long to display the canvas, in microseconds.
     uint duration;
     uint64_t start;
     Font *font;
-    TextElement *elements;
-    TextElement *lastElement;
+    std::vector<TextElement *> elements;
 
-    public:
-    /// @brief Creates a text "animation" that just displays the text for a given time.
-    /// @param canvas 
+   public:
+    /// @brief Creates a text "animation" that just displays the text for a
+    /// given time.
+    /// @param canvas
     /// @param font
     /// @param duration How long to display the text, in milliseconds.
     TextAnimation(Canvas *canvas, Font *font, uint duration);
@@ -40,7 +41,6 @@ class TextAnimation : public Animation {
     void init();
 
     bool step();
-
 };
 
 #endif

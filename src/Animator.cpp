@@ -14,7 +14,8 @@ void Animator::add(Animation* a) {
 
 void Animator::init() {
     pos = 0;
-    animations[pos]->init();
+    Animation *f = animations[pos];
+    f->init();
 }
 
 bool Animator::step() {
