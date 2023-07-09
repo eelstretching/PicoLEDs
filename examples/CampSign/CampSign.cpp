@@ -6,6 +6,9 @@
 #include "ScrollWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
+#include "DataAnimation.h"
+#include "TimeAnimation.h"
+#include "TimedAnimation.h"
 #include "View.h"
 #include "colorutils.h"
 #include "data.h"
@@ -99,15 +102,18 @@ int main() {
     //
     // A couple of animations.
     TextAnimation text(&canvas, &twoP, 2000);
-    TextElement t103("TROOPS 103 AND 511", 10, 8, RGB::Green);
+    TextElement t103("TROOPS 103 AND 511", 10, 9, RGB::Green);
     TextElement burl("BURLINGTON", 10, 0, RGB::Yellow);
     text.add(&t103);
     text.add(&burl);
 
-    TextAnimation data(&canvas, &twoP, 10000);
-    data.add(new TextElement("POP: 99 H: 87 SR: 4:32", 1, 8, RGB::Blue));
+    DataAnimation data(&canvas, &twoP, 3000, signData);
+    TimeAnimation time(&canvas, &twoP);
+    TimedAnimation timedTime(&time, 5000);
+
     ScrollWipe upWipe(&canvas, ScrollDirection::UP);
     upWipe.setExtraFrames(20);
+
     ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
     downWipe.setExtraFrames(20);
 
@@ -118,7 +124,7 @@ int main() {
     animator.add(&fww);
     animator.add(&data);
     animator.add(&fww);
-    animator.add(&text);
+    animator.add(&timedTime);
     animator.add(&upWipe);
     animator.add(&text);
     animator.add(&downWipe);
@@ -126,7 +132,6 @@ int main() {
     animator.init();
 
     int n = 0;
-    printf("About to start stepping\n");
     datetime_t dt;
     while (1) {
         animator.step();

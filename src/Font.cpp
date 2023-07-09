@@ -103,4 +103,32 @@ uint Font::render(char c, uint bx, uint by, RGB color) {
     return charWidth;
 }
 
-void Font::setSpacing(uint spacing) { this->spacing = spacing; }
+uint Font::getWidth(const char* text) { 
+        uint p = 0;
+    uint tw = 0;
+
+    //
+    // Loop until the string-terminating null.
+    while (text[p] != 0) {
+        char c = text[p++];
+        if (c == 32) {
+            //
+            // Space is just a space, bro.
+            tw += fontSpaceWidth;
+            continue;
+        }
+        uint charWidth = getWidth(c);
+        tw = tw + charWidth + spacing;
+    }
+    return tw;
+
+ }
+
+ uint Font::getWidth(char c) {
+    if(!proportional) {
+        return fontWidth;
+    }
+    return fontData[(c - fontBase) * fCBytes];
+ }
+
+ void Font::setSpacing(uint spacing) { this->spacing = spacing; }

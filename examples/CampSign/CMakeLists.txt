@@ -33,7 +33,7 @@ pico_sdk_init()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add executable. Default name is the project name, version 0.1
-add_executable(CampSign CampSign.cpp data.cpp DataAnimation.cpp)
+add_executable(CampSign CampSign.cpp data.cpp DataAnimation.cpp TimeAnimation.cpp)
 
 pico_set_program_name(CampSign "CampSign")
 pico_set_program_version(CampSign "0.1")

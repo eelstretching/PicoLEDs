@@ -52,7 +52,12 @@ class Font {
 
     /// @brief Gets the width of the given string rendered in this font.
     /// @param text 
-    void getWidth(const char *text);
+    uint getWidth(const char *text);
+
+    /// @brief Gets the width of the given character when rendered in this font.
+    /// @param c the character
+    /// @return the width of the character
+    uint getWidth(char c);
 
     uint getSpacing() {return spacing;};
 
