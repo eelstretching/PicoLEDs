@@ -3,15 +3,17 @@
 
 #pragma once
 
+#include <vector>
+
 #include "Animation.h"
 #include "StopWatch.h"
 
 class Animator : public Animation {
 
     protected:
-        Animation *animations;
-        Animation *last;
-        Animation *curr;
+        std::vector<Animation*> animations;
+
+        int pos = 0;
 
         int fps = 30;
 

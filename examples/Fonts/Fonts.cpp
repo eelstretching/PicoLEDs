@@ -62,21 +62,26 @@ int main() {
 
     //
     // A couple of animations.
-    TextAnimation text(&canvas, &robo, 10000);
+    TextAnimation text(&canvas, &robo, 5000);
     TextElement t103("TROOP 103 AND 511", 10, 8, RGB::Green);
     TextElement burl("BURLINGTON", 10, 0, RGB::Red);
     text.add(&t103);
     text.add(&burl);
-    ScrollWipe wipe(&canvas, ScrollDirection::UP);
+    ScrollWipe upWipe(&canvas, ScrollDirection::UP);
+    upWipe.setExtraFrames(20);
+    ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
+    downWipe.setExtraFrames(20);
 
     Animator animator(&canvas, 30);
     animator.add(&text);
-    animator.add(&wipe);
+    animator.add(&upWipe);
+    animator.add(&text);
+    animator.add(&downWipe);
+    
     animator.init();
     canvas.clear();
 
     int n = 0;
-    text.init();
     while (1) {
         animator.step();
         n++;

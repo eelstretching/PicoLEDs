@@ -4,29 +4,21 @@ Animator::Animator(Canvas* canvas) : Animation(canvas) {
     //
     // We'll do 30 FPS by default.
     setFPS(30);
-    animations = NULL;
-    last = NULL;
 }
 
 Animator::Animator(Canvas* canvas, int fps) : Animator(canvas) { setFPS(fps); }
 
 void Animator::add(Animation* a) {
-    a->next = NULL;
-    if (animations == NULL) {
-        animations = a;
-        last = a;
-    } else {
-        last->next = a;
-        last = a;
-    }
+    animations.push_back(a);
 }
 
 void Animator::init() {
-    curr = animations;
+    pos = 0;
+    animations[pos]->init();
 }
 
 bool Animator::step() {
-    if (curr == NULL) {
+    if (animations.size() == 0) {
         return false;
     }
     //
@@ -34,12 +26,9 @@ bool Animator::step() {
     // get ready for the next one in the list, looping around to the start of
     // the list if we've reached the end.
     aw.start();
-    if (!curr->step()) {
-        curr = curr->next;
-        if (curr == NULL) {
-            curr = animations;
-        }
-        curr->init();
+    if (!animations[pos]->step()) {
+        pos = (pos + 1) % animations.size();
+        animations[pos]->init();
     }
     canvas->show();
     aw.finish();

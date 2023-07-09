@@ -19,6 +19,8 @@ class ScrollWipe : public Animation {
     uint limit;
     /// @brief The direction that we'll scroll.
     ScrollDirection dir;
+    /// @brief Whether we should have some extra frames at the end.
+    uint extraFrames = 0;
 
    public:
     /// @brief Create a scroll wipe on the canvas for the given direction.
@@ -31,6 +33,7 @@ class ScrollWipe : public Animation {
     /// @brief Take a step in the scrolling direction.
     /// @return true if there's more scrolling to come, false otherwise.
     bool step();
+    void setExtraFrames(uint extraFrames);
 };
 
 #endif

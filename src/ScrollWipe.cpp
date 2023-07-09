@@ -37,3 +37,8 @@ bool ScrollWipe::step() {
     scrolled++;
     return scrolled < limit;
 }
+
+void ScrollWipe::setExtraFrames(uint extraFrames) {
+    this->extraFrames = extraFrames;
+    limit += extraFrames;
+}

@@ -17,9 +17,6 @@ class Animation {
     /// @brief A stop watch to count our animation time.
     StopWatch aw;
 
-    /// @brief We can make a list of animations and go from one to the next.
-    Animation *next;
-
    public:
     /// @brief Default constructor
     Animation();
@@ -40,14 +37,6 @@ class Animation {
     /// @returns true if the animation will continue after this step, false if
     /// the animation is complete.
     virtual bool step() { return true; };
-
-    /// @brief Gets the next animation in the list.
-    /// @return The next animation in the list.
-    Animation *getNext() { return next; };
-
-    void setNext(Animation *a) {
-        next = a;
-    }
 
     Canvas *getCanvas() { return canvas; };
 };
