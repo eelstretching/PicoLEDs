@@ -69,6 +69,7 @@ class Font {
 
    private:
     Canvas *canvas;
+    bool proportional;
     uint8_t fontWidth, fontHeight, fontSpaceWidth, fontBase, fontUpper, fWBytes,
         fCBytes;
     uint8_t spacing = 1;

@@ -2,7 +2,7 @@
 
 #include "Canvas.h"
 #include "FireworkWipe.h"
-#include "FontRobotron.h"
+#include "FontTwoP.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
@@ -95,16 +95,16 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
-    Font robo(&canvas, RobotronFontData);
+    Font twoP(&canvas, FontTwoPData);
     //
     // A couple of animations.
-    TextAnimation text(&canvas, &robo, 2000);
-    TextElement t103("TROOP 103 AND 511", 10, 8, RGB::Green);
-    TextElement burl("BURLINGTON", 10, 0, RGB::Red);
+    TextAnimation text(&canvas, &twoP, 2000);
+    TextElement t103("TROOPS 103 AND 511", 10, 8, RGB::Green);
+    TextElement burl("BURLINGTON", 10, 0, RGB::Yellow);
     text.add(&t103);
     text.add(&burl);
 
-    TextAnimation data(&canvas, &robo, 10000);
+    TextAnimation data(&canvas, &twoP, 10000);
     data.add(new TextElement("POP: 99 H: 87 SR: 4:32", 1, 8, RGB::Blue));
     ScrollWipe upWipe(&canvas, ScrollDirection::UP);
     upWipe.setExtraFrames(20);

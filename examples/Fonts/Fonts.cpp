@@ -3,11 +3,8 @@
 #include "Animator.h"
 #include "Canvas.h"
 #include "Font.h"
-#include "FontRobotron.h"
-#include "ScrollWipe.h"
-#include "FireworkWipe.h"
+#include "FontTwoP.h"
 #include "Strip.h"
-#include "TextAnimation.h"
 #include "View.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
@@ -58,42 +55,16 @@ int main() {
         strips[i].show();
     }
 
-    Font robo(&canvas, RobotronFontData);
+    Font twoP(&canvas, FontTwoPData);
 
     //
     // A couple of animations.
-    TextAnimation text(&canvas, &robo, 5000);
-    TextElement t103("TROOP 103 AND 511", 10, 8, RGB::Green);
-    TextElement burl("BURLINGTON", 10, 0, RGB::Red);
-    text.add(&t103);
-    text.add(&burl);
-    ScrollWipe upWipe(&canvas, ScrollDirection::UP);
-    upWipe.setExtraFrames(20);
-    ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
-    downWipe.setExtraFrames(20);
-
-    FireworkWipe fww(&canvas);
-    printf("Made fireworks\n");
-
-    Animator animator(&canvas, 30);
-    animator.add(&text);
-    animator.add(&fww);
-    animator.add(&text);
-    animator.add(&upWipe);
-    animator.add(&text);
-    animator.add(&downWipe);
-
-    animator.init();
-
-    int n = 0;
-    printf("About to start stepping\n");
     while (1) {
-        animator.step();
-        n++;
-        if (n % 300 == 0) {
-            printf("%d frames run, %.2f us/frame, %d missed frames\n", n,
-                   animator.getAverageFrameTimeUS(),
-                   animator.getMissedFrames());
-        }
+        int w = twoP.render("TROOPS 103 AND 511", 10, 8, RGB::Green);
+        int w2 = twoP.render("BURLINGTON, MA", 10, 0, RGB::Yellow);
+        canvas.show();
+
+        printf("Render was %d pixels wide\n", w);
+        sleep_ms(2000);
     }
 }
