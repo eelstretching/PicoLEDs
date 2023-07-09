@@ -17,7 +17,7 @@ FireworkWipe::FireworkWipe(Canvas* canvas) : Animation(canvas) {
 
 void FireworkWipe::init() {
     for (int i = 0; i < canvas->getHeight(); i++) {
-        fw[i]->randomFlare();
+        fw[i]->halfFlare();
         fw[i]->setState(State::START_EXPLOSION);
     }
 }
@@ -25,7 +25,6 @@ void FireworkWipe::init() {
 bool FireworkWipe::step() {
     bool keepGoing = true;
     for (int i = 0; i < canvas->getHeight(); i++) {
-        printf("FW %d step, %d %p\n", i, fw[i]->getState(), fw[i]);
         fw[i]->step();
         if (fw[i]->getState() == State::RESET) {
             //

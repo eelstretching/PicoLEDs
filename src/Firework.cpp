@@ -45,7 +45,6 @@ void Firework::reset() {
     }
     state = RISING;
 }
-    
 
 void Firework::rise() {
     canvas->clearRow(row);
@@ -78,18 +77,21 @@ void Firework::rise() {
 void Firework::randomFlare() {
     flare[0].pos = canvas->getWidth() / 2;
     int rand = random8(4);
-    if(random8(10) < 5) {
+    if (random8(10) < 5) {
         flare[0].pos -= rand;
     } else {
         flare[0].pos += rand;
     }
 }
 
+void Firework::halfFlare() { flare[0].pos = canvas->getWidth() / 2; }
+
 void Firework::startExplosion() {
     //
     // We want a number of sparks proportional to the position of the head of
     // the flare. This looks about right.
-    numSparks = MAX(canvas->getWidth() / EXPLOSION_DIVISOR, flare[0].pos / EXPLOSION_DIVISOR);
+    numSparks = MAX(canvas->getWidth() / EXPLOSION_DIVISOR,
+                    flare[0].pos / EXPLOSION_DIVISOR);
     explosionSteps = 0;
 
     // initialize sparks
@@ -97,7 +99,7 @@ void Firework::startExplosion() {
         Spark* s = &explosion[i];
         s->pos = flare[0].pos;
         // Velocity from -1 to 1, which means some go "up" and some go "down".
-        s->vel = (float(random16(0, 20000)) / 10000.0) - 1.0;
+        s->vel = (float(random16(0, 10000)) / 5000.0) - 1.0;
         // set colors before scaling velocity to keep them bright
         s->val = constrain(abs(s->vel) * 500, 0, 255);
         // proportional to height

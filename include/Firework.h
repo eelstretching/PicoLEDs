@@ -91,6 +91,9 @@ class Firework : public Animation {
     /// explosion.
     void randomFlare();
 
+    /// @brief Set up for a flare that starts right in the middle of the row.
+    void halfFlare();
+
     /// @brief Gets the current state of the firework.
     /// @return The state.
     State getState() { return state; };
