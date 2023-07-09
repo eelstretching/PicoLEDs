@@ -96,7 +96,7 @@ int main() {
     Font robo(&canvas, RobotronFontData);
     //
     // A couple of animations.
-    TextAnimation text(&canvas, &robo, 5000);
+    TextAnimation text(&canvas, &robo, 2000);
     TextElement t103("TROOP 103 AND 511", 10, 8, RGB::Green);
     TextElement burl("BURLINGTON", 10, 0, RGB::Red);
     text.add(&t103);

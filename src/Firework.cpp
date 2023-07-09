@@ -100,6 +100,11 @@ void Firework::startExplosion() {
         s->pos = flare[0].pos;
         // Velocity from -1 to 1, which means some go "up" and some go "down".
         s->vel = (float(random16(0, 10000)) / 5000.0) - 1.0;
+        //
+        // Goose the ones going up, so they got a bit higher.
+        if(s->vel > 0) {
+            s->vel *= 1.25;
+        }
         // set colors before scaling velocity to keep them bright
         s->val = constrain(abs(s->vel) * 500, 0, 255);
         // proportional to height
