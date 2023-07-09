@@ -1,4 +1,5 @@
 add_subdirectory(StripTest)
+add_subdirectory(Stuff)
 add_subdirectory(SimpleLEDs)
 add_subdirectory(Fonts)
 add_subdirectory(Fire)

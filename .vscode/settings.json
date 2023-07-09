@@ -25,6 +25,8 @@
       "altcp_tls.h": "c",
       "altcp_tcp.h": "c",
       "altcp.h": "c",
-      "vector": "cpp"
+      "vector": "cpp",
+      "memory": "cpp",
+      "random": "cpp"
     },
 }

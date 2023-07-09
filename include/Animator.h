@@ -19,7 +19,7 @@ class Animator : public Animation {
 
         float msPerFrame;
 
-        uint missedFrames;
+        uint missedFrames = 0;
 
         StopWatch aw;
 

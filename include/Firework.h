@@ -34,7 +34,6 @@ enum State {
 };
 
 class Firework : public Animation {
-
     /// @brief The row that we'll be animating
     uint row;
 
@@ -88,6 +87,27 @@ class Firework : public Animation {
     /// @brief The flare rises, trailing a number of sparks.
     void rise();
 
+    /// @brief Generate a random flare position so that we can just do the
+    /// explosion.
+    void randomFlare();
+
+    /// @brief Gets the current state of the firework.
+    /// @return The state.
+    State getState() { return state; };
+
+    /// @brief Sets the maximum number of steps that an explosion will take. You
+    /// can use this to limit the time for an explosion.
+    /// @param maxExplosionSteps The number of steps to take, i.e., the number
+    /// of frames. You can increase or decrease based on your fps to get a
+    /// certain time.
+    void setMaxExplosionSteps(uint maxExplosionSteps) {
+        this->maxExplosionSteps = maxExplosionSteps;
+    };
+
+    /// @brief Sets the current state of the firework.
+    /// @param state The state to use.
+    void setState(State state) { this->state = state; };
+
     /// @brief Initialize our explosion.
     void startExplosion();
 
@@ -95,7 +115,5 @@ class Firework : public Animation {
     void explode();
 
     bool step();
-
-    
 };
 #endif

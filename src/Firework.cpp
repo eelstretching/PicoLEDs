@@ -8,6 +8,7 @@
 #include "math8.h"
 #include "pico.h"
 #include "pico/platform.h"
+#include "pico/printf.h"
 
 static float constrain(float f, int min, int max) {
     if (f <= min) {
@@ -71,6 +72,16 @@ void Firework::rise() {
         RGB sc = HeatColor(s->val);
         sc %= 50;
         canvas->set(s->pos, row, sc);
+    }
+}
+
+void Firework::randomFlare() {
+    flare[0].pos = canvas->getWidth() / 2;
+    int rand = random8(4);
+    if(random8(10) < 5) {
+        flare[0].pos -= rand;
+    } else {
+        flare[0].pos += rand;
     }
 }
 
