@@ -1,6 +1,9 @@
 #include "Canvas.h"
-#include "Firework.h"
+#include "FireworkWipe.h"
+#include "FontRobotron.h"
+#include "ScrollWipe.h"
 #include "Strip.h"
+#include "TextAnimation.h"
 #include "View.h"
 #include "colorutils.h"
 #include "data.h"
@@ -90,39 +93,44 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
-    int nf = canvas.getHeight();
-    Firework **fw = new Firework *[nf];
-    for (int i = 0; i < nf; i++) {
-        fw[i] = new Firework(&canvas, i);
-    }
+    Font robo(&canvas, RobotronFontData);
+    //
+    // A couple of animations.
+    TextAnimation text(&canvas, &robo, 5000);
+    TextElement t103("TROOP 103 AND 511", 10, 8, RGB::Green);
+    TextElement burl("BURLINGTON", 10, 0, RGB::Red);
+    text.add(&t103);
+    text.add(&burl);
+    ScrollWipe upWipe(&canvas, ScrollDirection::UP);
+    upWipe.setExtraFrames(20);
+    ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
+    downWipe.setExtraFrames(20);
 
-    datetime_t dt;
+    FireworkWipe fww(&canvas);
+
+    Animator animator(&canvas, 30);
+    animator.add(&text);
+    animator.add(&fww);
+    animator.add(&text);
+    animator.add(&upWipe);
+    animator.add(&text);
+    animator.add(&downWipe);
+
+    animator.init();
+
     int n = 0;
+    printf("About to start stepping\n");
+    datetime_t dt;
     while (1) {
-        aw.start();
-        for (int i = 0; i < nf; i++) {
-            fw[i]->step();
-        }
-        aw.finish();
-        sw.start();
-        canvas.show();
-        sw.finish();
+        animator.step();
         n++;
         if (n % 500 == 0) {
             rtc_get_datetime(&dt);
             printf("Time is: %04d/%02d/%02d %02d:%02d:%02d\n", dt.year,
                    dt.month, dt.day, dt.hour, dt.min, dt.sec);
-            printf("Stepped %d times, %.2f avg animation ms %.2f avg show ms\n",
-                   n, aw.getAverageTime() / 1000, sw.getAverageTime() / 1000);
-            for (int i = 0; i < 4; i++) {
-                printf(" Strip %d avg show time %.2f us\n", i,
-                       strips[i].getStripStats().getAverageTime());
-            }
-        }
-
-        uint64_t lms = sw.getLastTimeMS();
-        if (lms < msPerFrame) {
-            sleep_ms(msPerFrame - lms);
+            printf("%d frames run, %.2f us/frame, %d missed frames\n", n,
+                   animator.getAverageFrameTimeUS(),
+                   animator.getMissedFrames());
         }
     }
 }
