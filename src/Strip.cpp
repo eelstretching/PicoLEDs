@@ -6,6 +6,7 @@
 
 #include "hardware/dma.h"
 #include "hardware/irq.h"
+#include "pico/printf.h"
 #include "ws2812.pio.h"
 
 /// @brief An alarm function that gets called when the delay required at the end
@@ -73,7 +74,7 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
       pio_sm_unclaim(pio, sm);  // unclaim the state machine and skip this PIO
       continue;                 // if program couldn't be added
     }
-
+    printf("Got PIO %d sm %d\n", i, sm);
     break;  // found pio and sm that work
   }
 
@@ -86,6 +87,8 @@ Strip::Strip(uint pin, uint num_pixels) : pin(pin), numPixels(num_pixels) {
   // usually work out fine)
   dma_channel = dma_claim_unused_channel(false);
   if (dma_channel == -1) return;  // no free DMA channel
+
+  printf("Using DMA channel %d\n", dma_channel);
 
   //
   // Set up a DMA Channel.

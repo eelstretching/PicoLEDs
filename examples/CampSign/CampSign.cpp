@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "Canvas.h"
 #include "FireworkWipe.h"
 #include "FontRobotron.h"
@@ -101,6 +103,9 @@ int main() {
     TextElement burl("BURLINGTON", 10, 0, RGB::Red);
     text.add(&t103);
     text.add(&burl);
+
+    TextAnimation data(&canvas, &robo, 10000);
+    data.add(new TextElement("POP: 99 H: 87 SR: 4:32", 1, 8, RGB::Blue));
     ScrollWipe upWipe(&canvas, ScrollDirection::UP);
     upWipe.setExtraFrames(20);
     ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
@@ -110,6 +115,8 @@ int main() {
 
     Animator animator(&canvas, 30);
     animator.add(&text);
+    animator.add(&fww);
+    animator.add(&data);
     animator.add(&fww);
     animator.add(&text);
     animator.add(&upWipe);
@@ -126,11 +133,11 @@ int main() {
         n++;
         if (n % 500 == 0) {
             rtc_get_datetime(&dt);
-            printf("Time is: %04d/%02d/%02d %02d:%02d:%02d\n", dt.year,
-                   dt.month, dt.day, dt.hour, dt.min, dt.sec);
-            printf("%d frames run, %.2f us/frame, %d missed frames\n", n,
-                   animator.getAverageFrameTimeUS(),
-                   animator.getMissedFrames());
+            printf(
+                "Time: %04d/%02d/%02d %02d:%02d:%02d %d frames run, %.2f "
+                "us/frame, %d missed frames\n",
+                dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec, n,
+                animator.getAverageFrameTimeUS(), animator.getMissedFrames());
         }
     }
 }

@@ -11,7 +11,7 @@ FireworkWipe::FireworkWipe(Canvas* canvas) : Animation(canvas) {
         }
         //
         // We want the wipe to last a little longer than the usual one.
-        fw[i]->setMaxExplosionSteps(120);
+        fw[i]->setMaxExplosionSteps(140);
     }
 }
 
