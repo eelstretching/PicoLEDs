@@ -60,11 +60,10 @@ int main() {
     //
     // A couple of animations.
     while (1) {
-        int w = twoP.render("TROOPS 103 AND 511", 10, 8, RGB::Green);
-        int w2 = twoP.render("BURLINGTON, MA", 10, 0, RGB::Yellow);
+        int w = twoP.render("prepared", 10, 8, RGB::ForestGreen);
         canvas.show();
 
         printf("Render was %d pixels wide\n", w);
-        sleep_ms(2000);
+        sleep_ms(1000);
     }
 }
