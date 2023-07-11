@@ -13,7 +13,10 @@ class TimeAnimation : public Animation {
 
     Font *font;
     datetime_t dt;
-    char tb[20];
+    char tb[25];
+    uint64_t start;
+    uint64_t last;
+    uint duration;
 
     void render();
 
@@ -22,7 +25,9 @@ class TimeAnimation : public Animation {
     /// @brief Creates a data animation that will display the time and weather data.
     /// @param canvas the canvas we'll display on
     /// @param font the font we'll use for display
-    TimeAnimation(Canvas *canvas, Font *font) : Animation(canvas), font(font) { };
+    /// @param duration the duration of the display, in milliseconds
+    TimeAnimation(Canvas *canvas, Font *font, uint duration) : Animation(canvas), font(font), duration(duration*1000) { 
+    };
     void init();
     bool step();
 

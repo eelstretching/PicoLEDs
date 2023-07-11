@@ -78,6 +78,7 @@ int main() {
     if (cyw43_arch_init_with_country(CYW43_COUNTRY_USA)) {
         printf("WiFi failed to initialise\n");
         twoP.render("WiFi init failed", 4, 10, RGB::Red);
+        canvas.show();
         return 1;
     }
 
@@ -88,10 +89,12 @@ int main() {
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
         printf("WiFi failed to connect\n");
         twoP.render("WiFi connect failed", 4, 10, RGB::Red);
+        canvas.show();
         return 1;
     }
 
     twoP.render("Fetching Data", 4, 10, RGB::Green);
+    canvas.show();
     data_t *signData = fetch_data();
 
     rtc_init();
@@ -114,9 +117,8 @@ int main() {
     TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
     lct.add(&prep);
 
-    DataAnimation data(&canvas, &twoP, 5000, signData);
-    TimeAnimation time(&canvas, &twoP);
-    TimedAnimation timedTime(&time, 5000);
+    DataAnimation wxData(&canvas, &twoP, 5000, signData);
+    TimeAnimation time(&canvas, &twoP, 8000);
 
     ScrollWipe upWipe(&canvas, ScrollDirection::UP);
     upWipe.setExtraFrames(20);
@@ -129,9 +131,9 @@ int main() {
     Animator animator(&canvas, 30);
     animator.add(&text);
     animator.add(&fww);
-    animator.add(&data);
+    animator.add(&wxData);
     animator.add(&fww);
-    animator.add(&timedTime);
+    animator.add(&time);
     animator.add(&upWipe);
     animator.add(&lct);
     animator.add(&downWipe);

@@ -1,21 +1,33 @@
 #include "TimeAnimation.h"
 
 #include "hardware/rtc.h"
+#include "hardware/timer.h"
 #include "pico/types.h"
 #include "pico/util/datetime.h"
+#include "pico/printf.h"
+
+#define S_IN_US 1000000
 
 void TimeAnimation::render() {
+    last = time_us_64();
     rtc_get_datetime(&dt);
-    sprintf(tb, "%02d/%02d %02d:%02d", dt.month, dt.day, dt.hour, dt.min);
-    uint w = font->getWidth(tb);
+    sprintf(tb, "%02d/%02d    %02d:%02d:%02d", dt.month, dt.day, dt.hour,
+            dt.min, dt.sec);
     canvas->clear();
-    font->render(tb, (canvas->getWidth() - w)/2, 4, RGB::White);
+    font->render(tb, 20, 4, RGB::White);
 }
 
 void TimeAnimation::init() {
+    start = time_us_64();
+    printf("Init %llu\n", start);
     render();
 }
 
 bool TimeAnimation::step() {
-    return true;
+    uint64_t curr = time_us_64();
+    if (curr - last >= S_IN_US) {
+        render();
+    }
+    return curr - start < duration;;
 }
+
