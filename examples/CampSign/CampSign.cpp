@@ -91,9 +91,8 @@ int main() {
         return 1;
     }
 
+    twoP.render("Fetching Data", 4, 10, RGB::Green);
     data_t *signData = fetch_data();
-    twoP.render("Got data", 4, 10, RGB::Green);
-
 
     rtc_init();
     rtc_set_datetime(&signData->dt);
@@ -112,7 +111,7 @@ int main() {
     text.add(&burl);
 
     TextAnimation lct(&canvas, &twoP, 6000);
-    TextElement prep("Be Prepared", 10, 4, RGB::Gold);
+    TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
     lct.add(&prep);
 
     DataAnimation data(&canvas, &twoP, 5000, signData);

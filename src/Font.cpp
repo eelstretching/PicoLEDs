@@ -50,9 +50,6 @@ uint Font::render(const char* text, uint bx, uint by, RGB color) {
 
 uint Font::render(char c, uint bx, uint by, RGB color) {
 
-    if(c == 'p') {
-        printf("here\n");
-    }
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;
