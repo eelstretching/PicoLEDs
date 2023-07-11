@@ -1,12 +1,12 @@
 #include <stdlib.h>
 
 #include "Canvas.h"
+#include "DataAnimation.h"
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
-#include "DataAnimation.h"
 #include "TimeAnimation.h"
 #include "TimedAnimation.h"
 #include "View.h"
@@ -71,11 +71,13 @@ int main() {
 
     sleep_ms(delay);
     canvas.clear();
+    Font twoP(&canvas, FontTwoPData);
 
     //
     // Setup for networking.
     if (cyw43_arch_init_with_country(CYW43_COUNTRY_USA)) {
         printf("WiFi failed to initialise\n");
+        twoP.render("WiFi init failed", 4, 10, RGB::Red);
         return 1;
     }
 
@@ -85,10 +87,13 @@ int main() {
     if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD,
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
         printf("WiFi failed to connect\n");
+        twoP.render("WiFi connect failed", 4, 10, RGB::Red);
         return 1;
     }
 
     data_t *signData = fetch_data();
+    twoP.render("Got data", 4, 10, RGB::Green);
+
 
     rtc_init();
     rtc_set_datetime(&signData->dt);
@@ -98,16 +103,19 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
-    Font twoP(&canvas, FontTwoPData);
     //
     // A couple of animations.
-    TextAnimation text(&canvas, &twoP, 2000);
-    TextElement t103("TROOPS 103 AND 511", 10, 9, RGB::Green);
-    TextElement burl("BURLINGTON", 10, 0, RGB::Yellow);
+    TextAnimation text(&canvas, &twoP, 5000);
+    TextElement t103("TROOPS 103 AND 511", 10, 9, RGB::ForestGreen);
+    TextElement burl("BURLINGTON, MA", 10, 0, RGB::Gold);
     text.add(&t103);
     text.add(&burl);
 
-    DataAnimation data(&canvas, &twoP, 3000, signData);
+    TextAnimation lct(&canvas, &twoP, 6000);
+    TextElement prep("Be Prepared", 10, 4, RGB::Gold);
+    lct.add(&prep);
+
+    DataAnimation data(&canvas, &twoP, 5000, signData);
     TimeAnimation time(&canvas, &twoP);
     TimedAnimation timedTime(&time, 5000);
 
@@ -126,7 +134,7 @@ int main() {
     animator.add(&fww);
     animator.add(&timedTime);
     animator.add(&upWipe);
-    animator.add(&text);
+    animator.add(&lct);
     animator.add(&downWipe);
 
     animator.init();
@@ -136,7 +144,7 @@ int main() {
     while (1) {
         animator.step();
         n++;
-        if (n % 500 == 0) {
+        if (n % 1000 == 0) {
             rtc_get_datetime(&dt);
             printf(
                 "Time: %04d/%02d/%02d %02d:%02d:%02d %d frames run, %.2f "

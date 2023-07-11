@@ -1,36 +1,40 @@
 #include "DataAnimation.h"
 
-#include "pico/stdlib.h"
 #include "pico/printf.h"
+#include "pico/stdlib.h"
 
 DataAnimation::DataAnimation(Canvas* canvas, Font* font, uint duration,
-                             data_t *data)
+                             data_t* data)
     : TextAnimation(canvas, font, duration), data(data) {
+    //
+    // Make text chunks for each of the data elements
+    sprintf(pop, "P: %d", data->pop);
+    sprintf(high, "H: %d", data->high);
+    sprintf(low, "L: %d", data->low);
+    sprintf(sr, "SR: %s", data->sunrise);
+    sprintf(ss, "SS: %s", data->sunset);
 
-        //
-        // Make text chunks for each of the data elements
-        char pop[8];
-        char high[6];
-        char low[6];
-        char sr[10];
-        char ss[10];
-        sprintf(pop, "P: %2d", data->pop);
-        sprintf(high, "H: %2d",   data->high);
-        sprintf(low, "L: %2d",   data->low);
-        sprintf(sr, "SR: %4s",   data->sunrise);
-        sprintf(ss, "SS: %4s",   data->sunset);
-        uint w1 = font->getWidth(pop);
-        uint w2 = font->getWidth(high);
-        uint w3 = font->getWidth(sr);
-        uint x = 5;
-        add(new TextElement(pop, x, 9, RGB::Blue));
-        x += w1 + 1;
-        add(new TextElement(high, x, 9, RGB::Red));
-        x += w2 + 1;
-        add(new TextElement(low, x, 9, RGB::Blue));
-        x = 5;
-        add(new TextElement(sr, x, 0, RGB::Yellow));
-        x += w3 + 1;
-        add(new TextElement(sr, x, 0, RGB::Yellow));
+    uint pp = 5;
+    add(new TextElement(pop, pp, 9, RGB::Blue));
+    uint hp = pp + font->getWidth(pop) + 3;
+    add(new TextElement(high, hp, 9, RGB::Red));
+    uint srp = hp + font->getWidth(high) + 3;
+    add(new TextElement(sr, srp, 9, RGB::Yellow));
+    add(new TextElement(low, hp, 0, RGB::Blue));
+    add(new TextElement(ss, srp, 0, RGB::Gray));
+}
 
+DataAnimation::~DataAnimation() {
+    for (auto el : elements) {
+        delete el;
     }
+    elements.clear();   
+}
+
+void DataAnimation::display() {
+    printf("%s\n", pop);
+    printf("%s\n", high);
+    printf("%s\n", low);
+    printf("%s\n", sr);
+    printf("%s\n", ss);
+}

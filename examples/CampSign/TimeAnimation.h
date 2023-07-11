@@ -5,8 +5,6 @@
 #include "Font.h"
 #include "pico/util/datetime.h"
 
-
-
 #pragma once
 
 class TimeAnimation : public Animation {
@@ -16,8 +14,8 @@ class TimeAnimation : public Animation {
     Font *font;
     datetime_t dt;
     char tb[20];
-    uint64_t last = 0;
-    uint64_t curr = 0;
+
+    void render();
 
 
     public:
@@ -25,7 +23,7 @@ class TimeAnimation : public Animation {
     /// @param canvas the canvas we'll display on
     /// @param font the font we'll use for display
     TimeAnimation(Canvas *canvas, Font *font) : Animation(canvas), font(font) { };
-
+    void init();
     bool step();
 
 };
