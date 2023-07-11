@@ -19,7 +19,6 @@ void TimeAnimation::render() {
 
 void TimeAnimation::init() {
     start = time_us_64();
-    printf("Init %llu\n", start);
     render();
 }
 
