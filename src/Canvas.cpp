@@ -5,6 +5,7 @@
 
 #include "View.h"
 #include "pico/platform.h"
+#include "pico/mem_ops.h"
 
 Canvas::Canvas(uint width, uint height) : width(width), height(height) {
     numPixels = width * height;

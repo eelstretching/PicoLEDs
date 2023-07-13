@@ -1,5 +1,4 @@
-/* XPM */
-static char *sun[]={
+static const char *sun_xpm[]={
 "16 16 13 1",
 "# c #000000",
 ". c #00ff00",
@@ -29,4 +28,28 @@ static char *sun[]={
 ".####hiiiij####.",
 ".###a######a###.",
 ".##a########a##.",
+"................"};
+
+static const char *rain_xpm[]={
+"16 16 5 1",
+"# c #000000",
+"c c #0000ff",
+". c #00ff00",
+"a c #808080",
+"b c #ffffff",
+"................",
+".####aaaaaa####.",
+".###abbbbbba###.",
+".###abbbbbba###.",
+".##aabbbbbbaa##.",
+".#abbabbbbabba#.",
+".abbbbbbbbbbbba.",
+".abbbbbbbbbbbba.",
+".abbbbbbbbbbbba.",
+".#abbbbbbbbbba#.",
+".##aaaaaaaaaa##.",
+".###c###c###c##.",
+".##c###c###c###.",
+".#c###c###c####.",
+".c###c###c#####.",
 "................"};

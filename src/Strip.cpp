@@ -7,6 +7,7 @@
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "pico/printf.h"
+#include "pico/mem_ops.h"
 #include "ws2812.pio.h"
 
 /// @brief An alarm function that gets called when the delay required at the end

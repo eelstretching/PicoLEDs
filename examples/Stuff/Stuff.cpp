@@ -2,13 +2,11 @@
 
 #include "Animator.h"
 #include "Canvas.h"
-#include "Font.h"
-#include "FontTwoP.h"
-#include "ScrollWipe.h"
-#include "FireworkWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
 #include "View.h"
+#include "icons.h"
+#include "Xpm.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -58,22 +56,19 @@ int main() {
         strips[i].show();
     }
 
-    FireworkWipe fww(&canvas);
-    printf("Made fireworks\n");
 
-    Animator animator(&canvas, 30);
-    animator.add(&fww);
-    animator.init();
+    printf("We are here!\n");
+    Xpm sun(sun_xpm);
+    Xpm rain(rain_xpm);
+    printf("sun:  %d %d\n", sun.getWidth(), sun.getHeight());
+    printf("rain: %d %d\n", rain.getWidth(), rain.getHeight());
+    sun.render(&canvas, 10, 0);
+    rain.render(&canvas, 30, 0);
+    canvas.show();
 
     int n = 0;
-    printf("About to start stepping\n");
     while (1) {
-        animator.step();
-        n++;
-        if (n % 300 == 0) {
-            printf("%d frames run, %.2f us/frame, %d missed frames\n", n,
-                   animator.getAverageFrameTimeUS(),
-                   animator.getMissedFrames());
-        }
+        printf("Running\n");
+        sleep_ms(5000);
     }
 }

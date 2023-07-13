@@ -6,8 +6,9 @@
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
 #include "pico/cyw43_arch.h"
-#include "pico/stdlib.h"
 #include "pico/printf.h"
+#include "pico/stdlib.h"
+#include "pico/mem_ops.h"
 
 #define TCP_SERVER_IP "192.168.1.217"
 #define TCP_PORT 1030
@@ -201,7 +202,7 @@ data_t *fetch_data() {
     }
 
     //
-    // Parse the returned data into our data structure. I know this is gross.
+    // Parse the returned data into our data structure. 
     data_t *ret = (data_t *)calloc(1, sizeof(data_t));
     int el = 0;
     int ps = 0;

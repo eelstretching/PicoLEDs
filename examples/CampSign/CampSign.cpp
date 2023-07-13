@@ -4,6 +4,7 @@
 #include "DataAnimation.h"
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
+#include "RandomAnimation.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
@@ -126,17 +127,30 @@ int main() {
     ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
     downWipe.setExtraFrames(20);
 
+    ScrollWipe leftWipe(&canvas, ScrollDirection::LEFT);
+    leftWipe.setExtraFrames(20);
+
+    ScrollWipe rightWipe(&canvas, ScrollDirection::RIGHT);
+    rightWipe.setExtraFrames(20);
+
     FireworkWipe fww(&canvas);
+
+    RandomAnimation wipes(&canvas);
+    wipes.add(&upWipe);
+    wipes.add(&downWipe);
+    wipes.add(&leftWipe);
+    wipes.add(&rightWipe);
+    wipes.add(&fww);
 
     Animator animator(&canvas, 30);
     animator.add(&text);
-    animator.add(&fww);
+    animator.add(&wipes);
     animator.add(&wxData);
-    animator.add(&fww);
+    animator.add(&wipes);
     animator.add(&time);
-    animator.add(&upWipe);
+    animator.add(&wipes);
     animator.add(&lct);
-    animator.add(&downWipe);
+    animator.add(&wipes);
 
     animator.init();
 

@@ -16,18 +16,14 @@ static inline uint8_t random8() { return get_rand_32() % 256; }
 /// @brief Generates an 8-bit random number between 0 and lim
 /// @param lim the upper bound for the result, exclusive
 static inline uint8_t random8(uint8_t lim) {
-    uint8_t r = random8();
-    r = (r * lim) >> 8;
-    return r;
+    return get_rand_32() % lim;
 }
 
 /// @brief Generates an 8-bit random number in the given range
 /// @param min the lower bound for the random number, inclusive
 /// @param lim the upper bound for the random number, exclusive
 static inline uint8_t random8(uint8_t min, uint8_t lim) {
-    uint8_t delta = lim - min;
-    uint8_t r = random8(delta) + min;
-    return r;
+    return random8(lim - min) + min;
 }
 
 /// Generate a 16-bit random number
@@ -41,10 +37,7 @@ static inline uint16_t random16()
 /// @param lim the upper bound for the result, exclusive
 static inline uint16_t random16( uint16_t lim)
 {
-    uint16_t r = random16();
-    uint32_t p = (uint32_t)lim * (uint32_t)r;
-    r = p >> 16;
-    return r;
+    return get_rand_32() % lim;
 }
 
 /// Generate an 16-bit random number in the given range
@@ -52,9 +45,7 @@ static inline uint16_t random16( uint16_t lim)
 /// @param lim the upper bound for the random number, exclusive
 static inline uint16_t random16( uint16_t min, uint16_t lim)
 {
-    uint16_t delta = lim - min;
-    uint16_t r = random16( delta) + min;
-    return r;
+    return random16(lim - min) + min;
 }
 
 
