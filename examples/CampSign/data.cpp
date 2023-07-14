@@ -10,7 +10,7 @@
 #include "pico/stdlib.h"
 #include "pico/mem_ops.h"
 
-#define TCP_SERVER_IP "192.168.1.217"
+#define TCP_SERVER_IP "129.80.173.91"
 #define TCP_PORT 1030
 
 #define SEND_BUFF_SIZE 4

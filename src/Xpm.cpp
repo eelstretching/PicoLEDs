@@ -90,5 +90,6 @@ void Xpm::render(Canvas *canvas, uint x, uint y) {
             printf("cx: %d cy: %d pix: %s\n", cx, cy, pixels[p].toString(b, 10));
             canvas->set(cx++, cy, pixels[p++]);
         }
+        cy--;
     }
 }

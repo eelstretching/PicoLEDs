@@ -10,13 +10,12 @@ weekdays = ["Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "
 class MyTCPHandler(socketserver.StreamRequestHandler):
 
     def handle(self):
+        print(f"{datetime.now()} Serving: {self.client_address[0]}")
         self.data = self.rfile.readline().strip()
-        # Likewise, self.wfile is a file-like object used to write back
-        # to the client.
         self.send_time()
         self.send_sun()
         self.send_weather()
-        print(f"{datetime.now()} served: {self.client_address[0]}")
+        print(f"{datetime.now()} Served: {self.client_address[0]}")
 
     def send_time(self):
         #
