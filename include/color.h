@@ -123,7 +123,7 @@ struct RGB {
   };
 
   char *toString(char *b, uint bs) {
-    snprintf(b, bs, "%X %X %X", raw[0], raw[1], raw[2]);
+    snprintf(b, bs, "%02X%02X%02X", raw[0], raw[1], raw[2]);
     return b;
   }
 

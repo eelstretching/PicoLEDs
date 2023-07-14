@@ -56,12 +56,13 @@ int main() {
         strips[i].show();
     }
 
-
-    printf("We are here!\n");
     Xpm sun(sun_xpm);
     Xpm rain(rain_xpm);
-    printf("sun:  %d %d\n", sun.getWidth(), sun.getHeight());
-    printf("rain: %d %d\n", rain.getWidth(), rain.getHeight());
+
+    printf("Sun\n");
+    sun.dump();
+    printf("Rain\n");
+    rain.dump();
     sun.render(&canvas, 10, 0);
     rain.render(&canvas, 30, 0);
     canvas.show();

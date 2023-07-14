@@ -13,6 +13,7 @@ class Xpm {
     uint8_t nc;
     uint8_t h;
     uint8_t w;
+    RGB *colors;
     RGB *pixels;
 
    public:
@@ -26,5 +27,6 @@ class Xpm {
     void render(Canvas *canvas, uint x, uint y);
     uint8_t getHeight() {return h;};
     uint8_t getWidth() {return w;};
+    void dump();
 };
 #endif

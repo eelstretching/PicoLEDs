@@ -43,7 +43,7 @@ Xpm::Xpm(const char *xpm[]) {
                     nc = v;
                     break;
             }
-            p = i+1;
+            p = i + 1;
             el++;
         }
     }
@@ -51,8 +51,7 @@ Xpm::Xpm(const char *xpm[]) {
     //
     // Colors.
     char *cc = new char[nc];
-    RGB *colors = new RGB[nc];
-    char b[10];
+    colors = new RGB[nc];
     for (int i = 0; i < nc; i++) {
         const char *row = xpm[i + 1];
         cc[i] = row[0];
@@ -65,19 +64,18 @@ Xpm::Xpm(const char *xpm[]) {
     //
     // Yeah, this is a triple-barrelled loop, but it only runs once per pixmap!
     for (int i = nc + 1; i < nc + 1 + h; i++) {
+        const char *row = xpm[i];
         for (int j = 0; j < w; j++) {
-            char p = xpm[i][j];
+            char pc = row[j];
             for (int k = 0; k < nc; k++) {
-                if (cc[k] == p) {
-                    pixels[p++] = RGB(colors[k]);
+                if (cc[k] == pc) {
+                    pixels[p++] = colors[k];
                     break;
                 }
             }
         }
-
-        delete[] cc;
-        delete[] colors;
     }
+    delete[] cc;
 }
 
 void Xpm::render(Canvas *canvas, uint x, uint y) {
@@ -87,9 +85,20 @@ void Xpm::render(Canvas *canvas, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            printf("cx: %d cy: %d pix: %s\n", cx, cy, pixels[p].toString(b, 10));
             canvas->set(cx++, cy, pixels[p++]);
         }
         cy--;
+    }
+}
+
+void Xpm::dump() {
+    int p = 0;
+    printf("w: %d h: %d nc: %d\n", w, h, nc);
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            RGB x = pixels[p++];
+            printf("#%02X%02X%02X ", x.r, x.g, x.b);
+        }
+        printf("\n");
     }
 }
