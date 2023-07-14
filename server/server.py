@@ -3,9 +3,11 @@
 import socketserver
 import time
 from datetime import datetime
+import pytz
 import requests
 
 weekdays = ["Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Sunday"]
+tz = pytz.timezone('US/Eastern')
 
 class MyTCPHandler(socketserver.StreamRequestHandler):
 
@@ -19,24 +21,24 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
 
     def send_time(self):
         #
-        # Write out the current time, suitable for setting the RTC of the pico
-        tm = time.localtime()
+        # Write out the current time, in the eastern time zone, suitable for setting the RTC of the pico
+        dt = pytz.utc.localize(datetime.now()).astimezone(tz)
         newl = "\n".encode()
-        self.wfile.write(str(tm.tm_year).encode())
+        self.wfile.write(str(dt.year).encode())
         self.wfile.write(newl)
-        self.wfile.write(str(tm.tm_mon).encode())
+        self.wfile.write(str(dt.month).encode())
         self.wfile.write(newl)
-        self.wfile.write(str(tm.tm_mday).encode())
+        self.wfile.write(str(dt.day).encode())
         self.wfile.write(newl)
         #
         # The Pico thinks dotw = 0 is Sunday, python things dotw = 0 is Monday!
-        self.wfile.write(str((tm.tm_wday+1)%7).encode())
+        self.wfile.write(str((dt.weekday()+1)%7).encode())
         self.wfile.write(newl)
-        self.wfile.write(str(tm.tm_hour).encode())
+        self.wfile.write(str(dt.hour).encode())
         self.wfile.write(newl)
-        self.wfile.write(str(tm.tm_min).encode())
+        self.wfile.write(str(dt.minute).encode())
         self.wfile.write(newl)
-        self.wfile.write(str(tm.tm_sec).encode())
+        self.wfile.write(str(dt.second).encode())
         self.wfile.write(newl)
 
     def send_weather(self):
@@ -46,7 +48,8 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
         low = 66
         if resp.status_code == 200:
             print(f"{datetime.now()} Got weather")
-            tname = weekdays[(time.localtime().tm_wday+1)%7];
+            dt = pytz.utc.localize(datetime.now()).astimezone(tz)
+            tname = weekdays[(dt.weekday()+1)%7];
             for day in resp.json()['properties']['periods']:
                 if day['name'] == tname:
                     pop = day['probabilityOfPrecipitation']['value']
