@@ -61,10 +61,10 @@ class Ghost : public Sprite {
 
     RGB pupil = RGB(33, 33, 255);
 
-    void drawPupil();
+    void drawPupils();
 
    public:
-    Ghost(Canvas *canvas, RGB color, uint8_t startX, uint8_t startY);
+    Ghost(Canvas *canvas, RGB color, int startX, int startY);
     bool step();
 };
 

@@ -64,11 +64,13 @@ int main() {
     pac.setDirection(RIGHT);
     Ghost inky(&canvas, inkyColor, canvas.getWidth() - 1, 1);
     inky.setDirection(LEFT);
-    
+
     Animator animator(&canvas);
 
     animator.add(&pac);
     animator.add(&inky);
+
+    animator.init();
 
     int n = 0;
     while (1) {

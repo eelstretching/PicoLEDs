@@ -61,6 +61,6 @@ class PacMan : public Sprite {
     Xpm xpms[3] = {Xpm(pac1), Xpm(pac2), Xpm(pac3)};
 
     public:
-    PacMan(Canvas *canvas, uint8_t startX, uint8_t startY);
+    PacMan(Canvas *canvas, int startX, int startY);
     Xpm *getXpms() {return xpms;};
 };

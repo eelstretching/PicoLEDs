@@ -20,16 +20,16 @@ class Sprite : public Animation {
 
     protected:
     std::vector<Xpm*> frames;
-    uint8_t startX;
-    uint8_t startY;
-    uint8_t pos;
+    int startX;
+    int startY;
+    int pos;
 
-    uint8_t x;
-    uint8_t y;
+    int x;
+    int y;
     SpriteDirection direction;
 
     public:
-    Sprite(Canvas *canvas, uint8_t startX, uint8_t startY) : Animation(canvas), startX(startX), startY(startY) {};
+    Sprite(Canvas *canvas, int startX, int startY) : Animation(canvas), startX(startX), startY(startY) {};
     void add(Xpm *frame);
     std::vector<Xpm*>& getFrames() {return frames;};
     void setDirection(SpriteDirection direction) {this->direction = direction;};

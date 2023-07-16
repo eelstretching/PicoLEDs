@@ -4,7 +4,7 @@
 // We're going to assume that we're called after the animation step, at which
 // point the pixels have been rendered into the canvas and now we need to add
 // the pupil in the right place.
-void Ghost::drawPupil() {
+void Ghost::drawPupils() {
     //
     // figure out the bottom-left coordinate of the eye on the canvas.
     uint cx, cy;
@@ -41,7 +41,7 @@ void Ghost::drawPupil() {
     canvas->set(cx + 7, cy + 1, pupil);
 }
 
-Ghost::Ghost(Canvas* canvas, RGB color, uint8_t startX, uint8_t startY) : Sprite(canvas, startX, startY) {
+Ghost::Ghost(Canvas* canvas, RGB color, int startX, int startY) : Sprite(canvas, startX, startY) {
     //
     // The animation loop. Each state lasts for two frames
     add(&xpms[0]);
@@ -64,6 +64,6 @@ Ghost::Ghost(Canvas* canvas, RGB color, uint8_t startX, uint8_t startY) : Sprite
 
 bool Ghost::step() { 
     bool ret = Sprite::step();
-    drawPupil();
+    drawPupils();
     return ret;
 }

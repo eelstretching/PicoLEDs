@@ -11,17 +11,11 @@ void Sprite::init() {
 bool Sprite::step() {
 
     //
-    // If we've moved off the canvas, we're done.
-    if(x >= canvas->getWidth() || y >= canvas->getHeight()) {
-        return false;
-    }
-
-    //
     // Remember where we were and how big we were, so we can clean up behind ourselves.
-    uint8_t prevX = x;
-    uint8_t prevY = y;
-    uint8_t h = frames[pos]->getHeight();
-    uint8_t w = frames[pos]->getWidth();
+    int prevX = x;
+    int prevY = y;
+    int h = frames[pos]->getHeight();
+    int w = frames[pos]->getWidth();
     switch (direction) {
         case UP:
             y++;

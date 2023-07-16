@@ -1,6 +1,6 @@
 #include "pacman.h"
 
-PacMan::PacMan(Canvas *canvas, uint8_t startX, uint8_t startY) : Sprite(canvas, startX, startY) {
+PacMan::PacMan(Canvas *canvas, int startX, int startY) : Sprite(canvas, startX, startY) {
 
     //
     // Define the animation loop. We'll have each state last for two frames.

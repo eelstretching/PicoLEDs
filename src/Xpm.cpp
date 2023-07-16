@@ -88,21 +88,19 @@ bool Xpm::render(Canvas *canvas, uint x, uint y) {
 
 bool Xpm::render(Canvas *canvas, RGB *colorMap, uint x, uint y) {
     bool atLeastOnePixel = false;
-        int cy = y + h - 1;
+    int cy = y + h - 1;
     int p = 0;
     char b[10];
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            if(canvas->set(cx++, cy, colorMap[pixels[p++]])) {
+            if (canvas->set(cx++, cy, colorMap[pixels[p++]])) {
                 atLeastOnePixel = true;
             }
-
         }
         cy--;
     }
     return atLeastOnePixel;
-
 }
 
 void Xpm::dump() {
