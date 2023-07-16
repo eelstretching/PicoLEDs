@@ -1,13 +1,12 @@
-#ifndef FIREWORK_WIPE
-#define FIREWORK_WIPE
-
-#pragma once
+#ifndef FIREWORKS_H
+#define FIREWORKS_H
 
 #include "Animation.h"
 #include "Firework.h"
 
-/// @brief A wipe that clears the screen with fireworks.
-class FireworkWipe : public Animation {
+#pragma once
+
+class Fireworks : public Animation {
    protected:
     /// @brief Our fireworks
     Firework **fw;
@@ -15,8 +14,8 @@ class FireworkWipe : public Animation {
     int nf;
 
    public:
-    FireworkWipe(Canvas *canvas);
-    FireworkWipe(Canvas *canvas, Firework **fw, int nf);
+    Fireworks(Canvas *canvas);
+    Fireworks(Canvas *canvas, Firework **fw, int nf);
     void init();
     bool step();
     void finish();

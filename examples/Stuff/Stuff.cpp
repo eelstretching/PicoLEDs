@@ -1,15 +1,16 @@
 #include <stdlib.h>
 
 #include "Animator.h"
+#include "Fireworks.h"
 #include "Canvas.h"
 #include "Strip.h"
 #include "TextAnimation.h"
 #include "View.h"
-#include "icons.h"
 #include "Xpm.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
+#include "icons.h"
 #include "pico/printf.h"
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
@@ -56,20 +57,22 @@ int main() {
         strips[i].show();
     }
 
-    Xpm sun(sun_xpm);
-    Xpm rain(rain_xpm);
+    Fireworks fw(&canvas);
 
-    printf("Sun\n");
-    sun.dump();
-    printf("Rain\n");
-    rain.dump();
-    sun.render(&canvas, 10, 0);
-    rain.render(&canvas, 30, 0);
-    canvas.show();
+    Animator animator(&canvas);
+
+    animator.add(&fw);
 
     int n = 0;
     while (1) {
-        printf("Running\n");
-        sleep_ms(5000);
+        animator.step();
+        n++;
+        if (n % 200 == 0) {
+            printf(
+                "%d frames run, %.2f "
+                "us/frame, %d missed frames\n",
+                n,
+                animator.getAverageFrameTimeUS(), animator.getMissedFrames());
+        }
     }
 }

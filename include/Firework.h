@@ -27,6 +27,7 @@ class Spark {
 };
 
 enum State {
+    PAUSE,
     RISING,
     START_EXPLOSION,
     EXPLODING,
@@ -36,6 +37,10 @@ enum State {
 class Firework : public Animation {
     /// @brief The row that we'll be animating
     uint row;
+
+    /// @brief The number of frames to pause before launching. Randomly chose
+    /// after each explotion to space things out a little better.
+    uint8_t pauseTime;
 
     /// @brief The rising flare, which has a head and a tail. The head is at
     /// position 0.
@@ -66,7 +71,7 @@ class Firework : public Animation {
 
     /// @brief Our good old friend gravity. Gravity will be subtracted from
     /// spark velocity as time increases.
-    float gravity = 0.004;
+    float gravity = 0.005;
 
     /// @brief Gravity for sparks that are falling from an explosion.
     float dyingGravity;

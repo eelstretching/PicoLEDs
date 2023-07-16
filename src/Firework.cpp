@@ -43,7 +43,11 @@ void Firework::reset() {
         }
         flare[i].val = constrain(flare[i].vel * 1000, 0, 255);
     }
-    state = RISING;
+    //
+    // After reset, we'll pause for a bit.
+    pauseTime = random8(10,90);
+    state = PAUSE;
+    canvas->clearRow(row);
 }
 
 void Firework::rise() {
@@ -149,6 +153,12 @@ bool Firework::step() {
     switch (state) {
         case RESET:
             reset();
+            break;
+        case PAUSE:
+            if(pauseTime == 0) {
+                state = RISING;
+            }
+            pauseTime--;
             break;
         case RISING:
             rise();
