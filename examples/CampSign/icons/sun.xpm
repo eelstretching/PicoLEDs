@@ -1,5 +1,5 @@
 /* XPM */
-static char *sun[]={
+static char *dummy[]={
 "16 16 13 1",
 "# c #000000",
 ". c #00ff00",

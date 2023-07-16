@@ -1,5 +1,5 @@
 /* XPM */
-static char *clouds[]={
+static char *dummy[]={
 "16 16 4 1",
 "# c #000000",
 ". c #00ff00",
