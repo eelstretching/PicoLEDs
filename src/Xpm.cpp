@@ -87,6 +87,12 @@ bool Xpm::render(Canvas *canvas, uint x, uint y) {
 }
 
 bool Xpm::render(Canvas *canvas, RGB *colorMap, uint x, uint y) {
+    //
+    // Maybe we didn't get a color map, in which case, use the colors defined in
+    // the pixmap.
+    if (colorMap == NULL) {
+        colorMap = colors;
+    }
     bool atLeastOnePixel = false;
     int cy = y + h - 1;
     int p = 0;

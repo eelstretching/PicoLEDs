@@ -33,7 +33,7 @@ bool Sprite::step() {
         default:
             break;
     }
-    bool someRendered = frames[pos]->render(canvas, x, y);
+    bool someRendered = frames[pos]->render(canvas, colorMap, x, y);
     pos = (pos + 1) % frames.size();
 
     //
