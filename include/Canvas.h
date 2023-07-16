@@ -48,19 +48,23 @@ class Canvas {
    public:
     Canvas(uint width, uint height);
 
-    uint getHeight() {return height;};
+    uint getHeight() { return height; };
 
-    uint getWidth() {return width;};
+    uint getWidth() { return width; };
 
     /// @brief Set the background color.
     /// @param b the color to use.
     void setBackground(RGB b);
 
+    RGB getBackground() { return background; };
+
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel
     /// @param y the y co-ordinate of the pixel
     /// @param p the color the pixel should be set to.
-    void set(uint x, uint y, RGB p);
+    /// @return true, if it was possible to set this pixel, false if the pixel
+    /// was not on the canvas as it was out-of-bounds.
+    bool set(int x, int y, RGB p);
 
     /// @brief Gets the value of the pixel at the given coordinates
     RGB get(uint x, uint y);
@@ -70,7 +74,7 @@ class Canvas {
     /// @param n the number of pixels to copy in
     /// @param x the x coordinate where we want to do the copying.
     /// @param y the y coordinate where we want to do the copying.
-    void copy(RGB* d, int n, int x, int y);
+    void copy(RGB *d, int n, int x, int y);
 
     /// @brief Fills a row with the given color.
     /// @param row the row to fill
@@ -86,7 +90,8 @@ class Canvas {
     /// @param c the color to fill with.
     void fill(RGB c);
 
-    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's algorithm.
+    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's
+    /// algorithm.
     /// @param x0 The x coordinate of the first point.
     /// @param y0 The y coordinate of the first point.
     /// @param x1 The x coordinate of the second point.
@@ -102,14 +107,15 @@ class Canvas {
     /// @param c The color of the line to draw with.
     void drawRect(uint x0, uint y0, uint x1, uint y1, RGB c);
 
-     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1), filled with the given color.
+    /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1),
+    /// filled with the given color.
     /// @param x0 The x coordinate of one corner
     /// @param y0 The y coordinate of one corner
     /// @param x1 The x coordinate of the other corner
     /// @param y1 The y coordinate of the other corner
     /// @param l The color of the line to draw with.
     /// @param f The color to fill the rectangle with.
-   void drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f);
+    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f);
 
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.

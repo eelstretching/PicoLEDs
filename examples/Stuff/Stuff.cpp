@@ -1,7 +1,10 @@
 #include <stdlib.h>
 
+#include <vector>
 #include "Animator.h"
 #include "Fireworks.h"
+#include "pacman.h"
+#include "ghost.h"
 #include "Canvas.h"
 #include "Strip.h"
 #include "TextAnimation.h"
@@ -57,11 +60,15 @@ int main() {
         strips[i].show();
     }
 
-    Fireworks fw(&canvas);
-
+    PacMan pac(&canvas, 1, 1);
+    pac.setDirection(RIGHT);
+    Ghost inky(&canvas, inkyColor, canvas.getWidth() - 1, 1);
+    inky.setDirection(LEFT);
+    
     Animator animator(&canvas);
 
-    animator.add(&fw);
+    animator.add(&pac);
+    animator.add(&inky);
 
     int n = 0;
     while (1) {

@@ -16,14 +16,15 @@ Canvas::Canvas(uint width, uint height) : width(width), height(height) {
 
 void Canvas::setBackground(RGB b) { background = b; }
 
-void Canvas::set(uint x, uint y, RGB c) {
-    if (x >= width || y >= height) {
+bool Canvas::set(int x, int y, RGB c) {
+    if (x >= width || x < 0 || y >= height || y < 0) {
         //
         // Off the canvas.
-        return;
+        return false;
     }
 
     data[getPos(x, y)] = c;
+    return true;
 }
 
 RGB Canvas::get(uint x, uint y) { return data[getPos(x, y)]; }

@@ -59,7 +59,11 @@ Xpm::Xpm(const char *xpm[]) {
                         hextoi(row[9], row[10]));
     }
 
-    pixels = new RGB[w * h];
+    //
+    // The pixel values are just an index into the colors table. We're limited
+    // to 256 24-bit colors by this hack, but it makes the Xpms one-third the
+    // size, and lets us re-color pixmaps on the fly.
+    pixels = new uint8_t[w * h];
     p = 0;
     //
     // Yeah, this is a triple-barrelled loop, but it only runs once per pixmap!
@@ -69,7 +73,7 @@ Xpm::Xpm(const char *xpm[]) {
             char pc = row[j];
             for (int k = 0; k < nc; k++) {
                 if (cc[k] == pc) {
-                    pixels[p++] = colors[k];
+                    pixels[p++] = k;
                     break;
                 }
             }
@@ -78,17 +82,27 @@ Xpm::Xpm(const char *xpm[]) {
     delete[] cc;
 }
 
-void Xpm::render(Canvas *canvas, uint x, uint y) {
-    int cy = y + h - 1;
+bool Xpm::render(Canvas *canvas, uint x, uint y) {
+    return render(canvas, colors, x, y);
+}
+
+bool Xpm::render(Canvas *canvas, RGB *colorMap, uint x, uint y) {
+    bool atLeastOnePixel = false;
+        int cy = y + h - 1;
     int p = 0;
     char b[10];
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            canvas->set(cx++, cy, pixels[p++]);
+            if(canvas->set(cx++, cy, colorMap[pixels[p++]])) {
+                atLeastOnePixel = true;
+            }
+
         }
         cy--;
     }
+    return atLeastOnePixel;
+
 }
 
 void Xpm::dump() {

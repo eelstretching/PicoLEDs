@@ -14,7 +14,7 @@ class Xpm {
     uint8_t h;
     uint8_t w;
     RGB *colors;
-    RGB *pixels;
+    uint8_t *pixels;
 
    public:
     /// @brief Creates a pixmap
@@ -24,9 +24,23 @@ class Xpm {
     /// @param canvas the canvas to render on
     /// @param x the x coordinate to render at
     /// @param y the y coordinate to render at
-    void render(Canvas *canvas, uint x, uint y);
-    uint8_t getHeight() {return h;};
-    uint8_t getWidth() {return w;};
+    /// @return true if any pixel of the pixmap was rendered onto the canvas,
+    /// false otherwise. This will give us a way to detect if a pixmap was
+    /// rendered "off-screen" when making sprites.
+    bool render(Canvas *canvas, uint x, uint y);
+    /// @brief Renders the pixmap with a different set of colors, which means we
+    /// only need one set of bitmaps for several different colored characters
+    /// (e.g., the Pac-Man ghosts).
+    /// @param canvas The canvas to render on
+    /// @param colorMap The colorMap to use. We're not going to do a lot of
+    /// checking on this, so beware.
+    /// @param x The x coordinate to render at
+    /// @param y the y coordinate to render at
+    bool render(Canvas *canvas, RGB *colorMap, uint x, uint y);
+    RGB *getColors() { return colors; };
+    uint8_t getNumberOfColors() { return nc; };
+    uint8_t getHeight() { return h; };
+    uint8_t getWidth() { return w; };
     void dump();
 };
 #endif
