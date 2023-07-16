@@ -3,8 +3,8 @@
 #include <vector>
 #include "Animator.h"
 #include "Fireworks.h"
-#include "pacman.h"
-#include "ghost.h"
+#include "PacMan.h"
+#include "Ghost.h"
 #include "Canvas.h"
 #include "Strip.h"
 #include "TextAnimation.h"
