@@ -2,7 +2,7 @@
 
 pico_sdk_init()
 
-add_executable(Stuff Stuff.cpp PacMan.cpp Ghost.cpp)
+add_executable(Stuff Stuff.cpp)
 
 pico_set_program_name(Stuff "Stuff")
 pico_set_program_version(Stuff "0.1")

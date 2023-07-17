@@ -6,10 +6,10 @@
 #include "pico/types.h"
 
 enum ScrollDirection {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
+    SCROLL_UP,
+    SCROLL_DOWN,
+    SCROLL_LEFT,
+    SCROLL_RIGHT,
 };
 
 class ScrollWipe : public Animation {

@@ -10,10 +10,10 @@
 #include "Xpm.h"
 
 enum SpriteDirection {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
+    SPRITE_UP,
+    SPRITE_DOWN,
+    SPRITE_LEFT,
+    SPRITE_RIGHT,
 };
 
 class Sprite : public Animation {
@@ -38,6 +38,10 @@ class Sprite : public Animation {
     void setDirection(SpriteDirection direction) {
         this->direction = direction;
     };
+    void setStartPosition(int startX, int startY) {
+        this->startX = startX;
+        this->startY = startY;
+    }
     void init();
     bool step();
 };

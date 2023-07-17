@@ -17,16 +17,16 @@ bool Sprite::step() {
     int h = frames[pos]->getHeight();
     int w = frames[pos]->getWidth();
     switch (direction) {
-        case UP:
+        case SPRITE_UP:
             y++;
             break;
-        case DOWN:
+        case SPRITE_DOWN:
             y--;
             break;
-        case LEFT:
+        case SPRITE_LEFT:
             x--;
             break;
-        case RIGHT:
+        case SPRITE_RIGHT:
             x++;
             break;
 
@@ -39,22 +39,22 @@ bool Sprite::step() {
     //
     // clear out the pixels left behind
     switch (direction) {
-        case UP:
+        case SPRITE_UP:
             for(int a = x; a < x + w; a++) {
                 canvas->set(a, prevY, canvas->getBackground());
             }
             break;
-        case DOWN:
+        case SPRITE_DOWN:
             for(int a = x; a < x + w; a++) {
                 canvas->set(a, prevY+h-1, canvas->getBackground());
             }
             break;
-        case LEFT:
+        case SPRITE_LEFT:
             for(int a = y; a < y+h-1; a++) {
                 canvas->set(prevX+w-1, a, canvas->getBackground());
             }
             break;
-        case RIGHT:
+        case SPRITE_RIGHT:
             for(int a = y; a < y+h-1; a++) {
                 canvas->set(prevX, a, canvas->getBackground());
             }

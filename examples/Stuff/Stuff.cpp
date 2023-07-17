@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "PacWipe.h"
 #include <vector>
 #include "Animator.h"
 #include "Fireworks.h"
@@ -60,24 +61,10 @@ int main() {
         strips[i].show();
     }
 
-    PacMan pac(&canvas, 0, 1);
-    pac.setDirection(RIGHT);
-    Ghost inky(&canvas, inkyColor, canvas.getWidth() - 1, 1);
-    inky.setDirection(LEFT);
-    Ghost blinky(inky, blinkyColor, 0, 1);
-    blinky.setDirection(RIGHT);
-    Ghost pinky(inky, pinkyColor, canvas.getWidth() - 1, 1);
-    pinky.setDirection(LEFT);
-    Ghost clyde(inky, clydeColor, 0, 1);
-    clyde.setDirection(RIGHT);
-
+    PacWipe pac(&canvas);
     Animator animator(&canvas);
 
     animator.add(&pac);
-    animator.add(&inky);
-    animator.add(&blinky);
-    animator.add(&pinky);
-    animator.add(&clyde);
 
     animator.init();
 

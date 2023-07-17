@@ -5,6 +5,7 @@
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "RandomAnimation.h"
+#include "PacWipe.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
 #include "TextAnimation.h"
@@ -77,8 +78,8 @@ int main() {
     //
     // Setup for networking.
     if (cyw43_arch_init_with_country(CYW43_COUNTRY_USA)) {
-        printf("WiFi failed to initialise\n");
-        twoP.render("WiFi init failed", 4, 10, RGB::Red);
+        printf("WiFi not init\n");
+        twoP.render("WiFi init failed", 4, 4, RGB::Red);
         canvas.show();
         return 1;
     }
@@ -88,8 +89,8 @@ int main() {
     printf("Connecting to Wi-Fi %s\n", WIFI_SSID);
     if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD,
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
-        printf("WiFi failed to connect\n");
-        twoP.render("WiFi connect failed", 4, 10, RGB::Red);
+        printf("WiFi not connect\n");
+        twoP.render("WiFi connect failed", 4, 4, RGB::Red);
         canvas.show();
         return 1;
     }
@@ -121,19 +122,21 @@ int main() {
     DataAnimation wxData(&canvas, &twoP, 5000, signData);
     TimeAnimation time(&canvas, &twoP, 8000);
 
-    ScrollWipe upWipe(&canvas, ScrollDirection::UP);
+    ScrollWipe upWipe(&canvas, ScrollDirection::SCROLL_UP);
     upWipe.setExtraFrames(20);
 
-    ScrollWipe downWipe(&canvas, ScrollDirection::DOWN);
+    ScrollWipe downWipe(&canvas, ScrollDirection::SCROLL_DOWN);
     downWipe.setExtraFrames(20);
 
-    ScrollWipe leftWipe(&canvas, ScrollDirection::LEFT);
+    ScrollWipe leftWipe(&canvas, ScrollDirection::SCROLL_LEFT);
     leftWipe.setExtraFrames(20);
 
-    ScrollWipe rightWipe(&canvas, ScrollDirection::RIGHT);
+    ScrollWipe rightWipe(&canvas, ScrollDirection::SCROLL_RIGHT);
     rightWipe.setExtraFrames(20);
 
     FireworkWipe fww(&canvas);
+
+    PacWipe pac(&canvas);
 
     RandomAnimation wipes(&canvas);
     wipes.add(&upWipe);
@@ -141,6 +144,7 @@ int main() {
     wipes.add(&leftWipe);
     wipes.add(&rightWipe);
     wipes.add(&fww);
+    wipes.add(&pac);
 
     Animator animator(&canvas, 30);
     animator.add(&text);
