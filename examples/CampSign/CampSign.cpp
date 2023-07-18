@@ -9,6 +9,7 @@
 #include "PacWipe.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
+#include "ScoutLaw.h"
 #include "TextAnimation.h"
 #include "TimeAnimation.h"
 #include "TimedAnimation.h"
@@ -128,11 +129,13 @@ int main() {
     RandomText randText(&canvas, &twoP, 6000);
 
     TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
-    TextElement turn("DO A GOOD TURN DAILY!", 5, 4, RGB::Gold);
-    TextElement fire("BE CAREFUL WITH FIRE", 5, 4, RGB::Gold);
+    TextElement turn("DO A GOOD TURN", 0, 4, RGB::Gold);
+    TextElement fire("BE CAREFUL WITH FIRE", 0, 4, RGB::Gold);
     randText.add(&prep);
     randText.add(&turn);
     randText.add(&fire);
+
+    ScoutLaw law(&canvas, &twoP, 500);
 
     DataAnimation wxData(&canvas, &twoP, 5000, signData);
     TimeAnimation time(&canvas, &twoP, 8000);
@@ -170,6 +173,14 @@ int main() {
     animator.add(&wipes);
     animator.add(&randText);
     animator.add(&wipes);
+    animator.add(&law);
+    animator.add(&wipes);
+
+    void *foo = malloc(16*1024);
+    if(foo != NULL) {
+        printf("Malloced 16K!\n");
+        free(foo);
+    }
 
     animator.init();
 

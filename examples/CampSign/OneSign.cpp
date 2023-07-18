@@ -77,7 +77,7 @@ int main() {
     canvas.clear();
     Font twoP(&canvas, FontTwoPData);
 
-    ScoutLaw law(&canvas, &twoP);
+    ScoutLaw law(&canvas, &twoP, 500);
     Animator animator(&canvas, 30);
     animator.add(&law);
     animator.init();

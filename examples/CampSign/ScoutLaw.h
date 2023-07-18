@@ -9,7 +9,7 @@
 
 class ScoutLaw : public Animation {
    protected:
-    uint scrollDuration = 1000 * 1000;
+    int wait;
     uint8_t state;
     uint64_t start;
     int curr;
@@ -29,7 +29,7 @@ class ScoutLaw : public Animation {
                            "THRIFTY",    "BRAVE", "CLEAN",    "REVERENT"};
 
    public:
-    ScoutLaw(Canvas *canvas, Font *font);
+    ScoutLaw(Canvas *canvas, Font *font, int wait);
     void init();
     bool step();
 };
