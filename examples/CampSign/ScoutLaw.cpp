@@ -10,18 +10,18 @@ ScoutLaw::ScoutLaw(Canvas* canvas, Font* font)
     : Animation(canvas), font(font) {}
 
 void ScoutLaw::init() {
+
     canvas->clear();
 
     single = random8(100) < 50;
     state = SCROLLING;
 
+    int w = font->getWidth(sis);
+
     //
     // Render the constant part, remember where it ends.
-    lawPos = font->render(sis, 2, 4, RGB::ForestGreen);
-    lawPos += 4;
+    font->render(sis, (canvas->getHeight() - w) / 2, 8, RGB::ForestGreen);
 
-    start = time_us_64();
-    scrollY = 15;
     //
     // If we're doing a single element, pick a random one.
     if (single) {
@@ -31,6 +31,12 @@ void ScoutLaw::init() {
         printf("Everything\n");
         curr = 0;
     }
+
+    cw = font->getWidth(law[curr]);
+    mid = (canvas->getWidth() - cw) / 2;
+    scrollX = 0 - cw;
+
+    start = time_us_64();
 }
 
 bool ScoutLaw::step() {
@@ -39,31 +45,35 @@ bool ScoutLaw::step() {
         case SCROLLING:
             //
             // clear out the space, then render the current text at the given Y.
-            canvas->clear(lawPos, 0, canvas->getWidth() - lawPos,
-                          canvas->getHeight());
-            font->render(law[curr], lawPos, scrollY, RGB::Gold);
-            if (scrollY == 4) {
+            for(int i = 0; i < font->getFontHeight(); i++) {
+                canvas->clearRow(i);
+            }
+            font->render(law[curr], scrollX, 0, RGB::Gold);
+            if (scrollX == mid) {
                 //
                 // At this postion, we need to wait for a bit.
                 start = time_us_64();
                 state = WAITING;
-            } else if(scrollY + font->getFontHeight() == 0) {
+            } else if (scrollX >= (int) canvas->getWidth()) {
                 //
                 // We've scrolled off screen.
                 curr++;
 
                 //
                 // We're done our only one, or we're all done.
-                if(single || curr >= n) {
+                if (single || curr >= n) {
                     return false;
                 }
 
                 //
-                // Set up for the next one, if there isn't one, we're done.            
-                scrollY = 15;
+                // Set up for the next one, if there isn't one, we're done.
+                cw = font->getWidth(law[curr]);
+                mid = (canvas->getWidth() - cw) / 2;
+                scrollX = 0 - cw;
                 state = SCROLLING;
+            } else {
+                scrollX++;
             }
-            scrollY--;
             break;
         case WAITING:
             if (diff >= scrollDuration) {

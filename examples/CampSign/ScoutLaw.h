@@ -12,11 +12,14 @@ class ScoutLaw : public Animation {
     uint scrollDuration = 1000 * 1000;
     uint8_t state;
     uint64_t start;
-    uint curr;
+    int curr;
+    int cw;
+    int mid;
+
     bool single;
-    uint lawPos = 0;
+
     /// @brief Where we'll render the current element.
-    int scrollY = 0;
+    int scrollX = 0;
 
     Font *font;
     uint n = 12;

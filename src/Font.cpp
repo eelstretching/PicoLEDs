@@ -25,7 +25,7 @@ Font::Font(Canvas* canvas, const uint8_t* fontData) {
     }
 }
 
-uint Font::render(const char* text, uint bx, uint by, RGB color) {
+uint Font::render(const char* text, int bx, int by, RGB color) {
     uint x = bx;
     uint p = 0;
     uint tw = 0;
@@ -48,8 +48,7 @@ uint Font::render(const char* text, uint bx, uint by, RGB color) {
     return tw;
 }
 
-uint Font::render(char c, uint bx, uint by, RGB color) {
-
+uint Font::render(char c, int bx, int by, RGB color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;
@@ -104,8 +103,8 @@ uint Font::render(char c, uint bx, uint by, RGB color) {
     return charWidth;
 }
 
-uint Font::getWidth(const char* text) { 
-        uint p = 0;
+uint Font::getWidth(const char* text) {
+    uint p = 0;
     uint tw = 0;
 
     //
@@ -122,14 +121,13 @@ uint Font::getWidth(const char* text) {
         tw = tw + charWidth + spacing;
     }
     return tw;
+}
 
- }
-
- uint Font::getWidth(char c) {
-    if(!proportional) {
+uint Font::getWidth(char c) {
+    if (!proportional) {
         return fontWidth;
     }
     return fontData[(c - fontBase) * fCBytes];
- }
+}
 
- void Font::setSpacing(uint spacing) { this->spacing = spacing; }
+void Font::setSpacing(uint spacing) { this->spacing = spacing; }
