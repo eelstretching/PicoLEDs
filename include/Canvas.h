@@ -211,6 +211,13 @@ class Canvas {
     /// @brief Clears the canvas.
     void clear();
 
+    /// @brief Clears a region of the canvas
+    /// @param x The x coordinate to start clearing at
+    /// @param y The y coordinate to start clearing at
+    /// @param w The width of the region
+    /// @param h The height of the region
+    void clear(uint x, uint y, uint w, uint h);
+
     /// @brief Clears a row of the canvas.
     /// @param row the row to clear.
     void clearRow(uint row);

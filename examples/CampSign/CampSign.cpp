@@ -5,6 +5,7 @@
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "RandomAnimation.h"
+#include "RandomText.h"
 #include "PacWipe.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
@@ -86,7 +87,10 @@ int main() {
 
     cyw43_arch_enable_sta_mode();
 
-    printf("Connecting to Wi-Fi %s\n", WIFI_SSID);
+    printf("CONNECT TO WIFI %s\n", WIFI_SSID);
+    twoP.render("CONNECT TO WIFI...", 4, 4, RGB::Green);
+    canvas.show();
+
     if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD,
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
         printf("WiFi not connect\n");
@@ -95,7 +99,13 @@ int main() {
         return 1;
     }
 
-    twoP.render("Fetching Data", 4, 10, RGB::Green);
+    canvas.clear();
+    twoP.render("WIFI CONNECT!", 4, 4, RGB::Green);
+    canvas.show();
+    sleep_ms(2000);
+
+    canvas.clear();
+    twoP.render("FETCH DATA...", 4,4, RGB::Green);
     canvas.show();
     data_t *signData = fetch_data();
 
@@ -115,9 +125,14 @@ int main() {
     text.add(&t103);
     text.add(&burl);
 
-    TextAnimation lct(&canvas, &twoP, 6000);
+    RandomText randText(&canvas, &twoP, 6000);
+
     TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
-    lct.add(&prep);
+    TextElement turn("DO A GOOD TURN DAILY!", 5, 4, RGB::Gold);
+    TextElement fire("BE CAREFUL WITH FIRE", 5, 4, RGB::Gold);
+    randText.add(&prep);
+    randText.add(&turn);
+    randText.add(&fire);
 
     DataAnimation wxData(&canvas, &twoP, 5000, signData);
     TimeAnimation time(&canvas, &twoP, 8000);
@@ -153,7 +168,7 @@ int main() {
     animator.add(&wipes);
     animator.add(&time);
     animator.add(&wipes);
-    animator.add(&lct);
+    animator.add(&randText);
     animator.add(&wipes);
 
     animator.init();

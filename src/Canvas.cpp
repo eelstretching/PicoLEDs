@@ -287,6 +287,15 @@ void Canvas::clear() {
     }
 }
 
+void Canvas::clear(uint x, uint y, uint w, uint h) {
+    for(int i = y; i < y+h; i++) {
+        int dp = getPos(x, i);
+        for(int j = 0; j < w; j++) {
+            data[dp++] = background;
+        }
+    }
+}
+
 void Canvas::clearRow(uint row) {
     for(int dp = getPos(0, row), i = 0; i < width; i++, dp++) {
         data[dp] = background;

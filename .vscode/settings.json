@@ -27,7 +27,8 @@
       "altcp.h": "c",
       "vector": "cpp",
       "memory": "cpp",
-      "random": "cpp"
+      "random": "cpp",
+      "*.tcc": "cpp"
     },
     "[python]": {
       "editor.defaultFormatter": "ms-python.black-formatter"
