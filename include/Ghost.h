@@ -2,8 +2,10 @@
 #define GHOST_H
 
 #pragma once 
+
 #include "Sprite.h"
 
+/// @brief Comment
 static RGB inkyColor = RGB(0, 255, 255);
 static RGB blinkyColor = RGB(255, 0, 0);
 static RGB pinkyColor = RGB(255, 184, 255);

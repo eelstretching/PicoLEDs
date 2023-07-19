@@ -32,8 +32,9 @@ class Sprite : public Animation {
 
    public:
     Sprite(Canvas *canvas, int startX, int startY)
-        : Animation(canvas), startX(startX), startY(startY){colorMap = NULL;};
+        : Animation(canvas), startX(startX), startY(startY){colorMap = NULL; };
     void add(Xpm *frame);
+    Sprite(Sprite &o);
     std::vector<Xpm *> &getFrames() { return frames; };
     void setDirection(SpriteDirection direction) {
         this->direction = direction;
@@ -42,6 +43,12 @@ class Sprite : public Animation {
         this->startX = startX;
         this->startY = startY;
     }
+    uint getWidth();
+    uint getHeight();
+
+    int getX() {return x;};
+    int getY() {return y;};
+
     void init();
     bool step();
 };

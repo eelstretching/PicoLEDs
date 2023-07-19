@@ -129,8 +129,8 @@ int main() {
     RandomText randText(&canvas, &twoP, 6000);
 
     TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
-    TextElement turn("DO A GOOD TURN", 0, 4, RGB::Gold);
-    TextElement fire("BE CAREFUL WITH FIRE", 0, 4, RGB::Gold);
+    TextElement turn("DO A GOOD TURN\nDAILY", 0, 4, RGB::Gold);
+    TextElement fire("BE CAREFUL WITH\nFIRE", 0, 4, RGB::Gold);
     randText.add(&prep);
     randText.add(&turn);
     randText.add(&fire);

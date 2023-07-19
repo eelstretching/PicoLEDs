@@ -1,1 +1,1 @@
-../CampSign/Ghost.h
+../../include/Ghost.h

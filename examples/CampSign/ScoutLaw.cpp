@@ -13,8 +13,8 @@ void ScoutLaw::init() {
     canvas->clear();
 
     //
-    // One time in 10 we'll do the whole thing!
-    single = random16(1000) < 100;
+    // One time in 100 we'll do the whole thing!
+    single = random16(1000) < 10;
     state = SCROLLING;
 
     int w = font->getWidth(sis);

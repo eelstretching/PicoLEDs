@@ -5,6 +5,7 @@
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "PacWipe.h"
+#include "PacChase.h"
 #include "RandomAnimation.h"
 #include "RandomText.h"
 #include "ScoutLaw.h"
@@ -77,9 +78,9 @@ int main() {
     canvas.clear();
     Font twoP(&canvas, FontTwoPData);
 
-    ScoutLaw law(&canvas, &twoP, 500);
+    PacChase chase(&canvas);
     Animator animator(&canvas, 30);
-    animator.add(&law);
+    animator.add(&chase);
     animator.init();
 
     int n = 0;

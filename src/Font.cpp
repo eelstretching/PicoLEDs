@@ -29,23 +29,36 @@ uint Font::render(const char* text, int bx, int by, RGB color) {
     uint x = bx;
     uint p = 0;
     uint tw = 0;
+    uint lw = 0;
 
     //
     // Loop until the string-terminating null.
     while (text[p] != 0) {
         char c = text[p++];
-        if (c == 32) {
-            //
-            // Space is just a space, bro.
-            x += fontSpaceWidth;
-            tw += fontSpaceWidth;
-            continue;
+        switch (c) {
+            case ' ':
+                //
+                // Space is just a space, bro.
+                x += fontSpaceWidth;
+                tw += fontSpaceWidth;
+                break;
+            case '\n':
+                //
+                // New line puts us down to re-start at our current x, and we'll
+                // remember which line was widest.
+                x = bx;
+                by = by - fontHeight - 1;
+                if (tw > lw) {
+                    lw = tw;
+                }
+                break;
+            default:
+                uint charWidth = render(c, x, by, color);
+                tw = tw + charWidth + spacing;
+                x += (charWidth + spacing);
         }
-        uint charWidth = render(c, x, by, color);
-        tw = tw + charWidth + spacing;
-        x += (charWidth + spacing);
     }
-    return tw;
+    return lw == 0 ? tw : lw;
 }
 
 uint Font::render(char c, int bx, int by, RGB color) {
@@ -58,9 +71,9 @@ uint Font::render(char c, int bx, int by, RGB color) {
     uint8_t charWidth = proportional ? fontData[fdp] : fontWidth;
 
     //
-    // Our origin is at the lower left (i.e., Cartesian), so we need to render
-    // from the top down with a character. Note that we want to end on this row,
-    // so we need to subtract 1
+    // Our origin is at the lower left (i.e., Cartesian), so we need to
+    // render from the top down with a character. Note that we want to end
+    // on this row, so we need to subtract 1
     uint y = by + fontHeight - 1;
 
     //
@@ -78,9 +91,9 @@ uint Font::render(char c, int bx, int by, RGB color) {
         // Loop over the columns of pixels in the character.
         for (int j = 0; j < charWidth; j++) {
             //
-            // When do we need to switch to the next byte of character data for
-            // more pixels? Note that this will be triggered in the first
-            // iteration of the loop, which is fine, actually.
+            // When do we need to switch to the next byte of character data
+            // for more pixels? Note that this will be triggered in the
+            // first iteration of the loop, which is fine, actually.
             if (j % 8 == 0) {
                 cdata = fontData[++fdp];
             }

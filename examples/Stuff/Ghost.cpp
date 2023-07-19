@@ -1,1 +1,1 @@
-../CampSign/Ghost.cpp
+../../src/Ghost.cpp
