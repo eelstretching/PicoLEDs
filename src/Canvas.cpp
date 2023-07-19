@@ -296,13 +296,19 @@ void Canvas::clear(uint x, uint y, uint w, uint h) {
     }
 }
 
-void Canvas::clearRow(uint row) {
+void Canvas::clearRow(int row) {
+    if(row < 0 || row > height) {
+        return;
+    }
     for(int dp = getPos(0, row), i = 0; i < width; i++, dp++) {
         data[dp] = background;
     }
 }
 
-void Canvas::clearColumn(uint column) {
+void Canvas::clearColumn(int column) {
+    if(column < 0 || column >= width) {
+        return;
+    }
     for(int dp = getPos(column, 0), i = 0; i < height; i++, dp += width) {
         data[dp] = background;
     }

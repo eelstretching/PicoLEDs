@@ -32,4 +32,12 @@ void PacWipe::init() {
     curr->init();
 }
 
-bool PacWipe::step() { return curr->step(); }
+bool PacWipe::step() { 
+    bool ret = curr->step();
+    if(curr->getDirection() == SPRITE_RIGHT) {
+        canvas->clearColumn(curr->getX() - 1);
+    } else {
+        canvas->clearColumn(curr->getX() + curr->getWidth());
+    }
+    return ret;
+}

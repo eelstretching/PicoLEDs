@@ -14,7 +14,8 @@ void ScoutLaw::init() {
 
     //
     // One time in 100 we'll do the whole thing!
-    single = random16(1000) < 10;
+    int rand = random16(1000);
+    single = rand >= 10;
     state = SCROLLING;
 
     int w = font->getWidth(sis);

@@ -8,12 +8,13 @@
 #include "PacMan.h"
 
 class PacWipe : public Animation {
+    friend class PacChase;
 
-    protected:
+   protected:
     Sprite **sprites;
     Sprite *curr;
 
-    public:
+   public:
     PacWipe(Canvas *canvas);
     void init();
     bool step();

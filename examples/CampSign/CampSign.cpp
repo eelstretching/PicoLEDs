@@ -6,6 +6,7 @@
 #include "FontTwoP.h"
 #include "RandomAnimation.h"
 #include "RandomText.h"
+#include "PacChase.h"
 #include "PacWipe.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
@@ -94,8 +95,8 @@ int main() {
 
     if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD,
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
-        printf("WiFi not connect\n");
-        twoP.render("WiFi connect failed", 4, 4, RGB::Red);
+        canvas.clear();
+        twoP.render("FAIL CONNECT!!", 4, 4, RGB::Red);
         canvas.show();
         return 1;
     }
@@ -128,9 +129,9 @@ int main() {
 
     RandomText randText(&canvas, &twoP, 6000);
 
-    TextElement prep("BE PREPARED", 10, 4, RGB::Gold);
-    TextElement turn("DO A GOOD TURN\nDAILY", 0, 4, RGB::Gold);
-    TextElement fire("BE CAREFUL WITH\nFIRE", 0, 4, RGB::Gold);
+    TextElement prep("BE PREPARED", 10, 8, RGB::Gold);
+    TextElement turn("DO A GOOD TURN\nDAILY", 10, 8, RGB::Gold);
+    TextElement fire("BE CAREFUL WITH\nFIRE", 10, 8, RGB::Gold);
     randText.add(&prep);
     randText.add(&turn);
     randText.add(&fire);
@@ -154,7 +155,9 @@ int main() {
 
     FireworkWipe fww(&canvas);
 
-    PacWipe pac(&canvas);
+    PacWipe pacWipe(&canvas);
+    PacChase pacChase(&pacWipe);
+
 
     RandomAnimation wipes(&canvas);
     wipes.add(&upWipe);
@@ -162,7 +165,7 @@ int main() {
     wipes.add(&leftWipe);
     wipes.add(&rightWipe);
     wipes.add(&fww);
-    wipes.add(&pac);
+    wipes.add(&pacWipe);
 
     Animator animator(&canvas, 30);
     animator.add(&text);
@@ -175,12 +178,7 @@ int main() {
     animator.add(&wipes);
     animator.add(&law);
     animator.add(&wipes);
-
-    void *foo = malloc(16*1024);
-    if(foo != NULL) {
-        printf("Malloced 16K!\n");
-        free(foo);
-    }
+    animator.add(&pacChase);
 
     animator.init();
 

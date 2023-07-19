@@ -6,6 +6,7 @@
 #include "Animation.h"
 #include "Xpm.h"
 #include "Sprite.h"
+#include "PacWipe.h"
 
 static const char *power[]={
 "8 8 2 1",
@@ -65,6 +66,9 @@ static const char *pilled2[]={
 #define PLAIN 1
 #define POWER_PILL 2
 class PacChase : public Animation {
+
+    friend class PacWipe;
+
     protected:
     Sprite *pacMan;
     uint8_t pmw;
@@ -81,6 +85,8 @@ class PacChase : public Animation {
     
     public:
     PacChase(Canvas *canvas);
+    PacChase(PacWipe *wipe);
+    void setup();
     void drawDot(int i);
     void init();
     bool step();

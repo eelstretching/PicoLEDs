@@ -39,6 +39,8 @@ class Sprite : public Animation {
     void setDirection(SpriteDirection direction) {
         this->direction = direction;
     };
+    SpriteDirection getDirection() {return direction;};
+    
     void setStartPosition(int startX, int startY) {
         this->startX = startX;
         this->startY = startY;

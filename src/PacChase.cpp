@@ -8,12 +8,25 @@
 
 PacChase::PacChase(Canvas *canvas) : Animation(canvas) {
     pacMan = new PacMan(canvas, 0, 1);
-    pmw = pacMan->getWidth();
     ghosts = new Sprite *[4];
     ghosts[0] = new Ghost(canvas, inkyColor, 0, 1);
     ghosts[1] = new Ghost(*((Ghost *)ghosts[0]), blinkyColor, 0, 1);
     ghosts[2] = new Ghost(*((Ghost *)ghosts[0]), pinkyColor, 0, 1);
     ghosts[3] = new Ghost(*((Ghost *)ghosts[0]), clydeColor, 0, 1);
+    setup();
+}
+
+/// @brief A constructor that lets us borrow the bitmaps from a pac-man wipe.
+/// @param wipe The wipe we'll borrow from.
+PacChase::PacChase(PacWipe *wipe) {
+    canvas = wipe->canvas;
+    pacMan = wipe->sprites[0];
+    ghosts = &(wipe->sprites[1]);
+    setup();
+}
+
+void PacChase::setup() {
+    pmw = pacMan->getWidth();
     ghw = ghosts[0]->getWidth();
     pilled = new Sprite *[2];
     pilled[0] = new Sprite(canvas, 0, 0);
