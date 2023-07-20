@@ -9,9 +9,9 @@
 class DataAnimation : public TextAnimation {
    protected:
     data_t *data;
-    char pop[6];
-    char high[6];
-    char low[6];
+    char pop[10];
+    char high[10];
+    char low[10];
     char sr[10];
     char ss[10];
 

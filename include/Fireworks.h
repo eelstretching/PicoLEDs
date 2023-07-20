@@ -20,5 +20,8 @@ class Fireworks : public Animation {
     bool step();
     void finish();
     Firework **getFireworks() { return fw; };
+    int getNumFireworks() {
+        return nf;
+    };
 };
 #endif

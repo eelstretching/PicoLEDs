@@ -2,6 +2,7 @@
 
 #include "Canvas.h"
 #include "DataAnimation.h"
+#include "Fireworks.h"
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "RandomAnimation.h"
@@ -154,6 +155,8 @@ int main() {
     rightWipe.setExtraFrames(20);
 
     FireworkWipe fww(&canvas);
+    Fireworks fireworks(&canvas, fww.getFireworks(), fww.getNumFireWorks());
+    TimedAnimation timedFireworks(&fireworks, 20000);
 
     PacWipe pacWipe(&canvas);
     PacChase pacChase(&pacWipe);
@@ -179,8 +182,16 @@ int main() {
     animator.add(&law);
     animator.add(&wipes);
     animator.add(&pacChase);
+    animator.add(&timedFireworks);
+    animator.add(&wipes);
 
     animator.init();
+
+    // void *foo = malloc(16*1024);
+    // if(foo != NULL) {
+    //     printf("Malloced 16k!\n");
+    //     free(foo);
+    // }
 
     int n = 0;
     datetime_t dt;
