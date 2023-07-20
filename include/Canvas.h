@@ -125,7 +125,7 @@ class Canvas {
     /// given color.
     /// @param n the number of rolls to scroll up by.
     /// @param f The color to fill the emptied rows.
-    void scrollUp(uint n, RGB f);
+    void scrollUp(int n, RGB f);
 
     /// @brief Scroll the canvas down by one row, filling in the empty row with
     /// the background color.
@@ -137,10 +137,20 @@ class Canvas {
     /// @param f
     void scrollDown(int n, RGB f);
 
+    void scrollLeft() {scrollLeft(1, background);};
+
+    void scrollLeft(int n, RGB f);
+
+    void scrollRight() {scrollRight(1, background);};
+
+    void scrollRight(int n, RGB f);
+
     /// @brief Copies data from row src into row dst
     /// @param src The source of data
     /// @param dst The destination of data
-    void copyRow(uint src, uint dst);
+    void copyRow(int src, int dst);
+
+    void copyColumn(int src, int dst);
 
     /// @brief Rotate the canvas up by one row, which will make the top row the
     /// bottom row.
@@ -190,16 +200,16 @@ class Canvas {
     void mirrorBottomToTop(int r);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftLeft(uint x, uint y, uint w, uint h, int n);
+    void shiftLeft(int x, int y, uint w, uint h, int n);
+
+    /// @brief Shifts a rectangle of pixels to the right by n pixels.
+    void shiftRight(int x, int y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftRight(uint x, uint y, uint w, uint h, int n);
+    void shiftUp(int x, int y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftUp(uint x, uint y, uint w, uint h, int n);
-
-    /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftDown(uint x, uint y, uint w, uint h, int n);
+    void shiftDown(int x, int y, uint w, uint h, int n);
 
     /// @brief Gets the position in our data array for a given x and y. Just
     /// here so friends can figure it out

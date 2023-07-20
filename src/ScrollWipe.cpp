@@ -26,12 +26,10 @@ bool ScrollWipe::step() {
             canvas->scrollDown();
             break;
         case SCROLL_RIGHT:
-            canvas->shiftRight(scrolled, 0, canvas->getWidth() - scrolled,
-                               canvas->getHeight(), 1);
+            canvas->scrollRight();
             break;
         case SCROLL_LEFT:
-            canvas->shiftLeft(1, 0, canvas->getWidth() - scrolled,
-                              canvas->getHeight(), 1);
+            canvas->scrollLeft();
             break;
     }
     scrolled++;

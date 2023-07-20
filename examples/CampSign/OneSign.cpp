@@ -78,9 +78,18 @@ int main() {
     canvas.clear();
     Font twoP(&canvas, FontTwoPData);
 
-    PacChase chase(&canvas);
+    TextAnimation text(&canvas, &twoP, 1000);
+    text.add(new TextElement("THIS IS TEXT", 20, 8, RGB::BlueViolet));
+    text.add(new TextElement("FOO", 0, 0, RGB::Green));
+    text.add(new TextElement("BAR", 40, 0, RGB::CadetBlue));
+
+    ScrollWipe sw1(&canvas, ScrollDirection::SCROLL_RIGHT);
+    ScrollWipe sw2(&canvas, ScrollDirection::SCROLL_LEFT);
     Animator animator(&canvas, 30);
-    animator.add(&chase);
+    animator.add(&text);
+    animator.add(&sw1);
+    animator.add(&text);
+    animator.add(&sw2);
     animator.init();
 
     int n = 0;

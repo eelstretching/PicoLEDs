@@ -4,8 +4,8 @@
 #include <string.h>
 
 #include "View.h"
-#include "pico/platform.h"
 #include "pico/mem_ops.h"
+#include "pico/platform.h"
 
 Canvas::Canvas(uint width, uint height) : width(width), height(height) {
     numPixels = width * height;
@@ -97,18 +97,18 @@ void Canvas::drawRect(uint x0, uint y0, uint x1, uint y1, RGB c) {
 
 void Canvas::drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f) {
     drawRect(x0, y0, x1, y1, l);
-    if(x1 < x0) {
+    if (x1 < x0) {
         uint tmp = x1;
-        x1 = x0; 
+        x1 = x0;
         x0 = tmp;
     }
-    if(y1 < y0) {
+    if (y1 < y0) {
         uint tmp = y1;
         y1 = y0;
         y0 = y1;
     }
-    for(int x = x0 + 1; x < x1; x++) {
-        for(int y = y0 + 1; y < y1; y++) {
+    for (int x = x0 + 1; x < x1; x++) {
+        for (int y = y0 + 1; y < y1; y++) {
             set(x, y, f);
         }
     }
@@ -116,7 +116,7 @@ void Canvas::drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f) {
 
 void Canvas::scrollUp() { scrollUp(1, background); }
 
-void Canvas::scrollUp(uint n, RGB f) {
+void Canvas::scrollUp(int n, RGB f) {
     if (n >= height) {
         //
         // Scrolled too much! Everything's black.
@@ -152,7 +152,25 @@ void Canvas::scrollDown(int n, RGB f) {
     }
 }
 
-void Canvas::copyRow(uint src, uint dst) {
+void Canvas::scrollLeft(int n, RGB f) {
+    for(int col = n; col < width; col++) {
+        copyColumn(col, col - n);
+    }
+    for(int col = width - n; col < width; col++) {
+        fillColumn(col, f);
+    }
+}
+
+void Canvas::scrollRight(int n, RGB f) {
+    for(int col = width - n -1; col >= 0; col--) {
+        copyColumn(col, col+n);
+    }
+    for(int col = 0; col < n; col++) {
+        fillColumn(col, f);
+    }
+}
+
+void Canvas::copyRow(int src, int dst) {
     if (src == dst) {
         //
         // Don't copy a row onto itself.
@@ -171,6 +189,25 @@ void Canvas::copyRow(uint src, uint dst) {
     int sp = getPos(0, src);
     int tp = getPos(0, dst);
     memcpy(&data[tp], &data[sp], rowBytes);
+}
+
+void Canvas::copyColumn(int src, int dst) {
+    if(src == dst) {
+        return;
+    }
+    if(src > width) {
+        fillColumn(dst, background);
+    }
+    int srcPos = getPos(src, 0);
+    int destPos = getPos(dst, 0);
+    for(int row = 0; row < height; row++) {
+        data[destPos] = data[srcPos];
+
+        //
+        // Next one is one row up.
+        destPos += width;
+        srcPos += width;
+    }
 }
 
 void Canvas::rotateUp() {
@@ -215,7 +252,7 @@ void Canvas::mirrorLeftToRight(int c) {
         //
         // We'll start mirroring at the column itself and mirror onto the next
         // pixel over.
-        int sp = getPos(c-1, i);
+        int sp = getPos(c - 1, i);
         int dp = getPos(c, i);
         for (int j = 0; j < n; j++) {
             data[dp++] = data[sp--];
@@ -248,7 +285,7 @@ void Canvas::mirrorRightToLeft(int c) {
         // We'll start mirroring at the column itself and mirror onto the next
         // pixel over.
         int sp = getPos(c, i);
-        int dp = getPos(c-1, i);
+        int dp = getPos(c - 1, i);
         for (int j = 0; j < n; j++) {
             data[dp--] = data[sp++];
         }
@@ -288,28 +325,28 @@ void Canvas::clear() {
 }
 
 void Canvas::clear(uint x, uint y, uint w, uint h) {
-    for(int i = y; i < y+h; i++) {
+    for (int i = y; i < y + h; i++) {
         int dp = getPos(x, i);
-        for(int j = 0; j < w; j++) {
+        for (int j = 0; j < w; j++) {
             data[dp++] = background;
         }
     }
 }
 
 void Canvas::clearRow(int row) {
-    if(row < 0 || row > height) {
+    if (row < 0 || row > height) {
         return;
     }
-    for(int dp = getPos(0, row), i = 0; i < width; i++, dp++) {
+    for (int dp = getPos(0, row), i = 0; i < width; i++, dp++) {
         data[dp] = background;
     }
 }
 
 void Canvas::clearColumn(int column) {
-    if(column < 0 || column >= width) {
+    if (column < 0 || column >= width) {
         return;
     }
-    for(int dp = getPos(column, 0), i = 0; i < height; i++, dp += width) {
+    for (int dp = getPos(column, 0), i = 0; i < height; i++, dp += width) {
         data[dp] = background;
     }
 }
@@ -321,7 +358,7 @@ void Canvas::setView(View *v, uint x, uint y) {
     viewY = y;
 }
 
-void Canvas::shiftLeft(uint x, uint y, uint w, uint h, int n) {
+void Canvas::shiftLeft(int x, int y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
@@ -344,30 +381,26 @@ void Canvas::shiftLeft(uint x, uint y, uint w, uint h, int n) {
     }
 }
 
-void Canvas::shiftRight(uint x, uint y, uint w, uint h, int n) {
+void Canvas::shiftRight(int x, int y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
-    uint yf = MIN(y + h, height);
-    uint xf = MIN(x + w, width);
-    uint xn = MIN(xf + n, width);
+    int yf = MIN(y + h, height);
+    int xsource = MIN(x + w - 1, width);
+    int xdest = MIN(xsource + n, width);
     for (int row = y; row < yf; row++) {
-        int sp = getPos(xf - 1, row);
-        int dp = getPos(xn - 1, row);
-        int ep = getPos(x, row);
-        for (int i = sp; i >= ep; i--) {
-            data[dp--] = data[sp--];
+        for (int col = xsource; col >= x; col--) {
+            if (col + n < width) {
+                data[getPos(col + n, row)] = data[getPos(col, row)];
+            }
         }
-        dp = getPos(x, row);
-        //
-        // Fill in the pixels we vacated with the background.
-        for (int i = 0; i < n && dp < numPixels; i++) {
-            data[dp++] = background;
+        for(int col = x; col < x+n; col++) {
+            data[getPos(col, row)] = background;
         }
     }
 }
 
-void Canvas::shiftUp(uint x, uint y, uint w, uint h, int n) {
+void Canvas::shiftUp(int x, int y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
@@ -387,7 +420,7 @@ void Canvas::shiftUp(uint x, uint y, uint w, uint h, int n) {
     }
 }
 
-void Canvas::shiftDown(uint x, uint y, uint w, uint h, int n) {
+void Canvas::shiftDown(int x, int y, uint w, uint h, int n) {
     if (x >= width || y >= height) {
         return;
     }
