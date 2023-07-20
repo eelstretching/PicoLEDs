@@ -133,9 +133,19 @@ int main() {
     TextElement prep("BE PREPARED", 10, 8, RGB::Gold);
     TextElement turn("DO A GOOD TURN\nDAILY", 10, 8, RGB::Gold);
     TextElement fire("BE CAREFUL WITH\nFIRE", 10, 8, RGB::Gold);
+    TextElement essr("EAT. SLEEP.\nSCOUT. REPEAT.", 10, 8, RGB::Gold);
+    TextElement better("LEAVE IT BETTER\nTHAN YOU FOUND IT", 10, 8, RGB::Gold);
+    TextElement doubt("WHEN IN DOUBT\nHELP OUT", 10, 8, RGB::Gold);
+    TextElement advent("BE ADVENTUROUS", 10, 8, RGB::Gold);
+    TextElement good("GOOD DEEDS\nBRIGHTEN THE WORLD", 10, 8, RGB::Gold);
     randText.add(&prep);
     randText.add(&turn);
     randText.add(&fire);
+    randText.add(&essr);
+    randText.add(&better);
+    randText.add(&doubt);
+    randText.add(&advent);
+    randText.add(&good);
 
     ScoutLaw law(&canvas, &twoP, 500);
 
@@ -183,7 +193,7 @@ int main() {
     animator.add(&wipes);
     animator.add(&pacChase);
     animator.add(&timedFireworks);
-    animator.add(&wipes);
+    animator.add(&pacWipe);
 
     animator.init();
 
