@@ -1,5 +1,7 @@
 #include "PacMan.h"
 
+#include "Direction.h"
+
 PacMan::PacMan(Canvas *canvas, int startX, int startY) : Sprite(canvas, startX, startY) {
 
     //
@@ -12,5 +14,5 @@ PacMan::PacMan(Canvas *canvas, int startX, int startY) : Sprite(canvas, startX, 
     add(&xpms[2]);
     add(&xpms[1]);
     add(&xpms[1]);
-    setDirection(SPRITE_RIGHT);
+    setDirection(RIGHT);
 }

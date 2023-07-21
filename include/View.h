@@ -10,7 +10,7 @@
 
 class Canvas;
 
-enum Direction {
+enum StripDirection {
     FORWARDS,
     BACKWARDS,
 };
@@ -20,10 +20,10 @@ class Row {
     Strip *strip;
     uint start;
     uint n;
-    Direction dir;
+    StripDirection dir;
 
    public:
-    Row(Strip *strip, uint start, uint n, Direction dir)
+    Row(Strip *strip, uint start, uint n, StripDirection dir)
         : strip(strip), start(start), n(n), dir(dir) {}
 };
 

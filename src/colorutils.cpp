@@ -6,6 +6,8 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "pico/printf.h"
+
 void fill_solid(struct RGB* targetArray, int numToFill,
                 const struct RGB& color) {
     for (int i = 0; i < numToFill; ++i) {
@@ -32,8 +34,14 @@ void fill_rainbow(struct RGB* targetArray, int numToFill, uint8_t initialhue,
     hsv.hue = initialhue;
     hsv.val = 255;
     hsv.sat = 240;
+
     for (int i = 0; i < numToFill; ++i) {
         targetArray[i] = hsv;
+        // if(hsv.h == 0 || hsv.h==160) {
+        //     printf("i: %d hsv: %d %d %d rgb: %d %d %d\n", i, hsv.hue, hsv.val,
+        //            hsv.sat, targetArray[i].r, targetArray[i].g,
+        //            targetArray[i].b);
+        // }
         hsv.hue += deltahue;
     }
 }

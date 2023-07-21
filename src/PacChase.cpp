@@ -72,13 +72,13 @@ void PacChase::init() {
     // Set up for initial animation.
     state = PLAIN;
     pacMan->setStartPosition(-pmw, 1);
-    pacMan->setDirection(SpriteDirection::SPRITE_RIGHT);
+    pacMan->setDirection(RIGHT);
     pacMan->init();
     g1->setStartPosition(canvas->getWidth(), 1);
-    g1->setDirection(SpriteDirection::SPRITE_LEFT);
+    g1->setDirection(LEFT);
     g1->init();
     g2->setStartPosition(canvas->getWidth() + 6 + ghw, 1);
-    g2->setDirection(SpriteDirection::SPRITE_LEFT);
+    g2->setDirection(LEFT);
     g2->init();
 
     for (int i = 0; i < canvas->getWidth(); i += 8) {
@@ -96,9 +96,9 @@ bool PacChase::step() {
         if (pacMan->getX() + pmw >= PILL_POSITION) {
             state = POWER_PILL;
             pilled[0]->setStartPosition(g1->getX(), g1->getY());
-            pilled[0]->setDirection(SpriteDirection::SPRITE_RIGHT);
+            pilled[0]->setDirection(RIGHT);
             pilled[1]->setStartPosition(g2->getX(), g2->getY());
-            pilled[1]->setDirection(SpriteDirection::SPRITE_RIGHT);
+            pilled[1]->setDirection(RIGHT);
             g1 = pilled[0];
             g2 = pilled[1];
             g1->init();

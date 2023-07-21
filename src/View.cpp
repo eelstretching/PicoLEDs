@@ -11,13 +11,13 @@ void View::add(Strip &strip) {
     uint np = strip.getNumPixels();
 
     if (np == width) {
-        rows.push_back(Row(&strip, 0, width, Direction::FORWARDS));
+        rows.push_back(Row(&strip, 0, width, StripDirection::FORWARDS));
         return;
     }
 
     if (np < width) {
         printf("Strip added with %d pixels, but width is %d", np, width);
-        rows.push_back(Row(&strip, 0, np, Direction::FORWARDS));
+        rows.push_back(Row(&strip, 0, np, StripDirection::FORWARDS));
         return;
     }
 
@@ -27,15 +27,15 @@ void View::add(Strip &strip) {
     }
 
     int start = 0;
-    Direction dir = Direction::FORWARDS;
+    StripDirection dir = StripDirection::FORWARDS;
     while (np > 0) {
         rows.push_back(Row(&strip, start, width, dir));
         start += width;
         np -= width;
-        if (dir == Direction::FORWARDS) {
-            dir = Direction::BACKWARDS;
+        if (dir == StripDirection::FORWARDS) {
+            dir = StripDirection::BACKWARDS;
         } else {
-            dir = Direction::FORWARDS;
+            dir = StripDirection::FORWARDS;
         }
     }
 
@@ -67,7 +67,7 @@ void View::render() {
     uint cy = canvas->viewY;
     uint rc = 0;
     for (auto r : rows) {
-        if (r.dir == Direction::FORWARDS) {
+        if (r.dir == StripDirection::FORWARDS) {
             //
             // Forward, so we can use memcpy behavior. We'll start at the
             // provided position in the underlying strip for this row, and copy

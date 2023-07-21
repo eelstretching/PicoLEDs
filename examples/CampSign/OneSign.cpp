@@ -4,6 +4,7 @@
 #include "DataAnimation.h"
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
+#include "RainbowWipe.h"
 #include "PacWipe.h"
 #include "PacChase.h"
 #include "RandomAnimation.h"
@@ -47,8 +48,6 @@ int main() {
 
     int delay = 100;
 
-    int msPerFrame = 1000 / 60;
-
     //
     // Init to clear the strips and show they're working while rendering's
     // busted.
@@ -74,6 +73,10 @@ int main() {
         strips[i].show();
     }
 
+    HSV hsv(160,255,240);
+    RGB rgb(hsv);
+
+    printf("h: %d s: %d v: %d r: %d g: %d b: %d\n", hsv.h, hsv.s, hsv.v, rgb.r, rgb.g, rgb.b);
     sleep_ms(delay);
     canvas.clear();
     Font twoP(&canvas, FontTwoPData);
@@ -83,13 +86,10 @@ int main() {
     text.add(new TextElement("FOO", 0, 0, RGB::Green));
     text.add(new TextElement("BAR", 40, 0, RGB::CadetBlue));
 
-    ScrollWipe sw1(&canvas, ScrollDirection::SCROLL_RIGHT);
-    ScrollWipe sw2(&canvas, ScrollDirection::SCROLL_LEFT);
+    RainbowWipe rw = RainbowWipe(&canvas);
     Animator animator(&canvas, 30);
     animator.add(&text);
-    animator.add(&sw1);
-    animator.add(&text);
-    animator.add(&sw2);
+    animator.add(&rw);
     animator.init();
 
     int n = 0;

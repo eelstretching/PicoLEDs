@@ -134,10 +134,10 @@ int main() {
     TextElement turn("DO A GOOD TURN\nDAILY", 10, 8, RGB::Gold);
     TextElement fire("BE CAREFUL WITH\nFIRE", 10, 8, RGB::Gold);
     TextElement essr("EAT. SLEEP.\nSCOUT. REPEAT.", 10, 8, RGB::Gold);
-    TextElement better("LEAVE IT BETTER\nTHAN YOU FOUND IT", 10, 8, RGB::Gold);
+    TextElement better("LEAVE IT BETTER\nTHAN YOU FOUND IT", 2, 8, RGB::Gold);
     TextElement doubt("WHEN IN DOUBT\nHELP OUT", 10, 8, RGB::Gold);
     TextElement advent("BE ADVENTUROUS", 10, 8, RGB::Gold);
-    TextElement good("GOOD DEEDS\nBRIGHTEN THE WORLD", 10, 8, RGB::Gold);
+    TextElement good("GOOD DEEDS\nBRIGHTEN THE WORLD", 2, 8, RGB::Gold);
     randText.add(&prep);
     randText.add(&turn);
     randText.add(&fire);
@@ -152,16 +152,16 @@ int main() {
     DataAnimation wxData(&canvas, &twoP, 5000, signData);
     TimeAnimation time(&canvas, &twoP, 8000);
 
-    ScrollWipe upWipe(&canvas, ScrollDirection::SCROLL_UP);
+    ScrollWipe upWipe(&canvas, Direction::UP);
     upWipe.setExtraFrames(20);
 
-    ScrollWipe downWipe(&canvas, ScrollDirection::SCROLL_DOWN);
+    ScrollWipe downWipe(&canvas, Direction::DOWN);
     downWipe.setExtraFrames(20);
 
-    ScrollWipe leftWipe(&canvas, ScrollDirection::SCROLL_LEFT);
+    ScrollWipe leftWipe(&canvas, Direction::LEFT);
     leftWipe.setExtraFrames(20);
 
-    ScrollWipe rightWipe(&canvas, ScrollDirection::SCROLL_RIGHT);
+    ScrollWipe rightWipe(&canvas, Direction::RIGHT);
     rightWipe.setExtraFrames(20);
 
     FireworkWipe fww(&canvas);
@@ -190,7 +190,7 @@ int main() {
     animator.add(&randText);
     animator.add(&wipes);
     animator.add(&law);
-    animator.add(&wipes);
+    animator.add(&downWipe);
     animator.add(&pacChase);
     animator.add(&timedFireworks);
     animator.add(&pacWipe);

@@ -18,6 +18,10 @@ Fireworks::Fireworks(Canvas* canvas) : Animation(canvas) {
 Fireworks::Fireworks(Canvas* canvas, Firework **fw, int nf) : Animation(canvas), fw(fw), nf(nf) {
 }
 
+int getFPSNeeded() {
+    return 60;
+}
+
 void Fireworks::init() {
     for (int i = 0; i < canvas->getHeight(); i++) {
         fw[i]->init();

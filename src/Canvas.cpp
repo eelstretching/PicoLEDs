@@ -318,6 +318,13 @@ void Canvas::mirrorBottomToTop(int r) {
 
 uint Canvas::getPos(uint x, uint y) { return y * width + x; }
 
+RGB *Canvas::getDataPointer(uint x, uint y) {
+    if(x >= width || y >= height) {
+        return NULL;
+    }
+    return &data[getPos(x, y)];
+}
+
 void Canvas::clear() {
     for (int i = 0; i < numPixels; i++) {
         data[i] = background;

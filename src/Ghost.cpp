@@ -56,19 +56,19 @@ void Ghost::drawPupils() {
     uint h = xpms[0]->getHeight();
 
     switch (direction) {
-        case SPRITE_UP:
+        case UP:
             cx = x + 2;
             cy = y + (h - 4) - 1;
             break;
-        case SPRITE_DOWN:
+        case DOWN:
             cx = x + 2;
             cy = y + (h - 7) - 1;
             break;
-        case SPRITE_LEFT:
+        case LEFT:
             cx = x + 1;
             cy = y + (h - 7) - 1;
             break;
-        case SPRITE_RIGHT:
+        case RIGHT:
             cx = x + 4;
             cy = y + (h - 7) - 1;
             break;

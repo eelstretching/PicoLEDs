@@ -8,7 +8,7 @@ DataAnimation::DataAnimation(Canvas* canvas, Font* font, uint duration,
     : TextAnimation(canvas, font, duration), data(data) {
     //
     // Make text chunks for each of the data elements
-    sprintf(pop, "POP: %d", data->pop);
+    sprintf(pop, "%: %d", data->pop);
     sprintf(high, "HI: %d", data->high);
     sprintf(low, "LO: %d", data->low);
     sprintf(sr, "SR: %s", data->sunrise);

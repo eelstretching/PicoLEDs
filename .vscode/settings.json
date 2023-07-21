@@ -28,7 +28,10 @@
       "vector": "cpp",
       "memory": "cpp",
       "random": "cpp",
-      "*.tcc": "cpp"
+      "*.tcc": "cpp",
+      "array": "cpp",
+      "string": "cpp",
+      "string_view": "cpp"
     },
     "[python]": {
       "editor.defaultFormatter": "ms-python.black-formatter"

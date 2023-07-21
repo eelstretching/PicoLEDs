@@ -218,6 +218,12 @@ class Canvas {
     /// @return the index into our data array for this x and y.
     uint getPos(uint x, uint y);
 
+    /// @brief Gets a pointer into the underlying data array for the given x,y coordinate. Use carefully!
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @return a pointer into the data array, or NULL if the coords are weird.
+    RGB *getDataPointer(uint x, uint y);
+
     /// @brief Clears the canvas.
     void clear();
 

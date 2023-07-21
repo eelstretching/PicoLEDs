@@ -15,6 +15,7 @@ void Animator::add(Animation* a) {
 void Animator::init() {
     pos = 0;
     Animation *f = animations[pos];
+    setFPS(f->getFPSNeeded());
     f->init();
 }
 
@@ -30,6 +31,7 @@ bool Animator::step() {
     if (!animations[pos]->step()) {
         animations[pos]->finish();
         pos = (pos + 1) % animations.size();
+        setFPS(animations[pos]->getFPSNeeded());
         animations[pos]->init();
     }
     canvas->show();

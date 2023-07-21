@@ -17,15 +17,15 @@ void PacWipe::init() {
 
         //
         // PacMan can only go right for now!
-        curr->setDirection(SPRITE_RIGHT);
+        curr->setDirection(RIGHT);
         curr->setStartPosition(1, 1);
 
     } else {
         if (random8(0, 100) < 50) {
-            curr->setDirection(SPRITE_RIGHT);
+            curr->setDirection(RIGHT);
             curr->setStartPosition(1, 1);
         } else {
-            curr->setDirection(SPRITE_LEFT);
+            curr->setDirection(LEFT);
             curr->setStartPosition(canvas->getWidth() - 1, 1);
         }
     }
@@ -34,7 +34,7 @@ void PacWipe::init() {
 
 bool PacWipe::step() { 
     bool ret = curr->step();
-    if(curr->getDirection() == SPRITE_RIGHT) {
+    if(curr->getDirection() == RIGHT) {
         canvas->clearColumn(curr->getX() - 1);
     } else {
         canvas->clearColumn(curr->getX() + curr->getWidth());

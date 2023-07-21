@@ -6,15 +6,9 @@
 #include <vector>
 
 #include "Animation.h"
+#include "Direction.h"
 #include "Canvas.h"
 #include "Xpm.h"
-
-enum SpriteDirection {
-    SPRITE_UP,
-    SPRITE_DOWN,
-    SPRITE_LEFT,
-    SPRITE_RIGHT,
-};
 
 class Sprite : public Animation {
    protected:
@@ -25,7 +19,7 @@ class Sprite : public Animation {
 
     int x;
     int y;
-    SpriteDirection direction;
+    Direction direction;
 
     /// @brief A color map for rendering.
     RGB *colorMap;
@@ -36,10 +30,10 @@ class Sprite : public Animation {
     void add(Xpm *frame);
     Sprite(Sprite &o);
     std::vector<Xpm *> &getFrames() { return frames; };
-    void setDirection(SpriteDirection direction) {
+    void setDirection(Direction direction) {
         this->direction = direction;
     };
-    SpriteDirection getDirection() {return direction;};
+    Direction getDirection() {return direction;};
     
     void setStartPosition(int startX, int startY) {
         this->startX = startX;

@@ -24,6 +24,10 @@ class Animation {
     /// @param canvas The canvas we'll draw on.
     Animation(Canvas *canvas);
 
+    /// @brief Gets the frames-per-second this animation requires. Default is 30.
+    /// @return the FPS this animation needs.
+    int getFPSNeeded() {return 30;};
+
     /// @brief Virtual destructor!
     virtual ~Animation(){};
 
