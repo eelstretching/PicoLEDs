@@ -4,9 +4,9 @@
 #include "DataAnimation.h"
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
-#include "RainbowWipe.h"
-#include "PacWipe.h"
 #include "PacChase.h"
+#include "PacWipe.h"
+#include "RainbowWipe.h"
 #include "RandomAnimation.h"
 #include "RandomText.h"
 #include "ScoutLaw.h"
@@ -73,12 +73,16 @@ int main() {
         strips[i].show();
     }
 
-    HSV hsv(160,255,240);
+    HSV hsv(160, 240, 255);
     RGB rgb(hsv);
 
-    printf("h: %d s: %d v: %d r: %d g: %d b: %d\n", hsv.h, hsv.s, hsv.v, rgb.r, rgb.g, rgb.b);
+    printf("h: %d s: %d v: %d r: %d g: %d b: %d\n", hsv.h, hsv.s, hsv.v, rgb.r,
+           rgb.g, rgb.b);
+
+
     sleep_ms(delay);
     canvas.clear();
+
     Font twoP(&canvas, FontTwoPData);
 
     TextAnimation text(&canvas, &twoP, 1000);
@@ -86,6 +90,7 @@ int main() {
     text.add(new TextElement("FOO", 0, 0, RGB::Green));
     text.add(new TextElement("BAR", 40, 0, RGB::CadetBlue));
 
+    ScrollWipe sw = ScrollWipe(&canvas, Direction::DOWN);
     RainbowWipe rw = RainbowWipe(&canvas);
     Animator animator(&canvas, 30);
     animator.add(&text);

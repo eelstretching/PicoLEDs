@@ -22,5 +22,6 @@ class FireworkWipe : public Animation {
     void finish();
     Firework **getFireworks() { return fw; };
     int getNumFireWorks(){return nf;};
+    int getFPSNeeded() {return 55;};
 };
 #endif

@@ -41,6 +41,8 @@ class TextAnimation : public Animation {
     void init();
 
     bool step();
+
+    int getFPSNeeded() {return 2;};
 };
 
 #endif

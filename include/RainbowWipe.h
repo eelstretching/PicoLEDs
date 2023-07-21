@@ -13,9 +13,11 @@ class RainbowWipe : public Animation {
     Direction direction;
 
     public:
+
     RainbowWipe(Canvas *canvas) : Animation(canvas) {};
     void init();
     bool step();
+    int getFPSNeeded() {return 55;};
 };
 
 #endif

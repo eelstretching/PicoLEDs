@@ -21,6 +21,7 @@ class Animator : public Animation {
 
         uint missedFrames = 0;
 
+        StopWatch sw;
         StopWatch aw;
 
     public:
@@ -34,7 +35,7 @@ class Animator : public Animation {
         /// @brief Adds an animation to the end of our list.
         /// @param a the animation to add.
         void add(Animation *a);
-        void setFPS(int fps) {this->fps = fps; msPerFrame = 1000.0 / fps;};
+        void setFPS(int fps) {this->fps = fps; msPerFrame = 1000.0 / fps; };
         /// @brief Steps through whatever animation that we're currently working on.
         /// @return 
         bool step();
@@ -43,6 +44,10 @@ class Animator : public Animation {
         /// @brief Gets the average frame animation and display time, in microseconds.
         float getAverageFrameTimeUS() {
            return aw.getAverageTime(); 
+        }
+
+        float getAverageShowTimeUS() {
+            return sw.getAverageTime();
         }
 };
 

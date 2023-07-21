@@ -30,6 +30,7 @@ class TimeAnimation : public Animation {
     };
     void init();
     bool step();
+    int getFPSNeeded() {return 10;};
 
 };
 #endif

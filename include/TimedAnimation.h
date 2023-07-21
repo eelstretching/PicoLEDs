@@ -28,6 +28,7 @@ class TimedAnimation : public Animation {
     /// @brief Steps the underlying animation.
     /// @return true if the animation is not out of time, false if we're out of time.
     bool step();
+    int getFPSNeeded() {return animation->getFPSNeeded();};
 
 };
 

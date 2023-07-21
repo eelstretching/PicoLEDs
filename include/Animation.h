@@ -26,7 +26,7 @@ class Animation {
 
     /// @brief Gets the frames-per-second this animation requires. Default is 30.
     /// @return the FPS this animation needs.
-    int getFPSNeeded() {return 30;};
+    virtual int getFPSNeeded() {return 30;};
 
     /// @brief Virtual destructor!
     virtual ~Animation(){};
@@ -40,7 +40,7 @@ class Animation {
     /// do anything.
     /// @returns true if the animation will continue after this step, false if
     /// the animation is complete.
-    virtual bool step() { printf("Base class step!\n"); return true; };
+    virtual bool step() { return true; };
 
     /// @brief Finishes the animation. Can be used to clear up, etc.
     virtual void finish() {};

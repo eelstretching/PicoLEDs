@@ -34,7 +34,9 @@ bool Animator::step() {
         setFPS(animations[pos]->getFPSNeeded());
         animations[pos]->init();
     }
+    sw.start();
     canvas->show();
+    sw.finish();
     aw.finish();
 
     //

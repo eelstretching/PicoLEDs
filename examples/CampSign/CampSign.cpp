@@ -6,6 +6,7 @@
 #include "FireworkWipe.h"
 #include "FontTwoP.h"
 #include "RandomAnimation.h"
+#include "RainbowWipe.h"
 #include "RandomText.h"
 #include "PacChase.h"
 #include "PacWipe.h"
@@ -46,37 +47,6 @@ int main() {
     view.add(strips[3]);
     canvas.setView(&view, 0, 0);
 
-    int delay = 100;
-
-    int msPerFrame = 1000 / 60;
-
-    //
-    // Init to clear the strips and show they're working while rendering's
-    // busted.
-    for (int i = 0; i < 4; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < 4; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
-        strips[i].show();
-    }
-
-    sleep_ms(delay);
-    canvas.clear();
     Font twoP(&canvas, FontTwoPData);
 
     //
@@ -135,7 +105,7 @@ int main() {
     TextElement fire("BE CAREFUL WITH\nFIRE", 10, 8, RGB::Gold);
     TextElement essr("EAT. SLEEP.\nSCOUT. REPEAT.", 10, 8, RGB::Gold);
     TextElement better("LEAVE IT BETTER\nTHAN YOU FOUND IT", 2, 8, RGB::Gold);
-    TextElement doubt("WHEN IN DOUBT\nHELP OUT", 10, 8, RGB::Gold);
+    TextElement doubt("WHEN IN DOUBT,\nHELP OUT", 10, 8, RGB::Gold);
     TextElement advent("BE ADVENTUROUS", 10, 8, RGB::Gold);
     TextElement good("GOOD DEEDS\nBRIGHTEN THE WORLD", 2, 8, RGB::Gold);
     randText.add(&prep);
@@ -171,6 +141,8 @@ int main() {
     PacWipe pacWipe(&canvas);
     PacChase pacChase(&pacWipe);
 
+    RainbowWipe rainbow(&canvas);
+
 
     RandomAnimation wipes(&canvas);
     wipes.add(&upWipe);
@@ -179,6 +151,7 @@ int main() {
     wipes.add(&rightWipe);
     wipes.add(&fww);
     wipes.add(&pacWipe);
+    wipes.add(&rainbow);
 
     Animator animator(&canvas, 30);
     animator.add(&text);
@@ -193,7 +166,7 @@ int main() {
     animator.add(&downWipe);
     animator.add(&pacChase);
     animator.add(&timedFireworks);
-    animator.add(&pacWipe);
+    animator.add(&rainbow);
 
     animator.init();
 
@@ -208,13 +181,15 @@ int main() {
     while (1) {
         animator.step();
         n++;
-        if (n % 1000 == 0) {
+        if (n % 500 == 0) {
             rtc_get_datetime(&dt);
             printf(
                 "Time: %04d/%02d/%02d %02d:%02d:%02d %d frames run, %.2f "
-                "us/frame, %d missed frames\n",
+                "us/frame, %.2f us/show %d missed frames\n",
                 dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec, n,
-                animator.getAverageFrameTimeUS(), animator.getMissedFrames());
+                animator.getAverageFrameTimeUS(), 
+                animator.getAverageShowTimeUS(),
+                animator.getMissedFrames());
         }
     }
 }

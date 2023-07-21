@@ -35,13 +35,16 @@ void fill_rainbow(struct RGB* targetArray, int numToFill, uint8_t initialhue,
     hsv.val = 255;
     hsv.sat = 240;
 
+    if (hsv.hue == 160) {
+        hsv.hue = 161;
+    }
+
     for (int i = 0; i < numToFill; ++i) {
-        targetArray[i] = hsv;
-        // if(hsv.h == 0 || hsv.h==160) {
-        //     printf("i: %d hsv: %d %d %d rgb: %d %d %d\n", i, hsv.hue, hsv.val,
-        //            hsv.sat, targetArray[i].r, targetArray[i].g,
-        //            targetArray[i].b);
-        // }
+        hsv2rgb_rainbow(hsv, targetArray[i]);
+        if (targetArray[i].r + targetArray[i].g + targetArray[i].b < 4 && i > 0) {
+            targetArray[i] = targetArray[i-1];
+        }
+
         hsv.hue += deltahue;
     }
 }
