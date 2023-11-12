@@ -18,7 +18,7 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 
 # Initialise pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
-set(PICO_SDK_PATH "/home/stgreen/pico/pico-sdk")
+# set(PICO_SDK_PATH "/home/stgreen/pico/pico-sdk")
 
 if(PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
   message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")

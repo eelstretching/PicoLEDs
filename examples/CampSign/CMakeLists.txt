@@ -8,12 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(WIFI_SSID "${WIFI_SSID}" CACHE INTERNAL "WiFi SSID for examples")
 set(WIFI_PASSWORD "${WIFI_PASSWORD}" CACHE INTERNAL "WiFi password for examples")
 
-# Initialise pico_sdk from installed location
-# (note this can come from environment, CMake cache etc)
-set(PICO_SDK_PATH "/home/stgreen/pico/pico-sdk")
-
-set(PICO_MBEDTLS_PATH "/home/stgreen/pico/pico-sdk/lib/mbedtls")
-
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
@@ -55,8 +49,8 @@ target_compile_definitions(CampSign PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(CampSign
-  PicoLEDs
   pico_cyw43_arch_lwip_poll
+  PicoLEDs
   hardware_dma
   hardware_pio
   hardware_rtc
