@@ -15,67 +15,82 @@ int main() {
 
     //
     // Simple test for a single strip of pixels.
-    Strip strip(2, 552);
+    Strip strips[] = {Strip(2, 138), Strip(3, 138)};
 
-    strip.setFractionalBrightness(32);
+    RGB colors[] = {RGB::Red, RGB::Green};
 
-    int delay = 20;
+    strips[0].setFractionalBrightness(32);
+    strips[1].setFractionalBrightness(32);
 
-    int n = 0;
+    int delay = 5;
 
-    int pos = 0;
+    int dirs[] = {1,0};
 
-    int dir = 1;
+    int width = 10;
 
-    int width = 20;
+    int posns[] = {0, (int) strips[1].getNumPixels() - width};
 
-    for (int i = 0; i < 10; i++) {
-        strip.fill(RGB::Red);
-        strip.show();
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 2; j++) {
+            strips[j].fill(RGB::Red);
+            strips[j].show();
+        }
         sleep_ms(200);
-        strip.fill(RGB::Green);
-        strip.show();
+        for (int j = 0; j < 2; j++) {
+            strips[j].fill(RGB::Green);
+            strips[j].show();
+        }
         sleep_ms(200);
-        strip.fill(RGB::Blue);
-        strip.show();
+        for (int j = 0; j < 2; j++) {
+            strips[j].fill(RGB::Blue);
+            strips[j].show();
+        }
         sleep_ms(200);
-        strip.fill(RGB::Black);
-        strip.show();
+        for (int j = 0; j < 2; j++) {
+            strips[j].fill(RGB::Black);
+            strips[j].show();
+        }
         sleep_ms(200);
     }
 
+    StopWatch fw;
     while (1) {
-        if (dir == 1) {
-            if (pos > 0) {
-                strip.putPixel(RGB::Black, pos - 1);
+        fw.start();
+        for (int s = 0; s < 2; s++) {
+            if (dirs[s] == 1) {
+                if (posns[s] > 0) {
+                    strips[s].putPixel(RGB::Black, posns[s] - 1);
+                }
+                for (int i = posns[s]; i < posns[s] + width; i++) {
+                    strips[s].putPixel(colors[s], i);
+                }
+                posns[s]++;
+                if (posns[s] == strips[s].getNumPixels() - width) {
+                    dirs[s] = 0;
+                }
+            } else {
+                if (posns[s] < strips[s].getNumPixels() - width) {
+                    strips[s].putPixel(RGB::Black, posns[s] + width);
+                }
+                for (int i = posns[s]; i < posns[s] + width; i++) {
+                    strips[s].putPixel(colors[s], i);
+                }
+                posns[s]--;
+                if (posns[s] == -1) {
+                    dirs[s] = 1;
+                    posns[s] = 0;
+                }
             }
-
-            for (int i = pos; i < pos + width; i++) {
-                strip.putPixel(RGB::Red, i);
-            }
-            pos++;
-            if (pos == strip.getNumPixels() - width) {
-                dir = 0;
-            }
-        } else {
-            if (pos < strip.getNumPixels() - width) {
-                strip.putPixel(RGB::Black, pos + width);
-            }
-            for (int i = pos; i < pos + width; i++) {
-                strip.putPixel(RGB::Red, i);
-            }
-            pos--;
-            if (pos == width) {
-                dir = 1;
-            }
+            strips[s].show();
         }
-        strip.show();
-        sleep_ms(delay);
+        if (delay > 0) {
+            sleep_ms(delay);
+        }
 
-        n++;
-        if (n % 10 == 0) {
-            StopWatch sw = strip.getStripStats();
-            printf("%d loops, %.2f us per show\n", n, sw.getAverageTime());
+        fw.finish();
+        if (fw.count % 500 == 0) {
+            printf("%d frames, %.2f f/s\n", fw.count,
+                   fw.count / (fw.totalTime / 1e6));
         }
     }
 }

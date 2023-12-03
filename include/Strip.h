@@ -32,7 +32,7 @@ static StripResetDelay *strip_delays[NUM_DMA_CHANNELS];
 /*
  * RES time, specification says it needs at least 50 us, but 30 seems to work?
  */
-#define RESET_TIME_US (60)
+#define RESET_TIME_US (55)
 
 class Strip {
    protected:
