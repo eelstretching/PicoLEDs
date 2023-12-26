@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <vector>
+
 #include "StopWatch.h"
+#include "Strip.h"
 #include "color.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -11,27 +14,74 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-class View;
+// @brief The direction that a strip goes, given the orientation of the canvas,
+// as a single strip might have multiple rows in it.
+enum StripDirection {
+    FORWARDS,
+    BACKWARDS,
+};
 
-class Canvas {
-    friend class View;
+class Canvas;
 
-    //
-    // The width and height of the canvas, in pixels.
+//
+// A single row in this canvas, which is all or part of a given strip.
+class Row {
+    friend class Canvas;
+    Canvas *canvas;
+    Strip *strip;
+    uint start;
     uint width;
-    uint height;
+    StripDirection dir;
+
+   public:
+    Row(Strip *strip, uint start, uint width, StripDirection dir, Canvas *canvas)
+        : strip(strip), start(start), width(width), dir(dir), canvas(canvas) {}
+
+    /// @brief Sets the pixel at position x in this row to the given color.
+    /// @param x the position of the pixel to set. This is relative to the
+    /// origin of the canvas holding this row. This value will be translatd to
+    /// the appropriate postion in the strip holding this row.
+    /// @param color the color to set the pixel to.
+    void set(int x, RGB color);
+
+    /// @brief Gets the value of a pixel at position x in this row.
+    /// @param x the position of the pixel relative to the origin of the canvas.
+    /// @return the color of the pixel at the given position.
+    RGB get(int x);
+
+    /// @brief Fills a row with the given color
+    /// @param color the color to fill with
+    void fill(RGB color);
+
+    /// @brief Copies as many color values from the provided array at the given position.
+    /// @param source The array containing values to be copied
+    /// @param p The position at which copying should begin in our row
+    /// @param n How many bytes we want to copy in total
+    /// @return the number of bytes that were copied into this row, before we hit the end.
+    int copy(RGB *source, int p, int n);
+
+    /// @brief Copies the data from another row into this one.
+    /// @param other the row whose data we should copy.
+    void copy(Row *other);
+};
+
+// A 2-D canvas that we can draw on. If you think of the canvas as a 2-D
+// object, the origin would be in the bottom-left.
+class Canvas {
+    //
+    // The width of the canvas, in pixels, and a couple of associated values.
+    uint width;
     uint numPixels;
     uint rowBytes;
 
-    //
-    // Where the current view is organized.
-    uint viewX = 0;
-    uint viewY = 0;
+    /// @brief The strips that make up this view, so we can show each one just
+    /// once
+    /// when rendering.
+    std::vector<Strip> strips;
 
-    //
-    // The actual data for the canvas. If you think of the canvas as a 2-D
-    // object, the origin would be in the bottom-left.
-    RGB *data;
+    /// @brief The rows that make up this view, which are distributed across the
+    /// strips that were added.
+    std::vector<Row> rows;
 
     //
     // A background color. When we blank something out, when data gets copied in
@@ -39,16 +89,17 @@ class Canvas {
     // By default, it's black.
     RGB background = RGB::Black;
 
-    /// @brief A view that we can use to render some or all of this canvas.
-    View *view = nullptr;
-
     /// @brief stats for our show operations.
     StopWatch stats;
 
    public:
-    Canvas(uint width, uint height);
+    Canvas(uint width);
 
-    uint getHeight() { return height; };
+    /// @brief Adds a strip of pixels to this view.
+    /// @param strip
+    void add(Strip &strip);
+
+    uint getHeight() { return rows.size(); };
 
     uint getWidth() { return width; };
 
@@ -137,11 +188,11 @@ class Canvas {
     /// @param f
     void scrollDown(int n, RGB f);
 
-    void scrollLeft() {scrollLeft(1, background);};
+    void scrollLeft() { scrollLeft(1, background); };
 
     void scrollLeft(int n, RGB f);
 
-    void scrollRight() {scrollRight(1, background);};
+    void scrollRight() { scrollRight(1, background); };
 
     void scrollRight(int n, RGB f);
 
@@ -218,7 +269,8 @@ class Canvas {
     /// @return the index into our data array for this x and y.
     uint getPos(uint x, uint y);
 
-    /// @brief Gets a pointer into the underlying data array for the given x,y coordinate. Use carefully!
+    /// @brief Gets a pointer into the underlying data array for the given x,y
+    /// coordinate. Use carefully!
     /// @param x the x coordinate
     /// @param y the y coordinate
     /// @return a pointer into the data array, or NULL if the coords are weird.
@@ -241,12 +293,6 @@ class Canvas {
     /// @brief Clears a column of the canvas.
     /// @param column the column to clear.
     void clearColumn(int column);
-
-    /// @brief Sets the origin of the view in this canvas. This lets us make a
-    /// larger canvas and shift things by moving the view.
-    /// @param x the x position of the view origin
-    /// @param y the y position of the view origin
-    void setView(View *v, uint x, uint y);
 
     /// @brief Shows the data on the canvas in the view provided by the strips.
     void show();

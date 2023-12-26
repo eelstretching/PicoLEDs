@@ -4,7 +4,6 @@
 #include "Font.h"
 #include "FontTwoP.h"
 #include "Strip.h"
-#include "View.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -18,18 +17,14 @@ int main() {
 
     //
     // A canvas and a view made out of strips.
-    Canvas canvas(138, 16);
-    View view(138);
+    Canvas canvas(138);
     Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
                       Strip(5, 552)};
-    view.add(strips[0]);
-    view.add(strips[1]);
-    view.add(strips[2]);
-    view.add(strips[3]);
-    canvas.setView(&view, 0, 0);
+    canvas.add(strips[0]);
+    canvas.add(strips[1]);
+    canvas.add(strips[2]);
+    canvas.add(strips[3]);
     int delay = 30;
-
-    printf("View is %d rows %d columns\n", view.getHeight(), view.getWidth());
 
     //
     // Init to clear the strips and show they're working without relying on

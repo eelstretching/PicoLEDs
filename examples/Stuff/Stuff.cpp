@@ -9,7 +9,6 @@
 #include "Canvas.h"
 #include "Strip.h"
 #include "TextAnimation.h"
-#include "View.h"
 #include "Xpm.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
@@ -24,16 +23,14 @@ int main() {
     stdio_init_all();
 
     //
-    // A canvas and a view made out of strips.
-    Canvas canvas(138, 16);
-    View view(138);
+    // A canvas made out of strips.
+    Canvas canvas(138);
     Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
                       Strip(5, 552)};
-    view.add(strips[0]);
-    view.add(strips[1]);
-    view.add(strips[2]);
-    view.add(strips[3]);
-    canvas.setView(&view, 0, 0);
+    canvas.add(strips[0]);
+    canvas.add(strips[1]);
+    canvas.add(strips[2]);
+    canvas.add(strips[3]);
     int delay = 30;
 
     //

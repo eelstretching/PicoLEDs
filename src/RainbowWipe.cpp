@@ -35,10 +35,10 @@ bool RainbowWipe::step() {
                 return true;
             }
             n = canvas->getWidth() - p;
-            fill_rainbow(canvas->getDataPointer(p, 0), n, 0, 7);
-            for (int row = 1; row < canvas->getHeight(); row++) {
-                canvas->copy(canvas->getDataPointer(p, 0), n, p, row);
-            }
+            // fill_rainbow(canvas->getDataPointer(p, 0), n, 0, 7);
+            // for (int row = 1; row < canvas->getHeight(); row++) {
+            //     canvas->copy(canvas->getDataPointer(p, 0), n, p, row);
+            // }
             p--;
             break;
 
@@ -48,10 +48,10 @@ bool RainbowWipe::step() {
                 clearing = true;
                 return true;
             }
-            fill_rainbow(canvas->getDataPointer(0, 0), p, 0, 7);
-            for (int row = 1; row < canvas->getHeight(); row++) {
-                canvas->copy(canvas->getDataPointer(0, 0), p, 0, row);
-            }
+            // fill_rainbow(canvas->getDataPointer(0, 0), p, 0, 7);
+            // for (int row = 1; row < canvas->getHeight(); row++) {
+            //     canvas->copy(canvas->getDataPointer(0, 0), p, 0, row);
+            // }
             p++;
             break;
     }

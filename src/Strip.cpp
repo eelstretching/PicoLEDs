@@ -142,6 +142,13 @@ void Strip::putPixel(RGB c, uint p) {
   data[p] = c;
 }
 
+RGB Strip::get(uint p) {
+  if(p >= numPixels) {
+    return RGB::Black;
+  }
+  return data[p];
+}
+
 void Strip::putPixels(RGB* pixels, uint n) { putPixels(pixels, 0, n); }
 
 void Strip::putPixels(RGB* pixels, uint p, uint n) {

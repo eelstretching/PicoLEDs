@@ -108,6 +108,11 @@ class Strip {
     /// @param c The RGB color value to put in the strip.
     void putPixel(RGB c, uint p);
 
+    /// @brief Gets the color value at a given position in the strip
+    /// @param p the position to get the color from
+    /// @return the color at the given position.
+    RGB get(uint p);
+
     /// @brief Puts n pixels from the given array into the strip, starting at
     /// position 0.
     /// @param pixels The data that we want to copy into our strip
@@ -147,6 +152,10 @@ class Strip {
     /// (off) and 255 (all the way on).
     void setFractionalBrightness(uint8_t fractionalBrightness) {
         fracBrightness = fractionalBrightness;
+    }
+
+    RGB* getData() {
+        return data;
     }
 
     uint8_t getFractionalBrightness() { return fracBrightness; }

@@ -1,7 +1,6 @@
 #include "Canvas.h"
 #include "Firework.h"
 #include "Strip.h"
-#include "View.h"
 #include "pico/printf.h"
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
@@ -12,15 +11,13 @@ int main() {
 
     //
     // A canvas and a view made out of strips.
-    Canvas canvas(138, 16);
-    View view(138);
+    Canvas canvas(138);
     Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
                       Strip(5, 552)};
-    view.add(strips[0]);
-    view.add(strips[1]);
-    view.add(strips[2]);
-    view.add(strips[3]);
-    canvas.setView(&view, 0, 0);
+    canvas.add(strips[0]);
+    canvas.add(strips[1]);
+    canvas.add(strips[2]);
+    canvas.add(strips[3]);
 
     int delay = 100;
 
