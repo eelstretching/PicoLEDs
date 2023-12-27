@@ -18,22 +18,21 @@ int main() {
     //
     // A canvas and a view made out of strips.
     Canvas canvas(138);
-    Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
-                      Strip(5, 552)};
+    Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
+    int ns = 3;
     canvas.add(strips[0]);
     canvas.add(strips[1]);
     canvas.add(strips[2]);
-    canvas.add(strips[3]);
-    int delay = 30;
+    int delay = 100;
 
     //
     // Init to clear the strips and show they're working without relying on
     // rendering.
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < ns; i++) {
         strips[i].fill(RGB::Green);
         strips[i].show();
     }
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < ns; i++) {
         sleep_ms(delay);
         strips[i].fill(RGB::Black, 0, 138);
         strips[i].show();
@@ -51,131 +50,44 @@ int main() {
         strips[i].show();
     }
 
+    int x = -1;
+    int y = -1;
+    bool up = true;
+    bool right = true;
+
     while (1) {
-        canvas.clear();
+        // printf("Prev %d,%d\n", x, y);
+        canvas.set(x, y, canvas.getBackground());
+        if(up) {
+            y++;
+            if(y == canvas.getHeight()-1) {
+                up = false;
+            }
+        }  else {
+            y--;
+            if(y == 0) {
+                up = true;
+            }
+        }
 
-        canvas.drawLine(0, 7, 40, 7, RGB::Red);
+        if(right) {
+            x++;
+            if(x == canvas.getWidth() - 1) {
+                right = false;
+            }
+        } else {
+            x--;
+            if(x == 0) {
+                right = true;
+            }
+        }
 
-        canvas.drawLine(0, 5, 40, 5, RGB::Green);
-
+        printf("Curr %d,%d\n", x, y);
+        canvas.set(x, y, RGB::Green);
         canvas.show();
 
-        sleep_ms(500);
+        sleep_ms(200);
 
-        canvas.mirrorTopToBottom();
-        canvas.show();
-
-        sleep_ms(500);
-
-        canvas.mirrorLeftToRight();
-        canvas.show();
-
-        sleep_ms(500);
-
-        canvas.clear();
-
-        canvas.drawLine(97, 0, 137, 0, RGB::Blue);
-        canvas.drawLine(97, 2, 137, 2, RGB::Fuchsia);
-        canvas.show();
-        sleep_ms(500);
-        canvas.mirrorBottomToTop();
-        canvas.show();
-        sleep_ms(500);
-        canvas.mirrorRightToLeft();
-        canvas.show();
-        sleep_ms(500);
     }
 
-    // //
-    // // Make a gradient that's 16 wide.
-    // RGB grad1[16];
-    // fill_gradient_RGB(grad1, 0, RGB::Blue, 16, RGB::Green);
-    // RGB grad2[16];
-    // fill_gradient_RGB(grad2, 0, RGB::Yellow, 16, RGB::Red);
-
-    // RGB simple[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
-    //                 RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White};
-    // char b[30];
-
-    // Font robo(&canvas, RobotronFontData);
-
-    // uint tw = robo.render("TROOP 103", 5, 0, RGB::Green);
-    // canvas.show();
-    // sleep_ms(10000);
-    // robo.render("BTON", tw+robo.getSpacing(), 0, RGB::Red);
-    // canvas.show();
-    // sleep_ms(10000);
-
-    // //
-    // // Make a 4x16 block of the gradients
-    // int n = 0;
-
-    // canvas.clear();
-    // canvas.copy(grad1, 16, 40, 0);
-    // canvas.copy(grad2, 16, 40, 1);
-    // canvas.copy(grad1, 16, 40, 2);
-    // canvas.copy(grad2, 16, 40, 3);
-
-    // canvas.show();
-    // sleep_ms(200);
-    // int rx = 40;
-    // int ry = 0;
-    // bool dir = true;
-    // while (1) {
-    //     printf("Bounce %d %d\n", rx, ry);
-    //     for (int i = 0; i < 40; i++) {
-    //         canvas.shiftRight(rx++, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //     }
-
-    //     if (dir) {
-    //         canvas.shiftUp(rx, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //         ry++;
-    //         if (ry == canvas.getHeight() - 4) {
-    //             dir = false;
-    //         }
-    //     } else {
-    //         canvas.shiftDown(rx, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //         ry--;
-    //         if (ry == 0) {
-    //             dir = true;
-    //         }
-    //     }
-
-    //     for (int i = 0; i < 40; i++) {
-    //         canvas.shiftLeft(rx--, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //     }
-
-    //     if (dir) {
-    //         canvas.shiftUp(rx, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //         ry++;
-    //         if (ry == canvas.getHeight() - 4) {
-    //             dir = false;
-    //         }
-    //     } else {
-    //         canvas.shiftDown(rx, ry, 16, 4, 1);
-    //         canvas.show();
-    //         sleep_ms(delay);
-    //         ry--;
-    //         if (ry == 0) {
-    //             dir = true;
-    //         }
-    //     }
-
-    //     n++;
-    //     if (n % 20 == 0) {
-    //         StopWatch *stats = canvas.getStopWatch();
-    //         printf("Average show time is %.2f us\n",
-    //         stats->getAverageTime());
-    //     }
-    // }
 }

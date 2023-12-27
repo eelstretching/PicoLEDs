@@ -15,38 +15,39 @@ int main() {
 
     //
     // Simple test for a single strip of pixels.
-    Strip strips[] = {Strip(2, 138), Strip(3, 138)};
+    Strip strips[] = {Strip(2,138), Strip(3, 138),Strip(4, 138)};
+    int ns = 3;
 
-    RGB colors[] = {RGB::Red, RGB::Green};
+    RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow};
 
-    strips[0].setFractionalBrightness(32);
-    strips[1].setFractionalBrightness(32);
-
+    for(int i = 0; i < ns; i++) {
+        strips[i].setFractionalBrightness(32);
+    }
     int delay = 5;
 
-    int dirs[] = {1,0};
+    int dirs[] = {1,0,1,0};
 
     int width = 10;
 
-    int posns[] = {0, (int) strips[1].getNumPixels() - width};
+    int posns[] = {0, (int) strips[1].getNumPixels() - width, 0, (int) strips[1].getNumPixels() - width};
 
     for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Red);
             strips[j].show();
         }
         sleep_ms(200);
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Green);
             strips[j].show();
         }
         sleep_ms(200);
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Blue);
             strips[j].show();
         }
         sleep_ms(200);
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Black);
             strips[j].show();
         }
@@ -56,7 +57,7 @@ int main() {
     StopWatch fw;
     while (1) {
         fw.start();
-        for (int s = 0; s < 2; s++) {
+        for (int s = 0; s < ns; s++) {
             if (dirs[s] == 1) {
                 if (posns[s] > 0) {
                     strips[s].putPixel(RGB::Black, posns[s] - 1);

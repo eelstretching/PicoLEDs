@@ -89,12 +89,14 @@ void Canvas::add(Strip &strip) {
 
     if (np == width) {
         rows.push_back(Row(&strip, 0, width, StripDirection::FORWARDS, this));
+        strips.push_back(strip);
         return;
     }
 
     if (np < width) {
         printf("Strip added with %d pixels, but width is %d", np, width);
         rows.push_back(Row(&strip, 0, np, StripDirection::FORWARDS, this));
+        strips.push_back(strip);
         return;
     }
 
