@@ -24,9 +24,10 @@ class Animation {
     /// @param canvas The canvas we'll draw on.
     Animation(Canvas *canvas);
 
-    /// @brief Gets the frames-per-second this animation requires. Default is 30.
+    /// @brief Gets the frames-per-second this animation requires. Default
+    /// is 30.
     /// @return the FPS this animation needs.
-    virtual int getFPSNeeded() {return 30;};
+    virtual int getFPSNeeded() { return 30; };
 
     /// @brief Virtual destructor!
     virtual ~Animation(){};
@@ -43,9 +44,31 @@ class Animation {
     virtual bool step() { return true; };
 
     /// @brief Finishes the animation. Can be used to clear up, etc.
-    virtual void finish() {};
+    virtual void finish(){};
 
     Canvas *getCanvas() { return canvas; };
+};
+
+class MultiAnimation : public Animation {
+    std::vector<Animation *> animations;
+
+    int na;
+    int fps = -1;
+
+   public:
+    MultiAnimation(Canvas *canvas) : Animation(canvas){};
+    void add(Animation *animation) {
+        animations.push_back(animation);
+        fps = MAX(fps, animation->getFPSNeeded());
+    }
+
+    bool step() {
+        for(auto a : animations) {
+            a->step();
+        }
+        return true;
+    }
+    int getFPSNeeded() { return fps; }
 };
 
 #endif

@@ -29,15 +29,7 @@ class Bouncer : public Animation {
     Bouncer(Canvas *canvas, RGB color, int x, int y);
 
     Bouncer(Canvas *canvas, RGB color, int x, int y, int maxX, int maxY);
-    bool step();
-};
-
-class Bouncers : public Animation {
-    Bouncer *bouncers;
-    int nb;
-
-    public:
-    Bouncers(Canvas *canvas, Bouncer *bouncers, int nb) : Animation(canvas), bouncers(bouncers), nb(nb) {};
+    int getFPSNeeded() {return 10;};
     bool step();
 };
 

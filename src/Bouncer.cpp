@@ -5,7 +5,6 @@ Bouncer::Bouncer(Canvas* canvas, RGB color, int x, int y) : Animation(canvas), c
     maxY=canvas->getHeight() - 1;
     up = true;
     right = true;
-    printf("Bounce %d %d %d %d\n", x, y, maxX, maxY);
 }
 
 Bouncer::Bouncer(Canvas* canvas, RGB color, int x, int y, int maxX, int maxY) : Animation(canvas), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {
@@ -14,7 +13,6 @@ Bouncer::Bouncer(Canvas* canvas, RGB color, int x, int y, int maxX, int maxY) : 
 }
 
 bool Bouncer::step() {
-    printf("Step %d\n", color);
     canvas->set(x, y, canvas->getBackground());
     if (up) {
         y++;
@@ -43,10 +41,3 @@ bool Bouncer::step() {
     canvas->set(x, y, color);
     return true;
 }
-
-bool Bouncers::step() {
-    for(int i = 0; i < nb; i++) {
-        bouncers[i].step();
-    }
-    return true;
- }

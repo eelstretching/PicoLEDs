@@ -8,9 +8,7 @@ Animator::Animator(Canvas* canvas) : Animation(canvas) {
 
 Animator::Animator(Canvas* canvas, int fps) : Animator(canvas) { setFPS(fps); }
 
-void Animator::add(Animation* a) {
-    animations.push_back(a);
-}
+void Animator::add(Animation* a) { animations.push_back(a); }
 
 void Animator::init() {
     pos = 0;
@@ -50,4 +48,3 @@ bool Animator::step() {
     }
     return true;
 }
-

@@ -52,14 +52,20 @@ int main() {
 
     Bouncer b[] = {
         Bouncer(&canvas, RGB::Red, -1, -1),
-        Bouncer(&canvas, RGB::Yellow, 20, -1),
+        Bouncer(&canvas, RGB::Yellow, 20, 0),
         Bouncer(&canvas, RGB::GhostWhite, 50, -1),
-        Bouncer(&canvas, RGB::Green, canvas.getWidth() / 2, -1),
+        Bouncer(&canvas, RGB::CornflowerBlue, 60, 1),
+        Bouncer(&canvas, RGB::Green, canvas.getWidth() / 2, 0),
+        Bouncer(&canvas, RGB::DodgerBlue, 79, 1),
         Bouncer(&canvas, RGB::Blue, canvas.getWidth() - 2, -1)};
+    int nb = 7;
 
-    Bouncers bouncers(&canvas, b, 5);
+    MultiAnimation bouncers(&canvas);
+    for(int i = 0; i < nb; i++) {
+        bouncers.add(&b[i]);
+    }
 
-    Animator animator(&canvas, 10);
+    Animator animator(&canvas, 5);
     animator.add(&bouncers);
     animator.init();
 
