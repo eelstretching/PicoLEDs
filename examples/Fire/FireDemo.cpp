@@ -1,3 +1,4 @@
+#include "Animator.h"
 #include "Canvas.h"
 #include "Fire.h"
 #include "Strip.h"
@@ -12,31 +13,24 @@ int main() {
     //
     // A canvas and a view made out of strips.
     Canvas canvas(138);
-    Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
-                      Strip(5, 552)};
-    canvas.add(strips[0]);
-    canvas.add(strips[1]);
-    canvas.add(strips[2]);
-    canvas.add(strips[3]);
+    Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
+    int ns = 3;
+    for(int i = 0; i < ns; i++) {
+        strips[i].setFractionalBrightness(32);
+        canvas.add(strips[i]);
+    }
 
     int delay = 30;
-
-    int msPerFrame = 1000 / 30;
-
     //
     // Init to clear the strips and show they're working while rendering's
     // busted.
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < ns; i++) {
         strips[i].fill(RGB::Green);
         strips[i].show();
     }
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < ns; i++) {
         sleep_ms(delay);
         strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
         strips[i].show();
     }
 
@@ -44,30 +38,30 @@ int main() {
     canvas.clear();
     StopWatch sw;
 
-    int nf = 6;
-    Fire fires[6] = {Fire(&canvas, 10, 95, 1, 55, 120),
-                     Fire(&canvas, 10, 100, 2, 80, 150),
-                     Fire(&canvas, 10, 110, 3, 30, 120),
-                     Fire(&canvas, 10, 90, 4, 20, 50),
-                     Fire(&canvas, 10, 105, 5, 55, 110),
-                     Fire(&canvas, 10, 100, 6, 100, 200)};
+    int nf = 3;
+    Fire f[] = {Fire(&canvas, 10, 80, 0, 55, 120),
+                Fire(&canvas, 10, 100, 1, 80, 150),
+                Fire(&canvas, 10, 90, 2, 30, 120)};
+
+    MultiAnimation fires(&canvas);
+    for (int i = 0; i < nf; i++) {
+        fires.add(&f[i]);
+    }
+
+    Animator animator(&canvas, 5);
+    animator.add(&fires);
+    animator.init();
 
     int n = 0;
     while (1) {
-        sw.start();
-        for (int i = 0; i < 6; i++) {
-            fires[i].step();
-        }
-        canvas.show();
-        sw.finish();
-        uint64_t lms = sw.getLastTimeMS();
-        if (lms < msPerFrame) {
-            sleep_ms(msPerFrame - lms);
-        }
+        animator.step();
         n++;
-        if (n % 100 == 0) {
-            printf("Stepped %d times, %.2f ms/iteration\n", n,
-                   sw.getAverageTime() / 1000);
+        if (n % 500 == 0) {
+            printf(
+                "%d frames run, %.2f "
+                "us/frame, %.2f us/show %d missed frames\n",
+                n, animator.getAverageFrameTimeUS(),
+                animator.getAverageShowTimeUS(), animator.getMissedFrames());
         }
     }
 }

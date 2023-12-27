@@ -29,7 +29,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Fire FireDemo.cpp Fire.cpp)
+add_executable(Fire FireDemo.cpp)
 
 pico_set_program_name(Fire "Fire")
 pico_set_program_version(Fire "0.1")
