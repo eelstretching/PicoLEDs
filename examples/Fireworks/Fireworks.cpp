@@ -76,7 +76,7 @@ int main() {
         if (n % 500 == 0) {
             printf("Stepped %d times, %.2f avg animation ms %.2f avg show ms\n",
                    n, aw.getAverageTime() / 1000, sw.getAverageTime() / 1000);
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < ns; i++) {
                 printf(" Strip %d avg show time %.2f us\n", i, strips[i].getStripStats().getAverageTime());
             }
         }
