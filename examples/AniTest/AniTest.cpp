@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "Animator.h"
+#include "BarberPole.h"
 #include "Bouncer.h"
 #include "Canvas.h"
 #include "Strip.h"
@@ -36,37 +37,12 @@ int main() {
         sleep_ms(delay);
         strips[i].fill(RGB::Black, 0, 138);
         strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
-        strips[i].show();
     }
 
-    Bouncer b[] = {
-        Bouncer(&canvas, RGB::Red, -1, -1),
-        Bouncer(&canvas, RGB::Yellow, 20, 0),
-        Bouncer(&canvas, RGB::GhostWhite, 50, -1),
-        Bouncer(&canvas, RGB::CornflowerBlue, 60, 1),
-        Bouncer(&canvas, RGB::Green, canvas.getWidth() / 2, 0),
-        Bouncer(&canvas, RGB::DodgerBlue, 79, 1),
-        Bouncer(&canvas, RGB::Blue, canvas.getWidth() - 2, -1)};
-    int nb = 7;
-
-    MultiAnimation bouncers(&canvas);
-    for(int i = 0; i < nb; i++) {
-        bouncers.add(&b[i]);
-    }
+    BarberPole bp(&canvas, RGB::Red, RGB::White, 3);
 
     Animator animator(&canvas, 5);
-    animator.add(&bouncers);
+    animator.add(&bp);
     animator.init();
 
     int n = 0;
