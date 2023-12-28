@@ -30,6 +30,7 @@ int main() {
     // Init to clear the strips and show they're working without relying on
     // rendering.
     for (int i = 0; i < ns; i++) {
+        strips[i].setFractionalBrightness(16);
         strips[i].fill(RGB::Green);
         strips[i].show();
     }
@@ -39,7 +40,7 @@ int main() {
         strips[i].show();
     }
 
-    BarberPole bp(&canvas, RGB::Red, RGB::White, 3);
+    BarberPole bp(&canvas, RGB::Green, RGB::Purple, 5);
 
     Animator animator(&canvas, 5);
     animator.add(&bp);

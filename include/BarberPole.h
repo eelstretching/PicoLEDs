@@ -35,7 +35,7 @@ class BarberPole : public Animation {
         c[1] = c2;
     };
 
-    int getFPSNeeded() { return 2; };
+    int getFPSNeeded() { return 10; };
     void init();
 
     bool step();
