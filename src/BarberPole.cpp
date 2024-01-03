@@ -12,7 +12,7 @@ bool BarberPole::step() {
     //
     // We're going to draw diagonals across the entire canvas, alternating
     // colors every stripeWidth stripes.
-    int cc = 0;
+    int ci = 0;
     for (int i = 0; i < canvas->getWidth(); i++) {
         //
         // We'll start drawing at start and let the stripes wrap around the
@@ -23,13 +23,13 @@ bool BarberPole::step() {
         // For each x, we'll draw the diagonal fully, wrapping around on the x
         // axis if necessary.
         for (int y = 0; y < canvas->getHeight(); y++) {
-            canvas->set(x % canvas->getWidth(), y, c[cc]);
+            canvas->set(x % canvas->getWidth(), y, colors[ci]);
             x++;
         }
         if (i % stripeWidth == 0) {
             //
             // Switch colors at the stripe width.
-            cc = (cc + 1) % 2;
+            ci = (ci + 1) % nColors;
         }
     }
     //

@@ -26,6 +26,9 @@ int main() {
     canvas.add(strips[2]);
     int delay = 100;
 
+    RGB colors[] = {RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green, RGB::Blue, RGB::Indigo, RGB::Violet};
+    int nColors = 7;
+
     //
     // Init to clear the strips and show they're working without relying on
     // rendering.
@@ -40,7 +43,7 @@ int main() {
         strips[i].show();
     }
 
-    BarberPole bp(&canvas, RGB::Green, RGB::Purple, 5);
+    BarberPole bp(&canvas, colors, nColors, 5);
 
     Animator animator(&canvas, 5);
     animator.add(&bp);
