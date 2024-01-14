@@ -5,6 +5,7 @@
 
 #include "Animation.h"
 #include "Canvas.h"
+#include "colorutils.h"
 
 #define EXPLOSION_DIVISOR 4
 
@@ -112,6 +113,10 @@ class Firework : public Animation {
         this->maxExplosionSteps = maxExplosionSteps;
     };
 
+    int getFPSNeeded() {
+        return 45;
+    };
+
     /// @brief Sets the current state of the firework.
     /// @param state The state to use.
     void setState(State state) { this->state = state; };
@@ -119,9 +124,33 @@ class Firework : public Animation {
     /// @brief Initialize our explosion.
     void startExplosion();
 
+    /// @brief  Get the color of the flare as it slows and cools
+    /// @param val between 0 and 255
+    /// @return an appropriate color for the given temperature.
+    virtual RGB getFlareColor(uint val);
+
+    /// @brief Gets a color for a given point in the explosion. By default, we'll do fire colors.
+    /// @param val The value of the pixel for HSV
+    /// @param c1 A first color to time the explosion
+    /// @param c2 A second color to time the explosion
+    /// @return an RGB value we can use in the firework
+    virtual RGB getColor(float val, uint c1, uint c2);
+
     /// @brief The flare explodes.
     void explode();
 
     bool step();
+};
+
+class PaletteFirework : public Firework {
+    RGBPalette16 *palette;
+
+    public:
+    PaletteFirework(Canvas *canvas, uint row, RGBPalette16 *palette) : Firework(canvas, row), palette(palette) {};
+
+    RGB getFlareColor(uint val);
+    RGB getColor(float val, uint c1, uint c2);
+
+
 };
 #endif

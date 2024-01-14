@@ -45,7 +45,7 @@ void Firework::reset() {
     }
     //
     // After reset, we'll pause for a bit.
-    pauseTime = random8(10,90);
+    pauseTime = random8(10, 90);
     state = PAUSE;
     canvas->clearRow(row);
 }
@@ -72,8 +72,7 @@ void Firework::rise() {
         s->pos = constrain(s->pos + s->vel, 0, canvas->getWidth());
         s->vel -= gravity;
         s->val = constrain(s->vel * 1000, 0, 255);
-        RGB sc = HeatColor(s->val);
-        sc %= 50;
+        RGB sc = getFlareColor(s->val);
         canvas->set(s->pos, row, sc);
     }
 }
@@ -106,7 +105,7 @@ void Firework::startExplosion() {
         s->vel = (float(random16(0, 10000)) / 5000.0) - 1.0;
         //
         // Goose the ones going up, so they go a bit higher.
-        if(s->vel > 0) {
+        if (s->vel > 0) {
             s->vel *= 1.4;
         }
         // set colors before scaling velocity to keep them bright
@@ -120,28 +119,35 @@ void Firework::startExplosion() {
     state = EXPLODING;
 }
 
+RGB Firework::getFlareColor(uint val) {
+    RGB sc = HeatColor(val);
+    sc %= 50;
+    return sc;
+}
+
+RGB Firework::getColor(float val, uint c1, uint c2) {
+    if (val > c1) {
+        return RGB(255, 255, (255 * (val - c1)) / (255 - c1));
+    } else if (val < c2) {  // fade from red to black
+        return RGB((255 * val) / c2, 0, 0);
+    } else {  // fade from yellow to red
+        return RGB(255, (255 * (val - c2)) / (c1 - c2), 0);
+    }
+}
+
 void Firework::explode() {
     if (explosion[0].val <= c2 / 128 || explosionSteps >= maxExplosionSteps) {
         state = RESET;
         return;
     }
 
-    // canvas->clearRow(row);
     for (int i = 0; i < numSparks; i++) {
         Spark* s = &explosion[i];
         s->pos += s->vel;
         s->pos = constrain(s->pos, 0, canvas->getWidth());
         s->vel -= dyingGravity;
         s->val = constrain(s->val * 0.99, 0, 255);
-        if (s->val > c1) {
-            canvas->set(int(s->pos), row,
-                        RGB(255, 255, (255 * (s->val - c1)) / (255 - c1)));
-        } else if (s->val < c2) {  // fade from red to black
-            canvas->set(int(s->pos), row, RGB((255 * s->val) / c2, 0, 0));
-        } else {  // fade from yellow to red
-            canvas->set(int(s->pos), row,
-                        RGB(255, (255 * (s->val - c2)) / (c1 - c2), 0));
-        }
+        canvas->set(int(s->pos), row, getColor(s->val, c1, c2));
     }
     //
     // As sparks burn out they fall slower
@@ -155,7 +161,7 @@ bool Firework::step() {
             reset();
             break;
         case PAUSE:
-            if(pauseTime == 0) {
+            if (pauseTime == 0) {
                 state = RISING;
             }
             pauseTime--;
@@ -173,4 +179,12 @@ bool Firework::step() {
     //
     // By default, we're a never ending animation.
     return false;
+}
+
+RGB PaletteFirework::getFlareColor(uint val) {
+    return ColorFromPalette(*palette, val);
+}
+
+RGB PaletteFirework::getColor(float val, uint c1, uint c2) {
+    return ColorFromPalette(*palette, val);
 }

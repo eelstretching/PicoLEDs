@@ -10,7 +10,7 @@ int main() {
     stdio_init_all();
 
     //
-    // A canvas and a view made out of strips.
+    // A canvas made out of strips.
     Canvas canvas(138);
     Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
     int ns = 3;
