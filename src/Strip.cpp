@@ -18,10 +18,13 @@
 /// it again.
 /// @return 0, as we do not wish the alarm to repeat.
 static int64_t reset_delay_complete(alarm_id_t id, void* strip_delay) {
+  StripResetDelay *srd = (StripResetDelay *) strip_delay;
+
   //
   // Reset the alarm, and release the semaphore.
-  ((StripResetDelay*)strip_delay)->alarm = 0;
-  sem_release(&((StripResetDelay*)strip_delay)->sem);
+  srd->alarm = 0;
+  sem_release(&srd->sem);
+  srd->dma_time += (time_us_64() - srd->dma_start);
   return 0;
 }
 
@@ -174,6 +177,11 @@ void Strip::fill(RGB c, uint start, uint n) {
 void Strip::show() {
   stats->start();
   if (dma_channel != -1) {
+    delay->dma_start = time_us_64();
+    if(sem_available(&delay->sem) == 0) {
+      nblocked++;
+    }
+    sem_acquire_blocking(&delay->sem);
     //
     // Put the data into the DMA buffer. Maybe there's a fancy memcpy-esque way
     // to do this?
@@ -183,7 +191,6 @@ void Strip::show() {
     //
     // Acquire the semaphore that we're using for this strip's delay, and then
     // start the DMA. The semaphore will be released in the interrupt handler.
-    sem_acquire_blocking(&delay->sem);
     dma_channel_set_read_addr(dma_channel, (void*)dma_buff, false);
     dma_channel_set_trans_count(dma_channel, numPixels, true);
   } else {

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "StopWatch.h"
 #include "color.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -10,13 +11,13 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#include "StopWatch.h"
-
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
 /// light up.
 class StripResetDelay {
    public:
+    uint64_t dma_start;
+    uint64_t dma_time;
     alarm_id_t alarm = 0;
     semaphore sem;
 };
@@ -90,6 +91,10 @@ class Strip {
     uint pos;
 
    public:
+    int nblocked = 0;
+
+    uint64_t total_dma_us = 0;
+
     Strip(uint pin, uint num_pixels);
 
     /// @brief Adds a pixel to this strip at the next position
@@ -154,9 +159,11 @@ class Strip {
         fracBrightness = fractionalBrightness;
     }
 
-    RGB* getData() {
-        return data;
+    uint64_t getDMATime() {
+        return delay->dma_time;
     }
+
+    RGB *getData() { return data; }
 
     uint8_t getFractionalBrightness() { return fracBrightness; }
 

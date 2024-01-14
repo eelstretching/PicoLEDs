@@ -15,21 +15,26 @@ int main() {
 
     //
     // Simple test for a single strip of pixels.
-    Strip strips[] = {Strip(2,138), Strip(3, 138),Strip(4, 138)};
-    int ns = 3;
+    Strip strips[] = {Strip(
+        2, 276)};  //,Strip(3,276)}; // , Strip(3, 276)}; //,Strip(4, 138)};
+    int ns = 1;
 
     RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow};
 
-    for(int i = 0; i < ns; i++) {
-        strips[i].setFractionalBrightness(32);
+    for (int i = 0; i < ns; i++) {
+        strips[i].setFractionalBrightness(16);
     }
-    int delay = 5;
+    float fps = 75;
+    int delay = 8250;  // (int) (1000/fps);
 
-    int dirs[] = {1,0,1,0};
+    printf("Delay is %d\n", delay);
 
-    int width = 10;
+    int dirs[] = {1, 0, 1, 0};
 
-    int posns[] = {0, (int) strips[1].getNumPixels() - width, 0, (int) strips[1].getNumPixels() - width};
+    int width = 9;
+
+    int posns[] = {0, (int)strips[0].getNumPixels() - width, 0,
+                   (int)strips[0].getNumPixels() - width};
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < ns; j++) {
@@ -85,13 +90,19 @@ int main() {
             strips[s].show();
         }
         if (delay > 0) {
-            sleep_ms(delay);
+            sleep_us(delay);
         }
 
         fw.finish();
         if (fw.count % 500 == 0) {
             printf("%d frames, %.2f f/s\n", fw.count,
                    fw.count / (fw.totalTime / 1e6));
+            printf("%d blocked\n", strips[0].nblocked);
+            printf("%.2f us per DMA\n", ((float) strips[0].getDMATime())/fw.count);
+            for (int i = 0; i < ns; i++) {
+                StopWatch sw = strips[i].getStripStats();
+                printf("%d %.2fus/show\n", i, sw.getAverageTime());
+            }
         }
     }
 }

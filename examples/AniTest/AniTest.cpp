@@ -19,21 +19,23 @@ int main() {
     //
     // A canvas made out of strips.
     Canvas canvas(138);
-    Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
-    int ns = 3;
-    canvas.add(strips[0]);
-    canvas.add(strips[1]);
-    canvas.add(strips[2]);
+    Strip strips[] = {Strip(2, 552),
+                      Strip(3, 552)};  // , Strip(3, 276)}; //,Strip(4, 138)};
+    int ns = 2;
+    for (int i = 0; i < ns; i++) {
+        canvas.add(strips[i]);
+    }
     int delay = 100;
 
-    RGB colors[] = {RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green, RGB::Blue, RGB::Indigo, RGB::Violet};
+    RGB colors[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+                    RGB::Blue, RGB::Indigo, RGB::Violet};
     int nColors = 7;
 
     //
     // Init to clear the strips and show they're working without relying on
     // rendering.
     for (int i = 0; i < ns; i++) {
-        strips[i].setFractionalBrightness(16);
+        strips[i].setFractionalBrightness(8);
         strips[i].fill(RGB::Green);
         strips[i].show();
     }
@@ -43,6 +45,9 @@ int main() {
         strips[i].show();
     }
 
+    canvas.clear();
+
+    Bouncer bouncer(&canvas, RGB::Green, 0, 0);
     BarberPole bp(&canvas, colors, nColors, 5);
 
     Animator animator(&canvas, 5);
@@ -58,10 +63,8 @@ int main() {
             printf(
                 "%d frames run, %.2f "
                 "us/frame, %.2f us/show %d missed frames\n",
-                n,
-                animator.getAverageFrameTimeUS(), 
-                animator.getAverageShowTimeUS(),
-                animator.getMissedFrames());
+                n, animator.getAverageFrameTimeUS(),
+                animator.getAverageShowTimeUS(), animator.getMissedFrames());
         }
     }
 }
