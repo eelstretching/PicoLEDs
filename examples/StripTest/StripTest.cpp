@@ -11,19 +11,25 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 137
+#define NUM_STRIPS 8
+#define START_PIN 2
 
 int main() {
     stdio_init_all();
 
     //
     // Simple test for a single strip of pixels.
-    Strip strips[] = {Strip(2, STRIP_LEN), Strip(3,STRIP_LEN)}; // , Strip(3, 276)}; //,Strip(4, 138)};
-    int ns = 2;
+    Strip *strips[NUM_STRIPS];
+    int ns = NUM_STRIPS;
+    int pin = START_PIN;
+    for(int i = 0; i < ns; i++) {
+        strips[i] = new Strip(pin++, STRIP_LEN);
+    }
 
-    RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow};
+    RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow, RGB::Purple, RGB::GhostWhite, RGB::DarkViolet, RGB::FireBrick};
 
     for (int i = 0; i < ns; i++) {
-        strips[i].setFractionalBrightness(16);
+        strips[i]->setFractionalBrightness(16);
     }
     
     float fps = 60;
@@ -31,34 +37,43 @@ int main() {
 
     printf("Delay is %d\n", delay);
 
-    int dirs[] = {1, 0, 1, 0};
+    int dirs[NUM_STRIPS];
+    for(int i = 0; i < NUM_STRIPS; i++) {
+        dirs[i] = (i+1) % 2;
+    }
+
+    for(int i = 0; i < NUM_STRIPS; i++) {
+        printf("Dir %d: %d\n", i, dirs[i]);
+    }
 
     int width = 9;
 
-    int posns[] = {0, (int)strips[0].getNumPixels() - width, 0,
-                   (int)strips[0].getNumPixels() - width};
+    int posns[NUM_STRIPS];
+    for(int i = 0; i < NUM_STRIPS; i++) {
+        posns[i] = i % 2 == 0 ? 0 : ((int) strips[0]->getNumPixels() - width);
+    }
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < ns; j++) {
-            strips[j].fill(RGB::Red);
-            strips[j].show();
+            strips[j]->fill(RGB::Red);
+            strips[j]->show();
         }
-        sleep_ms(500);
+        sleep_ms(250);
         for (int j = 0; j < ns; j++) {
-            strips[j].fill(RGB::Green);
-            strips[j].show();
+            strips[j]->fill(RGB::Green);
+            strips[j]->show();
         }
-        sleep_ms(500);
+        sleep_ms(250);
         for (int j = 0; j < ns; j++) {
-            strips[j].fill(RGB::Blue);
-            strips[j].show();
+            strips[j]->fill(RGB::Blue);
+            strips[j]->show();
         }
-        sleep_ms(500);
+        sleep_ms(250);
         for (int j = 0; j < ns; j++) {
-            strips[j].fill(RGB::Black);
-            strips[j].show();
+            strips[j]->fill(RGB::Black);
+            strips[j]->show();
         }
-        sleep_ms(500);
+        sleep_ms(250);
     }
 
     StopWatch fw;
@@ -67,21 +82,21 @@ int main() {
         for (int s = 0; s < ns; s++) {
             if (dirs[s] == 1) {
                 if (posns[s] > 0) {
-                    strips[s].putPixel(RGB::Black, posns[s] - 1);
+                    strips[s]->putPixel(RGB::Black, posns[s] - 1);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s].putPixel(colors[s], i);
+                    strips[s]->putPixel(colors[s], i);
                 }
                 posns[s]++;
-                if (posns[s] == strips[s].getNumPixels() - width) {
+                if (posns[s] == strips[s]->getNumPixels() - width) {
                     dirs[s] = 0;
                 }
             } else {
-                if (posns[s] < strips[s].getNumPixels() - width) {
-                    strips[s].putPixel(RGB::Black, posns[s] + width);
+                if (posns[s] < strips[s]->getNumPixels() - width) {
+                    strips[s]->putPixel(RGB::Black, posns[s] + width);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s].putPixel(colors[s], i);
+                    strips[s]->putPixel(colors[s], i);
                 }
                 posns[s]--;
                 if (posns[s] == -1) {
@@ -89,7 +104,7 @@ int main() {
                     posns[s] = 0;
                 }
             }
-            strips[s].show();
+            strips[s]->show();
         }
         if (delay > 0) {
             sleep_ms(delay);
@@ -99,10 +114,10 @@ int main() {
         if (fw.count % 500 == 0) {
             printf("%d frames, %.2f f/s\n", fw.count,
                    fw.count / (fw.totalTime / 1e6));
-            printf("%d blocked\n", strips[0].nblocked);
-            printf("%.2f us per DMA\n", ((float) strips[0].getDMATime())/fw.count);
+            printf("%d blocked\n", strips[0]->nblocked);
+            printf("%.2f us per DMA\n", ((float) strips[0]->getDMATime())/fw.count);
             for (int i = 0; i < ns; i++) {
-                StopWatch sw = strips[i].getStripStats();
+                StopWatch sw = strips[i]->getStripStats();
                 printf("%d %.2fus/show\n", i, sw.getAverageTime());
             }
         }
