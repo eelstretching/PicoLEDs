@@ -12,13 +12,14 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+#define NUM_LEDS 120
 int main() {
     stdio_init_all();
 
     //
     // A canvas and a view made out of strips.
-    Canvas canvas(138);
-    Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
+    Canvas canvas(NUM_LEDS);
+    Strip strips[] = {Strip(2, NUM_LEDS), Strip(3, NUM_LEDS), Strip(4, NUM_LEDS)};
     int ns = 3;
     canvas.add(strips[0]);
     canvas.add(strips[1]);
@@ -34,19 +35,19 @@ int main() {
     }
     for (int i = 0; i < ns; i++) {
         sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
+        strips[i].fill(RGB::Black, 0, NUM_LEDS);
         strips[i].show();
 
         sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
+        strips[i].fill(RGB::Black, NUM_LEDS, NUM_LEDS * 2);
         strips[i].show();
 
         sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
+        strips[i].fill(RGB::Black, NUM_LEDS * 2, NUM_LEDS * 3);
         strips[i].show();
 
         sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
+        strips[i].fill(RGB::Black, NUM_LEDS * 3, NUM_LEDS * 4);
         strips[i].show();
     }
 

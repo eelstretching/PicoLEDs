@@ -10,22 +10,24 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+#define STRIP_LEN 137
+
 int main() {
     stdio_init_all();
 
     //
     // Simple test for a single strip of pixels.
-    Strip strips[] = {Strip(
-        2, 276)};  //,Strip(3,276)}; // , Strip(3, 276)}; //,Strip(4, 138)};
-    int ns = 1;
+    Strip strips[] = {Strip(2, STRIP_LEN), Strip(3,STRIP_LEN)}; // , Strip(3, 276)}; //,Strip(4, 138)};
+    int ns = 2;
 
     RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow};
 
     for (int i = 0; i < ns; i++) {
         strips[i].setFractionalBrightness(16);
     }
-    float fps = 75;
-    int delay = 8250;  // (int) (1000/fps);
+    
+    float fps = 60;
+    int delay =  (int) (1000/fps);
 
     printf("Delay is %d\n", delay);
 
@@ -41,22 +43,22 @@ int main() {
             strips[j].fill(RGB::Red);
             strips[j].show();
         }
-        sleep_ms(200);
+        sleep_ms(500);
         for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Green);
             strips[j].show();
         }
-        sleep_ms(200);
+        sleep_ms(500);
         for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Blue);
             strips[j].show();
         }
-        sleep_ms(200);
+        sleep_ms(500);
         for (int j = 0; j < ns; j++) {
             strips[j].fill(RGB::Black);
             strips[j].show();
         }
-        sleep_ms(200);
+        sleep_ms(500);
     }
 
     StopWatch fw;
@@ -90,7 +92,7 @@ int main() {
             strips[s].show();
         }
         if (delay > 0) {
-            sleep_us(delay);
+            sleep_ms(delay);
         }
 
         fw.finish();
