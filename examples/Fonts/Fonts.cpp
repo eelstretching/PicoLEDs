@@ -27,31 +27,6 @@ int main() {
     canvas.add(strips[3]);
     int delay = 30;
 
-    //
-    // Init to clear the strips and show they're working without relying on
-    // rendering.
-    for (int i = 0; i < 4; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < 4; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
-        strips[i].show();
-    }
-
     Font twoP(&canvas, FontTwoPData);
 
     //

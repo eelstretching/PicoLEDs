@@ -11,29 +11,6 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-/// @brief A struct to store a semaphore and a delay alarm that will allow us to
-/// delay after sending data to the LEDs to give the strip time to actually
-/// light up.
-class StripResetDelay {
-   public:
-    uint64_t dma_start;
-    uint64_t dma_time;
-    alarm_id_t alarm = 0;
-    semaphore sem;
-};
-
-/// @brief A static array of pointers to strip resets, one per DMA channel, as
-/// the IRQ handler will have to reset alarms as nescesary for any of the
-/// channels, since the IRQ handler is a global function, not a member one.
-///
-/// An element of this array will be non-null if we're doing DMA on that
-/// channel.
-static StripResetDelay *strip_delays[NUM_DMA_CHANNELS];
-
-/*
- * RES time, specification says it needs at least 50 us, but 30 seems to work?
- */
-#define RESET_TIME_US (55)
 
 class Strip {
    protected:
@@ -42,45 +19,17 @@ class Strip {
     uint pin;
 
     //
-    // The PIO unit that it's using.
-    PIO pio;
-
-    //
-    // The state machine in the PIO that we're using.
-    int sm;
-
-    //
-    // The DMA channel we'll use for transfers to the strip.
-    int dma_channel;
-
-    //
-    // The DMA buffer where we'll put our pixels for showing.
-    uint32_t *dma_buff;
-
-    //
-    // A delay timer for this strip.
-    StripResetDelay *delay;
-
-    //
-    // Stats for this strip.
-    StopWatch *stats;
-
-    //
-    // The offset of the PIO program to run the strip.
-    int offset;
-
-    //
     // The bytes making up the data for this strip.
     RGB *data;
-
-    //
-    // The color order for this strip. Default is GRB.
-    ColorOrder colorOrder = ColorOrder::ORGB;
 
     //
     // How many pixels there are in the strip. For now, we're going to assume
     // that strips are RGB.
     uint numPixels;
+
+    //
+    // The color order for this strip. Default is RGB.
+    ColorOrder colorOrder = ColorOrder::ORGB;
 
     //
     // We'll keep things dim by default.
@@ -90,10 +39,9 @@ class Strip {
     // Where the next pixel will be added.
     uint pos;
 
-   public:
-    int nblocked = 0;
+    Strip() {};
 
-    uint64_t total_dma_us = 0;
+   public:
 
     Strip(uint pin, uint num_pixels);
 
@@ -141,15 +89,7 @@ class Strip {
     /// @param n the number of pixels to fill
     void fill(RGB c, uint start, uint n);
 
-    /// @brief Shows the strip, i.e., it sends the data out the PIO state
-    /// machine.
-    void show();
-
     uint getNumPixels() { return numPixels; }
-
-    ColorOrder getColorOrder() { return colorOrder; }
-
-    void setColorOrder(ColorOrder co) { colorOrder = co; }
 
     /// @brief Sets the fractional brightness for the whole strip.
     /// @param fractionalBrightness A value between 0 and 255
@@ -159,9 +99,11 @@ class Strip {
         fracBrightness = fractionalBrightness;
     }
 
-    uint64_t getDMATime() {
-        return delay->dma_time;
-    }
+    int getPin() { return pin;}
+
+    ColorOrder getColorOrder() { return colorOrder; }
+
+    void setColorOrder(ColorOrder co) { colorOrder = co; }
 
     RGB *getData() { return data; }
 
@@ -169,7 +111,6 @@ class Strip {
 
     void reset() { pos = 0; }
 
-    StopWatch getStripStats() { return *stats; }
 };
 
 #endif

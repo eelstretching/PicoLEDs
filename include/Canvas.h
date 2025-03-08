@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "Renderer.h"
 #include "StopWatch.h"
 #include "Strip.h"
 #include "color.h"
@@ -34,7 +35,8 @@ class Row {
     StripDirection dir;
 
    public:
-    Row(Strip *strip, uint start, uint width, StripDirection dir, Canvas *canvas)
+    Row(Strip *strip, uint start, uint width, StripDirection dir,
+        Canvas *canvas)
         : strip(strip), start(start), width(width), dir(dir), canvas(canvas) {}
 
     /// @brief Sets the pixel at position x in this row to the given color.
@@ -53,11 +55,13 @@ class Row {
     /// @param color the color to fill with
     void fill(RGB color);
 
-    /// @brief Copies as many color values from the provided array at the given position.
+    /// @brief Copies as many color values from the provided array at the given
+    /// position.
     /// @param source The array containing values to be copied
     /// @param p The position at which copying should begin in our row
     /// @param n How many bytes we want to copy in total
-    /// @return the number of bytes that were copied into this row, before we hit the end.
+    /// @return the number of bytes that were copied into this row, before we
+    /// hit the end.
     int copy(RGB *source, int p, int n);
 
     /// @brief Copies the data from another row into this one.
@@ -74,10 +78,7 @@ class Canvas {
     uint numPixels;
     uint rowBytes;
 
-    /// @brief The strips that make up this view, so we can show each one just
-    /// once
-    /// when rendering.
-    std::vector<Strip> strips;
+    Renderer renderer;
 
     /// @brief The rows that make up this view, which are distributed across the
     /// strips that were added.
@@ -301,7 +302,7 @@ class Canvas {
 
     void printRect(int x, int y, int w, int h);
 
-    StopWatch *getStopWatch();
+    StopWatch *getStats();
 };
 
 #endif

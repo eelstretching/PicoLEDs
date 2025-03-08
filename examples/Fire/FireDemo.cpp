@@ -21,19 +21,6 @@ int main() {
     }
 
     int delay = 30;
-    //
-    // Init to clear the strips and show they're working while rendering's
-    // busted.
-    for (int i = 0; i < ns; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < ns; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-    }
-
     sleep_ms(delay);
     canvas.clear();
     StopWatch sw;

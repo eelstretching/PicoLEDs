@@ -89,14 +89,14 @@ void Canvas::add(Strip &strip) {
 
     if (np == width) {
         rows.push_back(Row(&strip, 0, width, StripDirection::FORWARDS, this));
-        strips.push_back(strip);
+        renderer.add(strip);
         return;
     }
 
     if (np < width) {
         printf("Strip added with %d pixels, but width is %d", np, width);
         rows.push_back(Row(&strip, 0, np, StripDirection::FORWARDS, this));
-        strips.push_back(strip);
+        renderer.add(strip);
         return;
     }
 
@@ -123,7 +123,7 @@ void Canvas::add(Strip &strip) {
     }
 
     numPixels += np;
-    strips.push_back(strip);
+    renderer.add(strip);
 }
 
 void Canvas::setBackground(RGB b) { background = b; }
@@ -487,13 +487,11 @@ void Canvas::shiftDown(int x, int y, uint w, uint h, int n) {
 
 void Canvas::show() {
     stats.start();
-    for (auto s : strips) {
-        s.show();
-    }
+    renderer.render();
     stats.finish();
 }
 
-StopWatch *Canvas::getStopWatch() { return &stats; }
+StopWatch *Canvas::getStats() { return &stats; }
 
 void Canvas::printRect(int x, int y, int w, int h) {}
 

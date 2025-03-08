@@ -1,3 +1,4 @@
+#include <Renderer.h>
 #include <stdlib.h>
 
 #include "StopWatch.h"
@@ -11,7 +12,7 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 137
-#define NUM_STRIPS 8
+#define NUM_STRIPS 1
 #define START_PIN 2
 
 int main() {
@@ -20,59 +21,58 @@ int main() {
     //
     // Simple test for a single strip of pixels.
     Strip *strips[NUM_STRIPS];
+    Renderer renderer;
     int ns = NUM_STRIPS;
     int pin = START_PIN;
-    for(int i = 0; i < ns; i++) {
-        strips[i] = new Strip(pin++, STRIP_LEN);
-    }
-
-    RGB colors[] = {RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow, RGB::Purple, RGB::GhostWhite, RGB::DarkViolet, RGB::FireBrick};
-
     for (int i = 0; i < ns; i++) {
-        strips[i]->setFractionalBrightness(16);
+        strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setFractionalBrightness(32);
+        renderer.add(*strips[i]);
     }
-    
-    float fps = 60;
-    int delay =  (int) (1000/fps);
+    renderer.setup();
 
-    printf("Delay is %d\n", delay);
+    RGB colors[] = {RGB::Red,        RGB::Green,    RGB::Blue,
+                    RGB::Yellow,     RGB::Purple,   RGB::GhostWhite,
+                    RGB::DarkViolet, RGB::FireBrick};
+
+    float fps = 10;
+    int delay = (int)(1000 / fps);
 
     int dirs[NUM_STRIPS];
-    for(int i = 0; i < NUM_STRIPS; i++) {
-        dirs[i] = (i+1) % 2;
-    }
-
-    for(int i = 0; i < NUM_STRIPS; i++) {
-        printf("Dir %d: %d\n", i, dirs[i]);
+    for (int i = 0; i < NUM_STRIPS; i++) {
+        //
+        // When I originally wrote the code, the even directions were 1, so
+        // there you go.
+        dirs[i] = (i + 1) % 2;
     }
 
     int width = 9;
 
     int posns[NUM_STRIPS];
-    for(int i = 0; i < NUM_STRIPS; i++) {
-        posns[i] = i % 2 == 0 ? 0 : ((int) strips[0]->getNumPixels() - width);
+    for (int i = 0; i < NUM_STRIPS; i++) {
+        posns[i] = i % 2 == 0 ? 0 : ((int)strips[0]->getNumPixels() - width);
     }
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(RGB::Red);
-            strips[j]->show();
         }
+        renderer.render();
         sleep_ms(250);
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(RGB::Green);
-            strips[j]->show();
         }
+        renderer.render();
         sleep_ms(250);
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(RGB::Blue);
-            strips[j]->show();
         }
+        renderer.render();
         sleep_ms(250);
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(RGB::Black);
-            strips[j]->show();
         }
+        renderer.render();
         sleep_ms(250);
     }
 
@@ -104,22 +104,23 @@ int main() {
                     posns[s] = 0;
                 }
             }
-            strips[s]->show();
         }
+        renderer.render();
         if (delay > 0) {
             sleep_ms(delay);
         }
 
         fw.finish();
-        if (fw.count % 500 == 0) {
+        if (fw.count % 1000 == 0) {
             printf("%d frames, %.2f f/s\n", fw.count,
                    fw.count / (fw.totalTime / 1e6));
-            printf("%d blocked\n", strips[0]->nblocked);
-            printf("%.2f us per DMA\n", ((float) strips[0]->getDMATime())/fw.count);
-            for (int i = 0; i < ns; i++) {
-                StopWatch sw = strips[i]->getStripStats();
-                printf("%d %.2fus/show\n", i, sw.getAverageTime());
-            }
+            printf("%d blocked\n", renderer.getBlockedCount());
+            printf("%.2f us per DMA\n",
+                   (double)renderer.getDMATime() / fw.count);
+            // for (int i = 0; i < ns; i++) {
+            //     StopWatch sw = strips[i]->getStripStats();
+            //     printf("%d %.2fus/show\n", i, sw.getAverageTime());
+            // }
         }
     }
 }

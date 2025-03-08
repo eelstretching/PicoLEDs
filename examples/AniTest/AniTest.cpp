@@ -31,20 +31,6 @@ int main() {
                     RGB::Blue, RGB::Indigo, RGB::Violet};
     int nColors = 7;
 
-    //
-    // Init to clear the strips and show they're working without relying on
-    // rendering.
-    for (int i = 0; i < ns; i++) {
-        strips[i].setFractionalBrightness(8);
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < ns; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-    }
-
     canvas.clear();
 
     Bouncer bouncer(&canvas, RGB::Green, 0, 0);

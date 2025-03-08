@@ -26,31 +26,6 @@ int main() {
     canvas.add(strips[2]);
     int delay = 100;
 
-    //
-    // Init to clear the strips and show they're working without relying on
-    // rendering.
-    for (int i = 0; i < ns; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < ns; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, NUM_LEDS);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, NUM_LEDS, NUM_LEDS * 2);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, NUM_LEDS * 2, NUM_LEDS * 3);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, NUM_LEDS * 3, NUM_LEDS * 4);
-        strips[i].show();
-    }
-
     int x = -1;
     int y = -1;
     bool up = true;

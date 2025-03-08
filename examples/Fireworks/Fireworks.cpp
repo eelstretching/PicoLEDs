@@ -22,31 +22,6 @@ int main() {
 
     int msPerFrame = 1000 / 60;
 
-    //
-    // Init to clear the strips and show they're working while rendering's
-    // busted.
-    for (int i = 0; i < ns; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < ns; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
-        strips[i].show();
-    }
-
     sleep_ms(delay);
     canvas.clear();
     StopWatch aw;
@@ -76,9 +51,6 @@ int main() {
         if (n % 500 == 0) {
             printf("Stepped %d times, %.2f avg animation ms %.2f avg show ms\n",
                    n, aw.getAverageTime() / 1000, sw.getAverageTime() / 1000);
-            for(int i = 0; i < ns; i++) {
-                printf(" Strip %d avg show time %.2f us\n", i, strips[i].getStripStats().getAverageTime());
-            }
         }
     }
 }

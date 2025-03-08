@@ -45,31 +45,6 @@ int main() {
 
     int delay = 100;
 
-    //
-    // Init to clear the strips and show they're working while rendering's
-    // busted.
-    for (int i = 0; i < 4; i++) {
-        strips[i].fill(RGB::Green);
-        strips[i].show();
-    }
-    for (int i = 0; i < 4; i++) {
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 0, 138);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 138, 276);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 276, 414);
-        strips[i].show();
-
-        sleep_ms(delay);
-        strips[i].fill(RGB::Black, 414, 552);
-        strips[i].show();
-    }
-
     HSV hsv(160, 240, 255);
     RGB rgb(hsv);
 

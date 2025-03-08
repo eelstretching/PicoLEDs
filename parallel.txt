@@ -1,0 +1,39 @@
+We have RGB data in arrays, one per LED strip and we want to send them out in parallel to the strips using the PIO program from the example repo.
+
+Let's assume that we have numStrips LED strips (numStrips has to be <= to 32) and that each strip has pixelsPerStrip LEDs on it. We're going to assume that the strips are all the same length, as that makes life a whole lot easier.
+
+In pictorial form, the data that we have looks like the following, where each of the r, g, and b values is a single bit. We're ignoring RGBW pixels for the moment.
+
++--------------+--------------------------+--------------------------+
+|Strip         |Pixel 0                   |Pixel 1                   |
++--------------+--------------------------+--------------------------+
+|             0|rrrrrrrrggggggggbbbbbbbb  |rrrrrrrrggggggggbbbbbbbb  |
++--------------+--------------------------+--------------------------+
+|             1|                          |                          |
++--------------+--------------------------+--------------------------+
+|           ...|                          |                          |
++--------------+--------------------------+--------------------------+
+|    numStrips |rrrrrrrrggggggggbbbbbbbb  |rrrrrrrrggggggggbbbbbbbb  |
++--------------+--------------------------+--------------------------+
+
+Essentially the data that we want to send out looks like stripping each bit off the head of the representation and packing those bits into a single uint32_t that we can send out via the PIO program. We'll call this a "plane" (i.e., we "planed" the first bits off the colors and put them in this place.)
+
+This looks something like:
+
++-------------+--------+----+---------+---------+----+---------+------+
+|          Bit|Plane 0 |... |Plane 7  |Plane 8  |... |Plane 16 |  ... |
++-------------+--------+----+---------+---------+----+---------+------+
+|            0|      r |    |       r |       g |    |       b |      |
++-------------+--------+----+---------+---------+----+---------+------+
+|            1|      r |    |       r |       g |    |       b |      |
++-------------+--------+----+---------+---------+----+---------+------+
+|          ...|      r |    |       r |       g |    |       b |      |
++-------------+--------+----+---------+---------+----+---------+------+
+|    numStrips|      r |    |       r |       g |    |       b |      |
++-------------+--------+----+---------+---------+----+---------+------+
+|          ...|      0 |    |       0 |       0 |    |       0 |      |
++-------------+--------+----+---------+---------+----+---------+------+
+|           31|      0 |    |       0 |       0 |    |       0 |      |
++-------------+--------+----+---------+---------+----+---------+------+
+
+I'm sure there is some exceedingly clever way to do this (perhaps I should consult Knuth?) but we're trying to get it right before we get it clever, so we'll do it by taking the pixel data for each strip and then laying those bits into the appropriate bit of each plane.
