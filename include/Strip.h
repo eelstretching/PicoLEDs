@@ -28,8 +28,8 @@ class Strip {
     uint numPixels;
 
     //
-    // The color order for this strip. Default is RGB.
-    ColorOrder colorOrder = ColorOrder::ORGB;
+    // The color order for this strip. Default is GRB for WS2812B, per the data sheet.
+    ColorOrder colorOrder = ColorOrder::OGRB;
 
     //
     // We'll keep things dim by default.

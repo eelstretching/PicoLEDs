@@ -59,7 +59,6 @@ class PIOProgram {
     StripResetDelay delay;
     StopWatch stats;
     uint32_t nblocked = 0;
-    uint64_t dma_us = 0;
     int startIndex = 0;
     int startPin = 0;
     int size = 0;

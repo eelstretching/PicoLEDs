@@ -213,7 +213,6 @@ void Renderer::render() {
         // We need to fill the buffer that we'll DMA to the PIO program. How
         // we fill it depends on how many strips we're sending.
         if (pip->size == 1) {
-            printf("Render one strip program\n");
             //
             // One strip, just put the data in the buffer according to the color
             // order after scaling by the strip's brightness.
@@ -247,11 +246,13 @@ void Renderer::render() {
                     // the uint32 it produces.
                     uint32_t val = data[j]
                                        .scale8(s.getFractionalBrightness())
-                                       .getColor(s.getColorOrder());
+                                       .getColor(s.getColorOrder()) << 8u;
                     //
                     // Plane it into the buffers.
-                    for (int k = 0; k < 24; k++, pp++, val >>= 1) {
-                        if (val & 1) {
+                    for (int k = 0; k < 24; k++, pp++, val <<= 1) {
+                        //
+                        // We want the bits in most-to-least significant order.
+                        if (val & 0x80000000) {
                             pip->buffer[pp] |= aBit;
                         }
                     }
@@ -279,7 +280,7 @@ uint32_t Renderer::getBlockedCount() {
 uint64_t Renderer::getDMATime() {
     uint64_t dt = 0;
     for (auto pip : programs) {
-        dt += pip->dma_us;
+        dt += pip->delay.dma_time;
     }
     return dt;
 }

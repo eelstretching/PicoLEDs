@@ -12,7 +12,7 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 137
-#define NUM_STRIPS 8
+#define NUM_STRIPS 1
 #define START_PIN 2
 
 int main() {
@@ -112,7 +112,7 @@ int main() {
         }
 
         fw.finish();
-        if (fw.count % 100 == 0) {
+        if (fw.count % 1000 == 0) {
             printf("%d frames, %.2f f/s\n", fw.count,
                    fw.count / (fw.totalTime / 1e6));
             printf("%d blocked\n", renderer.getBlockedCount());
