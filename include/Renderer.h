@@ -77,6 +77,8 @@ class Renderer {
     // Programs sufficient to render the strips.
     std::vector<PIOProgram *> programs;
 
+    StopWatch dw;
+
     bool setupDone = false;
 
    public:
@@ -111,5 +113,7 @@ class Renderer {
     /// @brief Gets the total time spent on DMA activities, in microseconds.
     /// @return The total time spent on DMA
     uint64_t getDMATime();
+
+    uint64_t getDataSetupTime() { return dw.totalTime; }
 };
 #endif

@@ -74,7 +74,7 @@ static bool isr_installed = false;
 
 Renderer::Renderer() {}
 
-void Renderer::add(Strip& strip) { strips.push_back(strip); }
+void Renderer::add(Strip &strip) { strips.push_back(strip); }
 
 void Renderer::setup() {
     if (setupDone) {
@@ -136,10 +136,11 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     hard_assert(success);
 
     if (pip->size == 1) {
-        ws2812_program_init(pip->pio, pip->sm, pip->offset, pip->startPin, 800000);
+        ws2812_program_init(pip->pio, pip->sm, pip->offset, pip->startPin,
+                            800000);
     } else {
-        ws2812_parallel_program_init(pip->pio, pip->sm, pip->offset, pip->startPin,
-                                     pip->size, 800000);
+        ws2812_parallel_program_init(pip->pio, pip->sm, pip->offset,
+                                     pip->startPin, pip->size, 800000);
     }
 
     //
@@ -167,10 +168,10 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // the PIO block.
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex].getNumPixels();
-        pip->buffer = (uint32_t*)calloc(pip->buffSize, sizeof(uint32_t));
+        pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
     } else {
         pip->buffSize = strips[startIndex].getNumPixels() * 24;
-        pip->buffer = (uint32_t*)calloc(pip->buffSize, sizeof(uint32_t));
+        pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
     }
 
     dma_channel_config channel_config =
@@ -217,19 +218,27 @@ void Renderer::render() {
             // One strip, just put the data in the buffer according to the color
             // order after scaling by the strip's brightness.
             Strip s = strips[pip->startIndex];
-            RGB* data = s.getData();
+            RGB *data = s.getData();
+            dw.start();
             for (int i = 0; i < s.getNumPixels(); i++) {
+                //
+                // Note that we're shifting by 8 here because the PIO program
+                // will be pulling 24 bits and it wants those 24 bits in the
+                // most significant place.
                 pip->buffer[i] = data[i]
-                                    .scale8(s.getFractionalBrightness())
-                                    .getColor(s.getColorOrder())
-                                << 8u;
+                                     .scale8(s.getFractionalBrightness())
+                                     .getColor(s.getColorOrder())
+                                 << 8u;
             }
+            dw.finish();
         } else {
             //
             // We'll need to turn the data for multiple strips into bit planes.
-            for (int i = pip->startIndex; i < pip->startIndex + pip->size; i++) {
+            dw.start();
+            for (int i = pip->startIndex; i < pip->startIndex + pip->size;
+                 i++) {
                 Strip s = strips[i];
-                RGB* data = s.getData();
+                RGB *data = s.getData();
                 uint32_t pp = 0;
 
                 //
@@ -240,13 +249,11 @@ void Renderer::render() {
                 for (int j = 0; j < s.getNumPixels(); j++) {
                     //
                     // Transform the data for color order and brightness.
-                    //
-                    // We're not shifting this left by 8 because getColor
-                    // leaves the 24 bits that we want in the right spot in
-                    // the uint32 it produces.
                     uint32_t val = data[j]
                                        .scale8(s.getFractionalBrightness())
-                                       .getColor(s.getColorOrder()) << 8u;
+                                       .getColor(s.getColorOrder())
+                                   << 8u;
+                    // printf("%2d %3d %032b\n", i, j, val);
                     //
                     // Plane it into the buffers.
                     for (int k = 0; k < 24; k++, pp++, val <<= 1) {
@@ -258,12 +265,22 @@ void Renderer::render() {
                     }
                 }
             }
+            dw.finish();
         }
         //
         // OK, start the DMA. The semaphore will be released by the interrupt
         // service routine.
-        dma_channel_set_read_addr(pip->dma_channel, (void*)pip->buffer, false);
+        dma_channel_set_read_addr(pip->dma_channel, (void *)pip->buffer, false);
         dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
+        // printf("Start PIO\n");
+        // for (int i = 0; i < pip->buffSize; i++) {
+        //     // if (i % 24 == 0) {
+        //     //     printf("\n");
+        //     // }
+        //     // printf("%04d %2d 0x%032b\n", i, i % 8, pip->buffer[i]);
+        //     pio_sm_put_blocking(pip->pio, pip->sm, pip->buffer[i]);
+        // }
+        // sleep_us(RESET_TIME_US);
 
         pip->stats.finish();
     }

@@ -11,7 +11,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 137
+#define STRIP_LEN 50
 #define NUM_STRIPS 8
 #define START_PIN 2
 
@@ -29,14 +29,22 @@ int main() {
         strips[i]->setFractionalBrightness(32);
         renderer.add(*strips[i]);
     }
-    printf("Calling setup\n");
     renderer.setup();
 
     RGB colors[] = {RGB::Red,        RGB::Green,    RGB::Blue,
                     RGB::Yellow,     RGB::Purple,   RGB::GhostWhite,
                     RGB::DarkViolet, RGB::FireBrick};
 
-    float fps = 60;
+    RGB patterns[] = {RGB(0b10101010, 0b10101010, 0b10101010),
+                      RGB(0b01010101, 0b01010101, 0b01010101),
+                      RGB(0b10011001, 0b10011001, 0b10011001),
+                      RGB(0b01100110, 0b01100110, 0b01100110),
+                      RGB(0b00110011, 0b00110011, 0b00110011),
+                      RGB(0b11001100, 0b11001100, 0b11001100),
+                      RGB(0b10001000, 0b10001000, 0b10001000),
+                      RGB(0b00010001, 0b00010001, 0b00010001)};
+
+    float fps = 10;
     int delay = (int)(1000 / fps);
 
     int dirs[NUM_STRIPS];
@@ -47,7 +55,7 @@ int main() {
         dirs[i] = (i + 1) % 2;
     }
 
-    int width = 9;
+    int width = 4;
 
     int posns[NUM_STRIPS];
     for (int i = 0; i < NUM_STRIPS; i++) {
@@ -55,6 +63,11 @@ int main() {
     }
 
     for (int i = 0; i < 5; i++) {
+        for(int j = 0; j < ns; j++) {
+            strips[j]->fill(patterns[j]);
+        }
+        renderer.render();
+        sleep_ms(250);
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(RGB::Red);
         }
@@ -71,11 +84,16 @@ int main() {
         renderer.render();
         sleep_ms(250);
         for (int j = 0; j < ns; j++) {
-            strips[j]->fill(RGB::Black);
+            strips[j]->fill(colors[j]);
         }
         renderer.render();
         sleep_ms(250);
     }
+    for (int j = 0; j < ns; j++) {
+        strips[j]->fill(RGB::Black);
+    }
+    renderer.render();
+    sleep_ms(250);
 
     StopWatch fw;
     while (1) {
@@ -112,10 +130,12 @@ int main() {
         }
 
         fw.finish();
-        if (fw.count % 100 == 0) {
+        if (fw.count % 200 == 0) {
             printf("%d frames, %.2f f/s\n", fw.count,
                    fw.count / (fw.totalTime / 1e6));
             printf("%d blocked\n", renderer.getBlockedCount());
+            printf("%.2f us data setup time\n",
+                   (double)renderer.getDataSetupTime() / fw.count);
             printf("%.2f us per DMA\n",
                    (double)renderer.getDMATime() / fw.count);
             // for (int i = 0; i < ns; i++) {
