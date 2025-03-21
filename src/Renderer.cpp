@@ -253,7 +253,6 @@ void Renderer::render() {
                                        .scale8(s.getFractionalBrightness())
                                        .getColor(s.getColorOrder())
                                    << 8u;
-                    // printf("%2d %3d %032b\n", i, j, val);
                     //
                     // Plane it into the buffers.
                     for (int k = 0; k < 24; k++, pp++, val <<= 1) {

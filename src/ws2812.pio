@@ -49,9 +49,9 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 
 .program ws2812_parallel
 
-.define public T1 3
-.define public T2 3
-.define public T3 4
+.define public T1 8
+.define public T2 8
+.define public T3 9
 
 .wrap_target
     out x, 32
