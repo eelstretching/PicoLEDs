@@ -49,15 +49,15 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 
 .program ws2812_parallel
 
-; One cycle per insttruction, plus the delays.
-; 2 + 1 + 2 + 4 = 9 cycles per bit
+; 2812 and 2812B require 400ns of high, 400ns of data, and 450ns of low.
+; This is an 8/8/9 split, so 8 cycles of high, 8 cycles of data, and 9 cycles of low.
 .define T1 8
 .define T2 9
 .define public CYCLES_FOR_1_BIT (T1 + T1 + T2)
 
 .wrap_target
-mov pins, !null [T1-1] ; Write 0 for 
-out pins, 32    [T1-1] ; Write the data bits to the pins
+mov pins, !null [T1-1] ; Write 1 for 8 cycles 
+out pins, 32    [T1-1] ; Write the data bits to the pins, autopulls data from TX FIFO.
 mov pins, null  [T2-1] ; Write 0 bits to all pins
 .wrap
 
