@@ -13,7 +13,7 @@
 
 #define STRIP_LEN 137
 #define NUM_STRIPS 1
-#define START_PIN 2
+#define START_PIN 10
 
 int main() {
     stdio_init_all();

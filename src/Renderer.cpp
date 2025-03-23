@@ -27,8 +27,6 @@ bool pinComparator(Strip s1, Strip s2) { return s1.getPin() < s2.getPin(); }
 static int64_t reset_delay_complete(alarm_id_t id, void *strip_delay) {
     StripResetDelay *srd = (StripResetDelay *)strip_delay;
 
-    reset_timer_expired++;
-
     //
     // Reset the alarm, and release the semaphore.
     srd->alarm = 0;
@@ -45,14 +43,11 @@ static int64_t reset_delay_complete(alarm_id_t id, void *strip_delay) {
 /// sending data has elapsed.
 /// @return nothing
 static inline void __isr dma_complete_handler() {
-    dma_irq_count++;
-
     for (unsigned int i = 0; i < NUM_DMA_CHANNELS; i++) {
         // if dma triggered for this channel and it's been used (has a delay
         // associated with it)
         if ((dma_hw->ints0 & (1 << i)) && strip_delays[i]) {
             dma_hw->ints0 = (1 << i);  // clear/ack IRQ
-            dma_counts[i]++;
             /* safety check: is there somehow an alarm already running? */
             if (strip_delays[i]->alarm != 0) {
                 cancel_alarm(strip_delays[i]->alarm); /* cancel it */
@@ -157,7 +152,8 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     //
     // Set up the semaphore that we'll use to decide when it's OK to send data
     // the next time. We'll leave it posted for the first time through so that
-    // we can send data without delay.
+    // we can send data without delay. Also, we'll put the strip delay into the
+    // global array so that the interrupt service routine can find it.
     sem_init(&pip->delay.sem, 1, 1);
     strip_delays[pip->dma_channel] = &pip->delay;
 
@@ -165,12 +161,14 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // Now we'll need a buffer where we can put the pixels while they're being
     // DMA'd Most examples seem to do this, as I guess we can be modifying the
     // existing pixels while the last bunch are being non-blockingly DMAed to
-    // the PIO block.
+    // the PIO block. We're naively assuming here that the strips all have the
+    // same number of pixels, so we can just use the size of the first one.
+    // Maybe better to pick the minimum length one?
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex].getNumPixels();
     } else {
         //
-        // Each pixel on the strip uses 24 bits of color, this array will have 
+        // Each pixel on the strip uses 24 bits of color, this array will have
         // ones where the strips have that bit of color.
         pip->buffSize = strips[startIndex].getNumPixels() * 24;
     }
@@ -211,17 +209,22 @@ void Renderer::render() {
             pip->nblocked++;
         }
         sem_acquire_blocking(&pip->delay.sem);
-        pip->delay.dma_start = time_us_64();
         //
         // We need to fill the buffer that we'll DMA to the PIO program. How
         // we fill it depends on how many strips we're sending.
+        //
+        // We want to track how long it takes to set up the data for the DMA.
+        dw.start();
+
+        //
+        // Let's start by zeroing the buffer.
+        memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
         if (pip->size == 1) {
             //
             // One strip, just put the data in the buffer according to the color
             // order after scaling by the strip's brightness.
             Strip s = strips[pip->startIndex];
             RGB *data = s.getData();
-            dw.start();
             for (int i = 0; i < s.getNumPixels(); i++) {
                 //
                 // Note that we're shifting by 8 here because the PIO program
@@ -232,12 +235,9 @@ void Renderer::render() {
                                      .getColor(s.getColorOrder())
                                  << 8u;
             }
-            dw.finish();
         } else {
             //
             // We'll need to turn the data for multiple strips into bit planes.
-            dw.start();
-            memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
             for (int i = pip->startIndex; i < pip->startIndex + pip->size;
                  i++) {
                 Strip s = strips[i];
@@ -248,43 +248,107 @@ void Renderer::render() {
                 // If there is a one bit at this position in the strips
                 // array, we'll always be or'ing in the same bit, so let's
                 // just make it now.
-                uint32_t aBit = 1 << i;
+                uint32_t stripBit = 1 << i;
                 for (int j = 0; j < s.getNumPixels(); j++) {
+                    uint32_t *pipbuff = &pip->buffer[pp];
                     //
-                    // Transform the data for color order and brightness.
-                    uint32_t val = data[j]
-                                       .scale8(s.getFractionalBrightness())
+                    // Transform the data for color order and brightness. Doing
+                    // that old school pointer bumping rather than array
+                    // accesses to try to cut down on the time spent prepping
+                    // the data.
+                    uint32_t val = data++->scale8(s.getFractionalBrightness())
                                        .getColor(s.getColorOrder())
                                    << 8u;
+
                     //
-                    // Plane it into the buffers.
-                    for (int k = 0; k < 24; k++, pp++, val <<= 1) {
-                        //
-                        // We want the bits in most-to-least significant order.
-                        if (val & 0x80000000) {
-                            pip->buffer[pp] |= aBit;
-                        }
+                    // Unrolling the inner loop to save some ops. There's
+                    // probably some crazy Duff's Device way to do this, but
+                    // this is simple and it cuts about a third of the time in
+                    // this loop.
+                    if (val & 0x80000000) {
+                        pipbuff[0] |= stripBit;
                     }
+                    if (val & 0x40000000) {
+                        pipbuff[1] |= stripBit;
+                    }
+                    if (val & 0x20000000) {
+                        pipbuff[2] |= stripBit;
+                    }
+                    if (val & 0x10000000) {
+                        pipbuff[3] |= stripBit;
+                    }
+                    if (val & 0x08000000) {
+                        pipbuff[4] |= stripBit;
+                    }
+                    if (val & 0x04000000) {
+                        pipbuff[5] |= stripBit;
+                    }
+                    if (val & 0x02000000) {
+                        pipbuff[6] |= stripBit;
+                    }
+                    if (val & 0x01000000) {
+                        pipbuff[7] |= stripBit;
+                    }
+                    if (val & 0x00800000) {
+                        pipbuff[8] |= stripBit;
+                    }
+                    if (val & 0x00400000) {
+                        pipbuff[9] |= stripBit;
+                    }
+                    if (val & 0x00200000) {
+                        pipbuff[10] |= stripBit;
+                    }
+                    if (val & 0x00100000) {
+                        pipbuff[11] |= stripBit;
+                    }
+                    if (val & 0x00080000) {
+                        pipbuff[12] |= stripBit;
+                    }
+                    if (val & 0x00040000) {
+                        pipbuff[13] |= stripBit;
+                    }
+                    if (val & 0x00020000) {
+                        pipbuff[14] |= stripBit;
+                    }
+                    if (val & 0x00010000) {
+                        pipbuff[15] |= stripBit;
+                    }
+                    if (val & 0x00008000) {
+                        pipbuff[16] |= stripBit;
+                    }
+                    if (val & 0x00004000) {
+                        pipbuff[17] |= stripBit;
+                    }
+                    if (val & 0x00002000) {
+                        pipbuff[18] |= stripBit;
+                    }
+                    if (val & 0x00001000) {
+                        pipbuff[19] |= stripBit;
+                    }
+                    if (val & 0x00000800) {
+                        pipbuff[20] |= stripBit;
+                    }
+                    if (val & 0x00000400) {
+                        pipbuff[21] |= stripBit;
+                    }
+                    if (val & 0x00000200) {
+                        pipbuff[22] |= stripBit;
+                    }
+                    if (val & 0x00000100) {
+                        pipbuff[23] |= stripBit;
+                    }
+
+                    pp += 24;
                 }
             }
-            dw.finish();
         }
-
-        // for(int i = 0; i < pip->buffSize; i++) {
-        //     pio_sm_put_blocking(pip->pio, pip->sm, pip->buffer[i]);
-        // }
+        dw.finish();
 
         //
-        // OK, start the DMA. The semaphore will be released by the interrupt
-        // service routine.
-        // printf("Bit planes\n");
-        // for (int i = 0; i < pip->buffSize; i++) {
-        //     if (i % 24 == 0) {
-        //         printf("\n");
-        //     }
-        //     printf("%04d %2d %032b\n", i, i % 8, pip->buffer[i]);
-        // }
-        dma_channel_set_read_addr(pip->dma_channel, (void *) pip->buffer, false);
+        // We'll keep track of the time for the DMA ops.
+        pip->delay.dma_start = time_us_64();
+
+        dma_channel_set_read_addr(pip->dma_channel, (void *)pip->buffer, false);
         dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
 
         pip->stats.finish();

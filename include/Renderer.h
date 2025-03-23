@@ -41,11 +41,6 @@ class StripResetDelay {
 /// which DMA channels need management.
 static StripResetDelay *strip_delays[NUM_DMA_CHANNELS] = {};
 
-static uint64_t dma_counts[NUM_DMA_CHANNELS] = {};
-
-static uint64_t dma_irq_count = 0;
-static uint64_t reset_timer_expired = 0;
-
 /// @brief A structure holding the details of a single PIO program for rendering
 /// one or more strips.
 class PIOProgram {
