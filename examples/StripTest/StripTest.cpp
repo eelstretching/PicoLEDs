@@ -13,7 +13,7 @@
 
 #define STRIP_LEN 137
 #define NUM_STRIPS 8
-#define START_PIN 2
+#define START_PIN 10
 
 int main() {
     stdio_init_all();
@@ -63,7 +63,7 @@ int main() {
     }
 
     float onesec = 1e6; // 1 second in microseconds
-    float fps = 120;
+    float fps = 130;
     int delay_us = (int)(onesec / fps);
 
     printf("delay_us %d\n", delay_us);
