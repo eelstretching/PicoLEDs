@@ -49,15 +49,16 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 
 .program ws2812_parallel
 
-.define public T1 8
-.define public T2 8
-.define public T3 9
+; One cycle per insttruction, plus the delays.
+; 2 + 1 + 2 + 4 = 9 cycles per bit
+.define T1 8
+.define T2 9
+.define public CYCLES_FOR_1_BIT (T1 + T1 + T2)
 
 .wrap_target
-    out x, 32
-    mov pins, !null [T1-1]
-    mov pins, x     [T2-1]
-    mov pins, null  [T3-2]
+mov pins, !null [T1-1] ; Write 0 for 
+out pins, 32    [T1-1] ; Write the data bits to the pins
+mov pins, null  [T2-1] ; Write 0 bits to all pins
 .wrap
 
 % c-sdk {
@@ -74,10 +75,10 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
     pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
     sm_config_set_out_shift(&c, true, true, 32);
     sm_config_set_out_pins(&c, pin_base, pin_count);
+    sm_config_set_in_shift(&c, true, false, 32);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
-    int cycles_per_bit = ws2812_parallel_T1 + ws2812_parallel_T2 + ws2812_parallel_T3;
-    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);
     sm_config_set_clkdiv(&c, div);
 
     pio_sm_init(pio, sm, offset, &c);

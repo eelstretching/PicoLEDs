@@ -168,11 +168,13 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // the PIO block.
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex].getNumPixels();
-        pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
     } else {
+        //
+        // Each pixel on the strip uses 24 bits of color, this array will have 
+        // ones where the strips have that bit of color.
         pip->buffSize = strips[startIndex].getNumPixels() * 24;
-        pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
     }
+    pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
 
     dma_channel_config channel_config =
         dma_channel_get_default_config(pip->dma_channel);
@@ -235,6 +237,7 @@ void Renderer::render() {
             //
             // We'll need to turn the data for multiple strips into bit planes.
             dw.start();
+            memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
             for (int i = pip->startIndex; i < pip->startIndex + pip->size;
                  i++) {
                 Strip s = strips[i];
@@ -266,20 +269,23 @@ void Renderer::render() {
             }
             dw.finish();
         }
+
+        // for(int i = 0; i < pip->buffSize; i++) {
+        //     pio_sm_put_blocking(pip->pio, pip->sm, pip->buffer[i]);
+        // }
+
         //
         // OK, start the DMA. The semaphore will be released by the interrupt
         // service routine.
-        dma_channel_set_read_addr(pip->dma_channel, (void *)pip->buffer, false);
-        dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
-        // printf("Start PIO\n");
+        // printf("Bit planes\n");
         // for (int i = 0; i < pip->buffSize; i++) {
-        //     // if (i % 24 == 0) {
-        //     //     printf("\n");
-        //     // }
-        //     // printf("%04d %2d 0x%032b\n", i, i % 8, pip->buffer[i]);
-        //     pio_sm_put_blocking(pip->pio, pip->sm, pip->buffer[i]);
+        //     if (i % 24 == 0) {
+        //         printf("\n");
+        //     }
+        //     printf("%04d %2d %032b\n", i, i % 8, pip->buffer[i]);
         // }
-        // sleep_us(RESET_TIME_US);
+        dma_channel_set_read_addr(pip->dma_channel, (void *) pip->buffer, false);
+        dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
 
         pip->stats.finish();
     }
