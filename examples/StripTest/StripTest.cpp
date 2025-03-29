@@ -11,8 +11,8 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 137
-#define NUM_STRIPS 8
+#define STRIP_LEN 130
+#define NUM_STRIPS 4
 #define START_PIN 10
 
 int main() {
@@ -26,7 +26,7 @@ int main() {
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(0x10);
+        strips[i]->setFractionalBrightness(0x20);
         renderer.add(*strips[i]);
     }
     renderer.setup();
@@ -44,15 +44,22 @@ int main() {
                       RGB(0b10001000, 0b10001000, 0b10001000),
                       RGB(0b00010001, 0b00010001, 0b00010001)};
 
-    //
-    // Simple color flash for startup.
-    for (uint32_t color = 0xFF0000; color > 0; color >>= 8) {
+    for (int k = 0; k < 5; k++) {
         for (int i = 0; i < ns; i++) {
-            strips[i]->fill(RGB(color));
+            strips[i]->fill(colors[k]);
+        }
+        renderer.render();
+        sleep_ms(1000);
+        for (int i = 0; i < ns; i++) {
+            for (int j = 0; j < strips[i]->getNumPixels(); j++) {
+                strips[i]->putPixel(colors[j % 3], j);
+            }
         }
         renderer.render();
         sleep_ms(1000);
     }
+
+    sleep_ms(2000);
 
     int dirs[NUM_STRIPS];
     for (int i = 0; i < NUM_STRIPS; i++) {
@@ -62,8 +69,8 @@ int main() {
         dirs[i] = (i + 1) % 2;
     }
 
-    float onesec = 1e6; // 1 second in microseconds
-    float fps = 130;
+    float onesec = 1e6;  // 1 second in microseconds
+    float fps = 60;
     int delay_us = (int)(onesec / fps);
 
     printf("delay_us %d\n", delay_us);

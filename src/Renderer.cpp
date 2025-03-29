@@ -259,6 +259,8 @@ void Renderer::render() {
                     uint32_t val = data++->scale8(s.getFractionalBrightness())
                                        .getColor(s.getColorOrder())
                                    << 8u;
+                    // uint32_t val = data++->getColor(s.getColorOrder())
+                    //            << 8u;
 
                     //
                     // Unrolling the inner loop to save some ops. There's

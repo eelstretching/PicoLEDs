@@ -15,7 +15,8 @@
 #include "pico/types.h"
 
 /*
- * RES time, specification says it needs at least 50 us.
+ * RES time, specification says it needs at least 50 us, but some folks say it
+ * can be as low as 9us!
  */
 #define RESET_TIME_US (55)
 
