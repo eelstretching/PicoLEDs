@@ -11,7 +11,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 40
+#define STRIP_LEN 137
 #define NUM_STRIPS 8
 #define START_PIN 10
 

@@ -257,9 +257,9 @@ void Renderer::render() {
                     // that old school pointer bumping rather than array
                     // accesses to try to cut down on the time spent prepping
                     // the data.
-                    // uint32_t val = data++->scale8(s.getFractionalBrightness())
-                    //                    .getColor(s.getColorOrder());
-                    uint32_t val = data->getColor(s.getColorOrder());
+                    uint32_t val = data->scale8(s.getFractionalBrightness())
+                                       .getColor(s.getColorOrder());
+                    // uint32_t val = data->getColor(s.getColorOrder());
                         
 
                     //
@@ -344,12 +344,12 @@ void Renderer::render() {
         }
         dw.finish();
 
-        for(int k = 0; k < pip->buffSize; k++) {
-            if(k > 0 && k % 24 == 0) {
-                printf("\n");
-            }
-            printf("%4d %2d %032b\n", k, k % 24, pip->buffer[k]);
-        }
+        // for(int k = 0; k < pip->buffSize; k++) {
+        //     if(k > 0 && k % 24 == 0) {
+        //         printf("\n");
+        //     }
+        //     printf("%4d %2d %032b\n", k, k % 24, pip->buffer[k]);
+        // }
 
 
         //
