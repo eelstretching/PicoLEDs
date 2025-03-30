@@ -650,7 +650,7 @@ struct RGB {
         Goldenrod = 0xDAA520,             ///< @htmlcolorblock{DAA520}
         Gray = 0x808080,                  ///< @htmlcolorblock{808080}
         Grey = 0x808080,                  ///< @htmlcolorblock{808080}
-        Green = 0x008000,                 ///< @htmlcolorblock{008000}
+        Green = 0x00FF00,                 ///< @htmlcolorblock{008000}
         GreenYellow = 0xADFF2F,           ///< @htmlcolorblock{ADFF2F}
         Honeydew = 0xF0FFF0,              ///< @htmlcolorblock{F0FFF0}
         HotPink = 0xFF69B4,               ///< @htmlcolorblock{FF69B4}

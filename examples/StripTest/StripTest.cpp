@@ -11,8 +11,8 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 130
-#define NUM_STRIPS 4
+#define STRIP_LEN 40
+#define NUM_STRIPS 8
 #define START_PIN 10
 
 int main() {
@@ -26,7 +26,7 @@ int main() {
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(0x20);
+        strips[i]->setFractionalBrightness(32);
         renderer.add(*strips[i]);
     }
     renderer.setup();
@@ -43,6 +43,13 @@ int main() {
                       RGB(0b11001100, 0b11001100, 0b11001100),
                       RGB(0b10001000, 0b10001000, 0b10001000),
                       RGB(0b00010001, 0b00010001, 0b00010001)};
+
+    printf("Ready\n");
+    for (int i = 0; i < ns; i++) {
+        strips[i]->fill(colors[i % 3]);
+    }
+    renderer.render();
+    sleep_ms(20000);
 
     for (int k = 0; k < 5; k++) {
         for (int i = 0; i < ns; i++) {
@@ -70,10 +77,10 @@ int main() {
     }
 
     float onesec = 1e6;  // 1 second in microseconds
-    float fps = 60;
-    int delay_us = (int)(onesec / fps);
+    float fps = 10;
+    int frame_time_us = (int)(onesec / fps);
 
-    printf("delay_us %d\n", delay_us);
+    printf("frame_time_us %d\n", frame_time_us);
 
     int width = 10;
 
@@ -121,7 +128,7 @@ int main() {
             }
         }
         renderer.render();
-        uint64_t dthis = delay_us - (time_us_64() - start);
+        uint64_t dthis = frame_time_us - (time_us_64() - start);
         if (dthis > 0) {
             sleep_us(dthis);
         }

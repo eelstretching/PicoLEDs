@@ -238,8 +238,8 @@ void Renderer::render() {
         } else {
             //
             // We'll need to turn the data for multiple strips into bit planes.
-            for (int i = pip->startIndex; i < pip->startIndex + pip->size;
-                 i++) {
+            for (int i = pip->startIndex, sn = 0; i < pip->startIndex + pip->size;
+                 i++, sn++) {
                 Strip s = strips[i];
                 RGB *data = s.getData();
                 uint32_t pp = 0;
@@ -247,104 +247,110 @@ void Renderer::render() {
                 //
                 // If there is a one bit at this position in the strips
                 // array, we'll always be or'ing in the same bit, so let's
-                // just make it now.
-                uint32_t stripBit = 1 << i;
-                for (int j = 0; j < s.getNumPixels(); j++) {
+                // just make it now. But remember that we need to start from 0 
+                // for this program!
+                uint32_t stripBit = 1 << (i - pip->startIndex);
+                for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
                     uint32_t *pipbuff = &pip->buffer[pp];
                     //
                     // Transform the data for color order and brightness. Doing
                     // that old school pointer bumping rather than array
                     // accesses to try to cut down on the time spent prepping
                     // the data.
-                    uint32_t val = data++->scale8(s.getFractionalBrightness())
-                                       .getColor(s.getColorOrder())
-                                   << 8u;
-                    // uint32_t val = data++->getColor(s.getColorOrder())
-                    //            << 8u;
+                    // uint32_t val = data++->scale8(s.getFractionalBrightness())
+                    //                    .getColor(s.getColorOrder());
+                    uint32_t val = data->getColor(s.getColorOrder());
+                        
 
                     //
                     // Unrolling the inner loop to save some ops. There's
                     // probably some crazy Duff's Device way to do this, but
                     // this is simple and it cuts about a third of the time in
                     // this loop.
-                    if (val & 0x80000000) {
+                    if (val & 0x00800000) {
                         pipbuff[0] |= stripBit;
                     }
-                    if (val & 0x40000000) {
+                    if (val & 0x00400000) {
                         pipbuff[1] |= stripBit;
                     }
-                    if (val & 0x20000000) {
+                    if (val & 0x00200000) {
                         pipbuff[2] |= stripBit;
                     }
-                    if (val & 0x10000000) {
+                    if (val & 0x00100000) {
                         pipbuff[3] |= stripBit;
                     }
-                    if (val & 0x08000000) {
+                    if (val & 0x00080000) {
                         pipbuff[4] |= stripBit;
                     }
-                    if (val & 0x04000000) {
+                    if (val & 0x00040000) {
                         pipbuff[5] |= stripBit;
                     }
-                    if (val & 0x02000000) {
+                    if (val & 0x00020000) {
                         pipbuff[6] |= stripBit;
                     }
-                    if (val & 0x01000000) {
+                    if (val & 0x00010000) {
                         pipbuff[7] |= stripBit;
                     }
-                    if (val & 0x00800000) {
+                    if (val & 0x00008000) {
                         pipbuff[8] |= stripBit;
                     }
-                    if (val & 0x00400000) {
+                    if (val & 0x00004000) {
                         pipbuff[9] |= stripBit;
                     }
-                    if (val & 0x00200000) {
+                    if (val & 0x00002000) {
                         pipbuff[10] |= stripBit;
                     }
-                    if (val & 0x00100000) {
+                    if (val & 0x00001000) {
                         pipbuff[11] |= stripBit;
                     }
-                    if (val & 0x00080000) {
+                    if (val & 0x00000800) {
                         pipbuff[12] |= stripBit;
                     }
-                    if (val & 0x00040000) {
+                    if (val & 0x00000400) {
                         pipbuff[13] |= stripBit;
                     }
-                    if (val & 0x00020000) {
+                    if (val & 0x00000200) {
                         pipbuff[14] |= stripBit;
                     }
-                    if (val & 0x00010000) {
+                    if (val & 0x00000100) {
                         pipbuff[15] |= stripBit;
                     }
-                    if (val & 0x00008000) {
+                    if (val & 0x00000080) {
                         pipbuff[16] |= stripBit;
                     }
-                    if (val & 0x00004000) {
+                    if (val & 0x00000040) {
                         pipbuff[17] |= stripBit;
                     }
-                    if (val & 0x00002000) {
+                    if (val & 0x00000020) {
                         pipbuff[18] |= stripBit;
                     }
-                    if (val & 0x00001000) {
+                    if (val & 0x00000010) {
                         pipbuff[19] |= stripBit;
                     }
-                    if (val & 0x00000800) {
+                    if (val & 0x00000008) {
                         pipbuff[20] |= stripBit;
                     }
-                    if (val & 0x00000400) {
+                    if (val & 0x00000004) {
                         pipbuff[21] |= stripBit;
                     }
-                    if (val & 0x00000200) {
+                    if (val & 0x00000002) {
                         pipbuff[22] |= stripBit;
                     }
-                    if (val & 0x00000100) {
+                    if (val & 0x00000001) {
                         pipbuff[23] |= stripBit;
                     }
-
-                    pp += 24;
                 }
             }
         }
         dw.finish();
+
+        for(int k = 0; k < pip->buffSize; k++) {
+            if(k > 0 && k % 24 == 0) {
+                printf("\n");
+            }
+            printf("%4d %2d %032b\n", k, k % 24, pip->buffer[k]);
+        }
+
 
         //
         // We'll keep track of the time for the DMA ops.
