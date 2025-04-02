@@ -46,6 +46,7 @@ static StripResetDelay *strip_delays[NUM_DMA_CHANNELS] = {};
 /// one or more strips.
 class PIOProgram {
    public:
+    ~PIOProgram();
     PIO pio;
     uint sm;
     uint offset;
@@ -82,6 +83,8 @@ class Renderer {
     /// @param pin The pin that the strip is connected to.
     /// @param strip The strip itself.
     Renderer();
+
+    ~Renderer();
 
     /// @brief After all strips have been added, set up for
     /// rendering by setting up PIO programs, DMA, etc.

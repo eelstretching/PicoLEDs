@@ -83,10 +83,10 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
 
     float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);
     sm_config_set_clkdiv(&c, div);
-    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_parallel_CYCLES_FOR_1_BIT, div);
-    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
-    printf("state machine cycle is: %.1fns\n", cycle_time);
-    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2812_parallel_T1 * cycle_time, ws2812_parallel_T2 * cycle_time, ws2812_parallel_T3 * cycle_time);
+//    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_parallel_CYCLES_FOR_1_BIT, div);
+//    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
+//    printf("state machine cycle is: %.1fns\n", cycle_time);
+//    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2812_parallel_T1 * cycle_time, ws2812_parallel_T2 * cycle_time, ws2812_parallel_T3 * cycle_time);
     
 
     pio_sm_init(pio, sm, offset, &c);

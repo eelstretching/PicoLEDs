@@ -12,8 +12,8 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 137
-#define NUM_STRIPS 8
-#define START_PIN 10
+#define NUM_STRIPS 16
+#define START_PIN 2
 
 int main() {
     stdio_init_all();
@@ -49,7 +49,13 @@ int main() {
         strips[i]->fill(colors[i % 3]);
     }
     renderer.render();
-    sleep_ms(20000);
+    sleep_ms(5000);
+
+    for(int i = 0; i < ns; i++) {
+        strips[i]->fill(RGB::Red);
+        renderer.render();
+        sleep_ms(1000);
+    }
 
     for (int k = 0; k < 5; k++) {
         for (int i = 0; i < ns; i++) {
@@ -77,7 +83,7 @@ int main() {
     }
 
     float onesec = 1e6;  // 1 second in microseconds
-    float fps = 10;
+    float fps = 60;
     int frame_time_us = (int)(onesec / fps);
 
     printf("frame_time_us %d\n", frame_time_us);

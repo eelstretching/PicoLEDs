@@ -1,0 +1,84 @@
+#include <Renderer.h>
+#include <stdlib.h>
+
+#include "StopWatch.h"
+#include "Strip.h"
+#include "colorutils.h"
+#include "hardware/clocks.h"
+#include "hardware/pio.h"
+#include "pico/printf.h"
+#include "pico/stdio.h"
+#include "pico/stdlib.h"
+#include "pico/types.h"
+
+#define STRIP_LEN 137
+#define NUM_STRIPS 16
+#define START_PIN 2
+
+RGB colors[] = {RGB::Red,    RGB::Green,      RGB::Blue,       RGB::Yellow,
+                RGB::Purple, RGB::GhostWhite, RGB::DarkViolet, RGB::FireBrick};
+
+RGB patterns[] = {RGB(0b10101010, 0b10101010, 0b10101010),
+                  RGB(0b01010101, 0b01010101, 0b01010101),
+                  RGB(0b10011001, 0b10011001, 0b10011001),
+                  RGB(0b01100110, 0b01100110, 0b01100110),
+                  RGB(0b00110011, 0b00110011, 0b00110011),
+                  RGB(0b11001100, 0b11001100, 0b11001100),
+                  RGB(0b10001000, 0b10001000, 0b10001000),
+                  RGB(0b00010001, 0b00010001, 0b00010001)};
+
+void run_test(Strip **strips, int startStrip, int endStrip, int ns,
+              int startPin) {
+    printf("Testing %d strips at %d\n", endStrip - startStrip, startPin);
+    Renderer r;
+    for (int i = startStrip; i < endStrip; i++) {
+        r.add(*strips[i]);
+    }
+    r.setup();
+    for (int i = startStrip; i < endStrip; i++) {
+        strips[i]->fill(colors[(startPin + i) % 3]);
+    }
+    r.render();
+    sleep_ms(100);
+
+    for (int i = startStrip; i < endStrip; i++) {
+        for (int j = 0; j < strips[i]->getNumPixels(); j++) {
+            strips[i]->putPixel(colors[j % 3], j);
+        }
+    }
+    r.render();
+    sleep_ms(100);
+
+    //
+    // Blank the strips.
+    for (int i = startStrip; i < endStrip; i++) {
+        strips[i]->fill(RGB::Black);
+    }
+    r.render();
+    sleep_ms(100);
+}
+
+int main() {
+    stdio_init_all();
+
+    //
+    // Testing the renderer in a variety of settings, with a variety of numbers
+    // of strips.
+    Strip *strips[NUM_STRIPS];
+    int ns = NUM_STRIPS;
+    int pin = START_PIN;
+    int pins[NUM_STRIPS];
+    for (int i = 0; i < ns; i++) {
+        pins[i] = pin;
+        strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setFractionalBrightness(16);
+    }
+
+    while (1) {
+        for (int s = 1; s < 12; s++) {
+            for (int i = 0; i < ns - (s - 1); i++) {
+                run_test(strips, i, i + s, ns, pins[i]);
+            }
+        }
+    }
+}

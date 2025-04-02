@@ -67,7 +67,37 @@ static inline void __isr dma_complete_handler() {
 // A global letting us know that we've installed the interrupt service routine.
 static bool isr_installed = false;
 
+PIOProgram::~PIOProgram() {
+    pio_sm_set_enabled(pio, sm, false);
+    pio_sm_unclaim(pio, sm);
+    pio_remove_program(
+        pio, size == 1 ? &ws2812_program : &ws2812_parallel_program, offset);
+    dma_channel_abort(dma_channel);
+    dma_channel_unclaim(dma_channel);
+    if (buffer) {
+        free(buffer);
+    }
+}
+
 Renderer::Renderer() {}
+
+Renderer::~Renderer() {
+    for (auto pip : programs) {
+        delete pip;
+    }
+    programs.clear();
+    strips.clear();
+    for (int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        if (strip_delays[i]) {
+            strip_delays[i] = nullptr;
+        }
+    }
+    if (isr_installed) {
+        irq_set_enabled(DMA_IRQ_0, false);
+        irq_remove_handler(DMA_IRQ_0, dma_complete_handler);
+        isr_installed = false;
+    }
+}
 
 void Renderer::add(Strip &strip) { strips.push_back(strip); }
 
@@ -238,8 +268,8 @@ void Renderer::render() {
         } else {
             //
             // We'll need to turn the data for multiple strips into bit planes.
-            for (int i = pip->startIndex, sn = 0; i < pip->startIndex + pip->size;
-                 i++, sn++) {
+            for (int i = pip->startIndex, sn = 0;
+                 i < pip->startIndex + pip->size; i++, sn++) {
                 Strip s = strips[i];
                 RGB *data = s.getData();
                 uint32_t pp = 0;
@@ -247,7 +277,7 @@ void Renderer::render() {
                 //
                 // If there is a one bit at this position in the strips
                 // array, we'll always be or'ing in the same bit, so let's
-                // just make it now. But remember that we need to start from 0 
+                // just make it now. But remember that we need to start from 0
                 // for this program!
                 uint32_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
@@ -260,7 +290,6 @@ void Renderer::render() {
                     uint32_t val = data->scale8(s.getFractionalBrightness())
                                        .getColor(s.getColorOrder());
                     // uint32_t val = data->getColor(s.getColorOrder());
-                        
 
                     //
                     // Unrolling the inner loop to save some ops. There's
@@ -350,7 +379,6 @@ void Renderer::render() {
         //     }
         //     printf("%4d %2d %032b\n", k, k % 24, pip->buffer[k]);
         // }
-
 
         //
         // We'll keep track of the time for the DMA ops.
