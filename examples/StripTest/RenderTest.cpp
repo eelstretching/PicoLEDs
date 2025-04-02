@@ -27,9 +27,9 @@ RGB patterns[] = {RGB(0b10101010, 0b10101010, 0b10101010),
                   RGB(0b10001000, 0b10001000, 0b10001000),
                   RGB(0b00010001, 0b00010001, 0b00010001)};
 
-void run_test(Strip **strips, int startStrip, int endStrip, int ns,
-              int startPin) {
-    printf("Testing %d strips at %d\n", endStrip - startStrip, startPin);
+void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
+                     int startPin) {
+    printf("Testing contiguous strips %d to %d\n", startStrip, endStrip);
     Renderer r;
     for (int i = startStrip; i < endStrip; i++) {
         r.add(*strips[i]);
@@ -58,12 +58,57 @@ void run_test(Strip **strips, int startStrip, int endStrip, int ns,
     sleep_ms(100);
 }
 
+void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
+
+    printf("Testing discontiguous strips: ");
+    for(int i = 0; i < ds; i++) {
+        printf("%d %d, ", s[i], e[i]);
+    }
+    printf("\n");
+    Renderer r;
+
+    for (int i = 0; i < ds; i++) {
+        for (int j = s[i]; j < e[i]; j++) {
+            r.add(*strips[j]);
+        }
+    }
+    r.setup();
+
+    for (int i = 0; i < ds; i++) {
+        for (int j = s[i]; j < e[i]; j++) {
+            strips[j]->fill(colors[j % 3]);
+        }
+    }
+    r.render();
+    sleep_ms(100);
+
+    for (int i = 0; i < ds; i++) {
+        for (int j = s[i]; j < e[i]; j++) {
+            for (int k = 0; k < strips[i]->getNumPixels(); j++) {
+                strips[j]->putPixel(colors[j % 3], j);
+            }
+        }
+    }
+    r.render();
+    sleep_ms(100);
+
+    //
+    // Blank the strips.
+    for (int i = 0; i < ds; i++) {
+        for (int j = s[i]; j < e[i]; j++) {
+            strips[j]->fill(RGB::Black);
+        }
+    }
+    r.render();
+    sleep_ms(100);
+}
+
 int main() {
     stdio_init_all();
 
     //
-    // Testing the renderer in a variety of settings, with a variety of numbers
-    // of strips.
+    // Testing the renderer in a variety of settings, with a variety of
+    // numbers of strips.
     Strip *strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
@@ -75,9 +120,28 @@ int main() {
     }
 
     while (1) {
+        //
+        // Continugous sets of strips, which will make a single PIO program.
         for (int s = 1; s < 12; s++) {
             for (int i = 0; i < ns - (s - 1); i++) {
-                run_test(strips, i, i + s, ns, pins[i]);
+                run_contig_test(strips, i, i + s, ns, pins[i]);
+            }
+        }
+
+        //
+        // Discontigous sets of strips!
+        int start[2];
+        int end[2];
+        //
+        // Discontiguous sets of size two through five.
+        for (int size = 2; size < 5; size++) {
+            int ts = 2 * size + 1;
+            for (int i = 0; i < ns - (ts - 1); i++) {
+                start[0] = i;
+                end[0] = i + size;
+                start[1] = end[0] + 1;
+                end[1] = start[1] + size;
+                run_discontig_test(strips, ns, start, end, 2);
             }
         }
     }
