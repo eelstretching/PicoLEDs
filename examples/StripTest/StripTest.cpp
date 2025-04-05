@@ -26,7 +26,7 @@ int main() {
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(32);
+        strips[i]->setFractionalBrightness(16);
         renderer.add(*strips[i]);
     }
     renderer.setup();
@@ -47,32 +47,9 @@ int main() {
     printf("Ready\n");
     for (int i = 0; i < ns; i++) {
         strips[i]->fill(colors[i % 3]);
-    }
-    renderer.render();
-    sleep_ms(5000);
-
-    for(int i = 0; i < ns; i++) {
-        strips[i]->fill(RGB::Red);
         renderer.render();
-        sleep_ms(1000);
+        sleep_ms(500);
     }
-
-    for (int k = 0; k < 5; k++) {
-        for (int i = 0; i < ns; i++) {
-            strips[i]->fill(colors[k]);
-        }
-        renderer.render();
-        sleep_ms(1000);
-        for (int i = 0; i < ns; i++) {
-            for (int j = 0; j < strips[i]->getNumPixels(); j++) {
-                strips[i]->putPixel(colors[j % 3], j);
-            }
-        }
-        renderer.render();
-        sleep_ms(1000);
-    }
-
-    sleep_ms(2000);
 
     int dirs[NUM_STRIPS];
     for (int i = 0; i < NUM_STRIPS; i++) {
@@ -83,7 +60,7 @@ int main() {
     }
 
     float onesec = 1e6;  // 1 second in microseconds
-    float fps = 60;
+    float fps = 30;
     int frame_time_us = (int)(onesec / fps);
 
     printf("frame_time_us %d\n", frame_time_us);
@@ -101,7 +78,6 @@ int main() {
         strips[j]->fill(RGB::Black);
     }
     renderer.render();
-    sleep_ms(250);
 
     StopWatch fw;
     while (1) {

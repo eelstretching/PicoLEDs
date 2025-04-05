@@ -13,18 +13,26 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+#define NUM_STRIPS 12
+#define START_PIN 2
+#define STRIP_LEN 137
+
 int main() {
     stdio_init_all();
 
     //
     // A canvas made out of strips.
-    Canvas canvas(138);
-    Strip strips[] = {Strip(2, 552),
-                      Strip(3, 552)};  // , Strip(3, 276)}; //,Strip(4, 138)};
-    int ns = 2;
+    Canvas canvas(137);
+    Strip *strips[NUM_STRIPS];
+    int ns = NUM_STRIPS;
+    int pin = START_PIN;
+    int pins[NUM_STRIPS];
     for (int i = 0; i < ns; i++) {
-        canvas.add(strips[i]);
-    }
+        pins[i] = pin;
+        strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setFractionalBrightness(16);
+        canvas.add(*strips[i]);
+    }    
     int delay = 100;
 
     RGB colors[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
