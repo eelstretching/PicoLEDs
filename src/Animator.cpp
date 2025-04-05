@@ -10,6 +10,13 @@ Animator::Animator(Canvas* canvas, int fps) : Animator(canvas) { setFPS(fps); }
 
 void Animator::add(Animation* a) { animations.push_back(a); }
 
+void Animator::setFPS(int fps) {
+    this->fps = fps;
+    // 
+    // There's a million microseconds in a second. 
+    usPerFrame = 1e6 / fps; 
+}
+
 void Animator::init() {
     pos = 0;
     Animation *f = animations[pos];
@@ -36,6 +43,7 @@ bool Animator::step() {
     canvas->show();
     sw.finish();
     aw.finish();
+    frameCount++;
 
     //
     // Sleep until it's time for the next frame. We're not trying to be

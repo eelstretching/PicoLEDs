@@ -46,20 +46,23 @@ int main() {
 
     Animator animator(&canvas, 5);
     animator.add(&bp);
-    animator.setFPS(60);
     animator.init();
+    animator.setFPS(30);
 
     int n = 0;
 
     while (1) {
         animator.step();
-        n++;
-        if (n % 500 == 0) {
+        if (animator.getFrameCount() % 250 == 0) {
+                uint64_t x = animator.getFrameCount() + 1;
             printf(
-                "%d frames run, %.2f "
-                "us/frame, %.2f us/show %d missed frames\n",
-                n, animator.getAverageFrameTimeUS(),
-                animator.getAverageShowTimeUS(), animator.getMissedFrames());
+                "%d frames run, %.2f us/frame at %d fps used %.2f us/frame, %.2f us/show %d missed frames\n",
+                animator.getFrameCount(), 
+                animator.getUsPerFrame(),
+                animator.getFPSNeeded(),
+                animator.getAverageFrameTimeUS(),
+                animator.getAverageShowTimeUS(), 
+                animator.getMissedFrames());
         }
     }
 }
