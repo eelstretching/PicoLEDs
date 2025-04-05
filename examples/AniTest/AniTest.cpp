@@ -46,6 +46,7 @@ int main() {
 
     Animator animator(&canvas, 5);
     animator.add(&bp);
+    animator.setFPS(60);
     animator.init();
 
     int n = 0;
