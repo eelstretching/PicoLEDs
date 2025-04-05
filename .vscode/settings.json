@@ -41,5 +41,6 @@
         "string_view": "cpp",
         "initializer_list": "cpp",
         "clocks.h": "c"
-    }
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }
