@@ -17,7 +17,7 @@ class Animator : public Animation {
 
         int fps = 30;
 
-        float msPerFrame;
+        float usPerFrame;
 
         uint missedFrames = 0;
 
@@ -35,7 +35,7 @@ class Animator : public Animation {
         /// @brief Adds an animation to the end of our list.
         /// @param a the animation to add.
         void add(Animation *a);
-        void setFPS(int fps) {this->fps = fps; msPerFrame = 1000.0 / fps; };
+        void setFPS(int fps) {this->fps = fps; usPerFrame = 1e6 / fps; };
         int getFPSNeeded() { return fps;};
         /// @brief Steps through whatever animation that we're currently working on.
         /// @return 

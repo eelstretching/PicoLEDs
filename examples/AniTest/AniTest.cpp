@@ -13,7 +13,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 12
+#define NUM_STRIPS 8
 #define START_PIN 2
 #define STRIP_LEN 137
 

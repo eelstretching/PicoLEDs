@@ -40,9 +40,9 @@ bool Animator::step() {
     //
     // Sleep until it's time for the next frame. We're not trying to be
     // super-precise here.
-    uint64_t lms = aw.getLastTimeMS();
-    if (lms < msPerFrame) {
-        sleep_ms(msPerFrame - lms);
+    uint64_t lus = aw.getLastTime();
+    if (lus < usPerFrame) {
+        sleep_us(usPerFrame - lus);
     } else {
         missedFrames++;
     }
