@@ -57,7 +57,7 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 .define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
 
 .wrap_target
-out x, 32   ; Read 32 bits from the OSR into X, autopulling from the TX FIFO, blocking until data is ready.
+out x, 8               ; Read 8 bits from the OSR into X, autopulling from the TX FIFO, blocking until data is ready.
 mov pins, !null [T1-1] ; Write 1 for 8 cycles 
 mov pins, x     [T2-1] ; Write the data bits to the pins, autopulls data from TX FIFO.
 mov pins, null  [T3-2] ; Write 0 bits to all pins, account for the instruction at the top of the loop
@@ -76,9 +76,9 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
     pio_sm_set_consecutive_pindirs(pio, sm, pin_base, pin_count, true);
 
     pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
-    sm_config_set_out_shift(&c, true, true, 32);
+    sm_config_set_out_shift(&c, true, true, 8);
     sm_config_set_out_pins(&c, pin_base, pin_count);
-    sm_config_set_in_shift(&c, true, false, 32);
+    sm_config_set_in_shift(&c, true, false, 8);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);

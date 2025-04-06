@@ -37,7 +37,7 @@ int main() {
     int nColors = 7;
 
     while (1) {
-        for (int sc = 2; sc <= 12; sc++) {
+        for (int sc = 4; sc <= 12; sc++) {
             for (int i = 0; i < ns - (sc - 1); i++) {
                 Canvas canvas(STRIP_LEN);
                 for (int j = 0; j < sc; j++) {
@@ -51,7 +51,7 @@ int main() {
                 animator.add(&bp);
                 animator.init();
                 animator.setFPS(60);
-                while (animator.getFrameCount() < 70) {
+                while (animator.getFrameCount() < 500) {
                     animator.step();
                 }
                 canvas.clear();

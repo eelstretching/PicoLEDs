@@ -123,9 +123,9 @@ void Renderer::setup() {
             startIndex = i;
             startPin = s.getPin();
             pinCount = 1;
-        } else if (s.getPin() == startPin + pinCount) {
+        } else if (s.getPin() == startPin + pinCount && pinCount < 8) {
             //
-            // Continuing a run.
+            // Continuing a run, but no run longer than 8 pins.
             pinCount++;
         } else {
             //
@@ -196,21 +196,30 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // Maybe better to pick the minimum length one?
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex].getNumPixels();
+        pip->buffer = calloc(pip->buffSize, sizeof(uint32_t));
+
+        dma_channel_config channel_config =
+            dma_channel_get_default_config(pip->dma_channel);
+        channel_config_set_transfer_data_size(&channel_config, DMA_SIZE_32);
+        channel_config_set_dreq(&channel_config,
+                                pio_get_dreq(pip->pio, pip->sm, true));
+        dma_channel_configure(pip->dma_channel, &channel_config,
+                              &pip->pio->txf[pip->sm], NULL, 1, false);
     } else {
         //
         // Each pixel on the strip uses 24 bits of color, this array will have
         // ones where the strips have that bit of color.
         pip->buffSize = strips[startIndex].getNumPixels() * 24;
-    }
-    pip->buffer = (uint32_t *)calloc(pip->buffSize, sizeof(uint32_t));
+        pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
 
-    dma_channel_config channel_config =
-        dma_channel_get_default_config(pip->dma_channel);
-    channel_config_set_transfer_data_size(&channel_config, DMA_SIZE_32);
-    channel_config_set_dreq(&channel_config,
-                            pio_get_dreq(pip->pio, pip->sm, true));
-    dma_channel_configure(pip->dma_channel, &channel_config,
-                          &pip->pio->txf[pip->sm], NULL, 1, false);
+        dma_channel_config channel_config =
+            dma_channel_get_default_config(pip->dma_channel);
+        channel_config_set_transfer_data_size(&channel_config, DMA_SIZE_8);
+        channel_config_set_dreq(&channel_config,
+                                pio_get_dreq(pip->pio, pip->sm, true));
+        dma_channel_configure(pip->dma_channel, &channel_config,
+                              &pip->pio->txf[pip->sm], NULL, 1, false);
+    }
 
     if (!isr_installed) {
         //
@@ -248,24 +257,26 @@ void Renderer::render() {
 
         //
         // Let's start by zeroing the buffer.
-        memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
         if (pip->size == 1) {
+            memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
             //
             // One strip, just put the data in the buffer according to the color
             // order after scaling by the strip's brightness.
             Strip s = strips[pip->startIndex];
             RGB *data = s.getData();
-            for (int i = 0; i < s.getNumPixels(); i++) {
+            uint32_t *pb = (uint32_t *)pip->buffer;
+            for (int i = 0; i < s.getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO program
                 // will be pulling 24 bits and it wants those 24 bits in the
                 // most significant place.
-                pip->buffer[i] = data[i]
-                                     .scale8(s.getFractionalBrightness())
-                                     .getColor(s.getColorOrder())
-                                 << 8u;
+                *pb = (*data)
+                          .scale8(s.getFractionalBrightness())
+                          .getColor(s.getColorOrder())
+                      << 8u;
             }
         } else {
+            memset(pip->buffer, 0, pip->buffSize * sizeof(uint8_t));
             //
             // We'll need to turn the data for multiple strips into bit planes.
             for (int i = pip->startIndex, sn = 0;
@@ -279,9 +290,9 @@ void Renderer::render() {
                 // array, we'll always be or'ing in the same bit, so let's
                 // just make it now. But remember that we need to start from 0
                 // for this program!
-                uint32_t stripBit = 1 << (i - pip->startIndex);
+                uint8_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
-                    uint32_t *pipbuff = &pip->buffer[pp];
+                    uint8_t *pipbuff = &((uint8_t *) pip->buffer)[pp];
                     //
                     // Transform the data for color order and brightness. Doing
                     // that old school pointer bumping rather than array
@@ -384,7 +395,7 @@ void Renderer::render() {
         // We'll keep track of the time for the DMA ops.
         pip->delay.dma_start = time_us_64();
 
-        dma_channel_set_read_addr(pip->dma_channel, (void *)pip->buffer, false);
+        dma_channel_set_read_addr(pip->dma_channel, pip->buffer, false);
         dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
 
         pip->stats.finish();

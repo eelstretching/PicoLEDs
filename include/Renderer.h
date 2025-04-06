@@ -18,7 +18,7 @@
  * RES time, specification says it needs at least 50 us, but some folks say it
  * can be as low as 9us!
  */
-#define RESET_TIME_US (55)
+#define RESET_TIME_US (40)
 
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
@@ -51,7 +51,7 @@ class PIOProgram {
     uint sm;
     uint offset;
     int dma_channel;
-    uint32_t *buffer;
+    void *buffer;
     uint32_t buffSize;
     StripResetDelay delay;
     StopWatch stats;
