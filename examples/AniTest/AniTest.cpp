@@ -13,7 +13,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 8
+#define NUM_STRIPS 4
 #define START_PIN 2
 #define STRIP_LEN 137
 
@@ -22,7 +22,6 @@ int main() {
 
     //
     // A canvas made out of strips.
-    Canvas canvas(137);
     Strip *strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
@@ -30,18 +29,21 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(16);
-        canvas.add(*strips[i]);
-    }    
-    int delay = 100;
+        strips[i]->setFractionalBrightness(32);
+    }
 
     RGB colors[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
                     RGB::Blue, RGB::Indigo, RGB::Violet};
     int nColors = 7;
 
+    Canvas canvas(STRIP_LEN);
+    for (int i = 0; i < ns; i++) {
+        canvas.add(*strips[i]);
+    }
+    canvas.setup();
     canvas.clear();
+    canvas.show();
 
-    Bouncer bouncer(&canvas, RGB::Green, 0, 0);
     BarberPole bp(&canvas, colors, nColors, 5);
 
     Animator animator(&canvas, 5);
@@ -54,7 +56,6 @@ int main() {
     while (1) {
         animator.step();
         if (animator.getFrameCount() % 250 == 0) {
-                uint64_t x = animator.getFrameCount() + 1;
             printf(
                 "%d frames run, %.2f us/frame at %d fps used %.2f us/frame, %.2f us/show %d missed frames\n",
                 animator.getFrameCount(), 

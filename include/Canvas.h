@@ -100,6 +100,9 @@ class Canvas {
     /// @param strip
     void add(Strip &strip);
 
+    /// @brief Set up the canvas for operations.
+    void setup() {renderer.setup();};
+
     uint getHeight() { return rows.size(); };
 
     uint getWidth() { return width; };
