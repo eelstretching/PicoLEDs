@@ -2,17 +2,17 @@
 
 #include "Canvas.h"
 #include "DataAnimation.h"
-#include "Fireworks.h"
 #include "FireworkWipe.h"
+#include "Fireworks.h"
 #include "FontTwoP.h"
-#include "RandomAnimation.h"
-#include "RainbowWipe.h"
-#include "RandomText.h"
 #include "PacChase.h"
 #include "PacWipe.h"
+#include "RainbowWipe.h"
+#include "RandomAnimation.h"
+#include "RandomText.h"
+#include "ScoutLaw.h"
 #include "ScrollWipe.h"
 #include "Strip.h"
-#include "ScoutLaw.h"
 #include "TextAnimation.h"
 #include "TimeAnimation.h"
 #include "TimedAnimation.h"
@@ -29,20 +29,32 @@
 #include "pico/types.h"
 #include "pico/util/datetime.h"
 
+#define NUM_STRIPS 16
+#define START_PIN 2
+#define STRIP_LEN 137
+
 int main() {
     //
     // Set up to printf stuff.
     stdio_init_all();
 
-    //
-    // A canvas and a view made out of strips.
-    Canvas canvas(138);
-    Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
-                      Strip(5, 552)};
-    canvas.add(strips[0]);
-    canvas.add(strips[1]);
-    canvas.add(strips[2]);
-    canvas.add(strips[3]);
+    Strip *strips[NUM_STRIPS];
+    int ns = NUM_STRIPS;
+    int pin = START_PIN;
+    int pins[NUM_STRIPS];
+    for (int i = 0; i < ns; i++) {
+        pins[i] = pin;
+        strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setFractionalBrightness(32);
+    }
+
+    Canvas canvas(STRIP_LEN);
+    for (int i = 0; i < ns; i++) {
+        canvas.add(*strips[i]);
+    }
+    canvas.setup();
+    canvas.clear();
+    canvas.show();
 
     Font twoP(&canvas, FontTwoPData);
 
@@ -61,26 +73,27 @@ int main() {
     twoP.render("CONNECT TO WIFI...", 4, 4, RGB::Green);
     canvas.show();
 
+    data_t *signData = nullptr;
+
     if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD,
                                            CYW43_AUTH_WPA2_AES_PSK, 60000)) {
         canvas.clear();
         twoP.render("FAIL CONNECT!!", 4, 4, RGB::Red);
         canvas.show();
-        return 1;
+    } else {
+        canvas.clear();
+        twoP.render("WIFI CONNECT!", 4, 4, RGB::Green);
+        canvas.show();
+        sleep_ms(2000);
+
+        canvas.clear();
+        twoP.render("FETCH DATA...", 4, 4, RGB::Green);
+        canvas.show();
+        signData = fetch_data();
+
+        rtc_init();
+        rtc_set_datetime(&signData->dt);
     }
-
-    canvas.clear();
-    twoP.render("WIFI CONNECT!", 4, 4, RGB::Green);
-    canvas.show();
-    sleep_ms(2000);
-
-    canvas.clear();
-    twoP.render("FETCH DATA...", 4,4, RGB::Green);
-    canvas.show();
-    data_t *signData = fetch_data();
-
-    rtc_init();
-    rtc_set_datetime(&signData->dt);
 
     cyw43_arch_deinit();
 
@@ -116,8 +129,12 @@ int main() {
 
     ScoutLaw law(&canvas, &twoP, 500);
 
-    DataAnimation wxData(&canvas, &twoP, 5000, signData);
-    TimeAnimation time(&canvas, &twoP, 8000);
+    DataAnimation *wxData = nullptr;
+    TimeAnimation *time = nullptr;
+    if (signData != nullptr) {
+        wxData = new DataAnimation(&canvas, &twoP, 5000, signData);
+        time = new TimeAnimation(&canvas, &twoP, 8000);
+    }
 
     ScrollWipe upWipe(&canvas, Direction::UP);
     upWipe.setExtraFrames(20);
@@ -140,7 +157,6 @@ int main() {
 
     RainbowWipe rainbow(&canvas);
 
-
     RandomAnimation wipes(&canvas);
     wipes.add(&upWipe);
     wipes.add(&downWipe);
@@ -153,9 +169,13 @@ int main() {
     Animator animator(&canvas, 30);
     animator.add(&text);
     animator.add(&wipes);
-    animator.add(&wxData);
+    if (wxData != nullptr) {
+        animator.add(wxData);
+    }
     animator.add(&wipes);
-    animator.add(&time);
+    if (time != nullptr) {
+        animator.add(time);
+    }
     animator.add(&wipes);
     animator.add(&randText);
     animator.add(&wipes);
@@ -184,9 +204,8 @@ int main() {
                 "Time: %04d/%02d/%02d %02d:%02d:%02d %d frames run, %.2f "
                 "us/frame, %.2f us/show %d missed frames\n",
                 dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec, n,
-                animator.getAverageFrameTimeUS(), 
-                animator.getAverageShowTimeUS(),
-                animator.getMissedFrames());
+                animator.getAverageFrameTimeUS(),
+                animator.getAverageShowTimeUS(), animator.getMissedFrames());
         }
     }
 }

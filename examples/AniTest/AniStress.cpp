@@ -51,7 +51,7 @@ int main() {
                 animator.add(&bp);
                 animator.init();
                 animator.setFPS(60);
-                while (animator.getFrameCount() < 500) {
+                while (animator.getFrameCount() < 200) {
                     animator.step();
                 }
                 canvas.clear();

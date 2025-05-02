@@ -32,23 +32,25 @@ bool Animator::step() {
     // Take a step on the current animation. If that animation finishes, then
     // get ready for the next one in the list, looping around to the start of
     // the list if we've reached the end.
-    aw.start();
+    frameWatch.start();
+    stepWatch.start();
     if (!animations[pos]->step()) {
         animations[pos]->finish();
         pos = (pos + 1) % animations.size();
         setFPS(animations[pos]->getFPSNeeded());
         animations[pos]->init();
     }
-    sw.start();
+    stepWatch.finish();
+    showWatch.start();
     canvas->show();
-    sw.finish();
-    aw.finish();
+    showWatch.finish();
+    frameWatch.finish();
     frameCount++;
 
     //
     // Sleep until it's time for the next frame. We're not trying to be
     // super-precise here.
-    uint64_t lus = aw.getLastTime();
+    uint64_t lus = frameWatch.getLastTime();
     if (lus < usPerFrame) {
         sleep_us(usPerFrame - lus);
     } else {

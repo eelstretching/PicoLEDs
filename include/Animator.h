@@ -23,8 +23,9 @@ class Animator : public Animation {
 
     uint frameCount = 0;
 
-    StopWatch sw;
-    StopWatch aw;
+    StopWatch frameWatch;
+    StopWatch showWatch;
+    StopWatch stepWatch;
 
    public:
     /// @brief Creates an animator for the given canvas.
@@ -47,9 +48,10 @@ class Animator : public Animation {
     uint getMissedFrames() { return missedFrames; };
     /// @brief Gets the average frame animation and display time, in
     /// microseconds.
-    float getAverageFrameTimeUS() { return aw.getAverageTime(); }
 
-    float getAverageShowTimeUS() { return sw.getAverageTime(); }
+    float getAverageStepTimeUS() { return stepWatch.getAverageTime(); }
+    float getAverageFrameTimeUS() { return frameWatch.getAverageTime(); }
+    float getAverageShowTimeUS() { return showWatch.getAverageTime(); }
 
     uint getFrameCount() { return frameCount; };
 

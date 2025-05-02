@@ -13,7 +13,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 4
+#define NUM_STRIPS 16
 #define START_PIN 2
 #define STRIP_LEN 137
 
@@ -49,20 +49,21 @@ int main() {
     Animator animator(&canvas, 5);
     animator.add(&bp);
     animator.init();
-    animator.setFPS(30);
+    animator.setFPS(80);
 
     int n = 0;
 
     while (1) {
         animator.step();
-        if (animator.getFrameCount() % 250 == 0) {
+        if (animator.getFrameCount() % 1000 == 0) {
             printf(
-                "%d frames run, %.2f us/frame at %d fps used %.2f us/frame, %.2f us/show %d missed frames\n",
+                "%d frames run, %.2f us/frame at %d fps %.2f us/step, %.2f us/show %.2f us/frame %d missed frames\n",
                 animator.getFrameCount(), 
                 animator.getUsPerFrame(),
                 animator.getFPSNeeded(),
-                animator.getAverageFrameTimeUS(),
+                animator.getAverageStepTimeUS(),
                 animator.getAverageShowTimeUS(), 
+                animator.getAverageFrameTimeUS(),
                 animator.getMissedFrames());
         }
     }
