@@ -304,9 +304,6 @@ void Renderer::render() {
                     uint32_t val = data->scale8(s.getFractionalBrightness())
                                        .getColor(s.getColorOrder());
 
-                    if(abs((int) (val-0x00ffffff)) < 100) {
-                        printf("Whitish: val: %08x color: %08x strip: %d pixel: %d\n", val, data->getColor(s.getColorOrder()), i, j);
-                    }
                     // uint32_t val = data->getColor(s.getColorOrder());
 
                     //
@@ -407,6 +404,7 @@ void Renderer::render() {
 
         pip->stats.finish();
     }
+    renderCount++;
 }
 
 uint32_t Renderer::getBlockedCount() {

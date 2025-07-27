@@ -15,7 +15,7 @@
 
 #define NUM_STRIPS 16
 #define START_PIN 2
-#define STRIP_LEN 137
+#define STRIP_LEN 136
 
 int main() {
     stdio_init_all();

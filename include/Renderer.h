@@ -78,6 +78,8 @@ class Renderer {
 
     bool setupDone = false;
 
+    int renderCount = 0;
+
    public:
     /// @brief Construct a renderer for a single strip.
     /// @param pin The pin that the strip is connected to.

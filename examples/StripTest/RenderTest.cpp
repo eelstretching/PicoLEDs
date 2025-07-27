@@ -122,7 +122,7 @@ int main() {
     while (1) {
         // //
         // // Continugous sets of strips, which will make a single PIO program.
-        for (int s = 8; s < 12; s++) {
+        for (int s = 1; s < 12; s++) {
             for (int i = 0; i < ns - (s - 1); i++) {
                 run_contig_test(strips, i, i + s, ns, pins[i]);
             }
