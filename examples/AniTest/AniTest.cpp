@@ -13,11 +13,11 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 8
-#define START_PIN 10
+#define NUM_STRIPS 16
+#define START_PIN 2
 #define STRIP_LEN 137
 #define BRIGHTNESS 8
-#define FPS 80
+#define FPS 40
 
 int main() {
     stdio_init_all();
@@ -75,7 +75,7 @@ int main() {
 
     while (1) {
         a2.step();
-        if (a2.getFrameCount() % 1000 == 0) {
+        if (a2.getFrameCount() % 200 == 0) {
             printf(
                 "%d frames run, %.2f us/frame at %d fps %.2f us/step, %.2f us/show %.2f us/frame %d missed frames\n",
                 a2.getFrameCount(), 

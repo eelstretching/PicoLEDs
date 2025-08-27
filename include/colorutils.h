@@ -6,7 +6,6 @@
 
 #include "color.h"
 #include "pico/types.h"
-#include "pico/mem_ops.h"
 
 typedef uint8_t fract8;
 

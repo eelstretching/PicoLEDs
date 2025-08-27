@@ -56,6 +56,8 @@ class Animator : public Animation {
     uint getFrameCount() { return frameCount; };
 
     float getUsPerFrame() { return usPerFrame; };
+
+    void printStats();
 };
 
 #endif

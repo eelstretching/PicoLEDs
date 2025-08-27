@@ -116,7 +116,7 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(16);
+        strips[i]->setFractionalBrightness(8);
     }
 
     while (1) {
@@ -128,44 +128,44 @@ int main() {
             }
         }
 
-        // {
-        //     int start[2];
-        //     int end[2];
-        //     //
-        //     // Two discontiguous sets of size two through five.
-        //     for (int size = 2; size < 5; size++) {
-        //         for (int gap = 1; gap < 4; gap++) {
-        //             int ts = 2 * size + gap;
-        //             for (int i = 0; i < ns - (ts - 1); i++) {
-        //                 start[0] = i;
-        //                 end[0] = i + size;
-        //                 start[1] = end[0] + gap;
-        //                 end[1] = start[1] + size;
-        //                 run_discontig_test(strips, ns, start, end, 2);
-        //             }
-        //         }
-        //     }
-        // }
-        // {
-        //     int start[3];
-        //     int end[3];
-        //     //
-        //     // Three discontiguous sets of size two through five.
-        //     for (int size = 2; size < 5; size++) {
-        //         for (int gap = 1; gap < 5 && (3 * size + 2 * gap) < ns;
-        //         gap++) {
-        //             int ts = 3 * size + 2 * gap;
-        //             for (int i = 0; i < ns - (ts - 1); i++) {
-        //                 start[0] = i;
-        //                 end[0] = i + size;
-        //                 start[1] = end[0] + gap;
-        //                 end[1] = start[1] + size;
-        //                 start[2] = end[1] + gap;
-        //                 end[2] = start[2] + size;
-        //                 run_discontig_test(strips, ns, start, end, 3);
-        //             }
-        //         }
-        //     }
-        // }
+        {
+            int start[2];
+            int end[2];
+            //
+            // Two discontiguous sets of size two through five.
+            for (int size = 2; size < 5; size++) {
+                for (int gap = 1; gap < 4; gap++) {
+                    int ts = 2 * size + gap;
+                    for (int i = 0; i < ns - (ts - 1); i++) {
+                        start[0] = i;
+                        end[0] = i + size;
+                        start[1] = end[0] + gap;
+                        end[1] = start[1] + size;
+                        run_discontig_test(strips, ns, start, end, 2);
+                    }
+                }
+            }
+        } 
+        {
+            int start[3];
+            int end[3];
+            //
+            // Three discontiguous sets of size two through five.
+            for (int size = 2; size < 5; size++) {
+                for (int gap = 1; gap < 5 && (3 * size + 2 * gap) < ns;
+                gap++) {
+                    int ts = 3 * size + 2 * gap;
+                    for (int i = 0; i < ns - (ts - 1); i++) {
+                        start[0] = i;
+                        end[0] = i + size;
+                        start[1] = end[0] + gap;
+                        end[1] = start[1] + size;
+                        start[2] = end[1] + gap;
+                        end[2] = start[2] + size;
+                        run_discontig_test(strips, ns, start, end, 3);
+                    }
+                }
+            }
+        }
     }
 }

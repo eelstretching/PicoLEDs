@@ -83,5 +83,3 @@ target_link_libraries(LogicTest
   hardware_clocks
   pico_stdlib
 )
-
-pico_add_extra_outputs(LogicTest)

@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pico/mem_ops.h"
 #include "pico/printf.h"
 
 

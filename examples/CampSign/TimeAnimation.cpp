@@ -1,6 +1,5 @@
 #include "TimeAnimation.h"
 
-#include "hardware/rtc.h"
 #include "hardware/timer.h"
 #include "pico/types.h"
 #include "pico/util/datetime.h"

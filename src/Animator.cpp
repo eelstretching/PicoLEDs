@@ -12,16 +12,25 @@ void Animator::add(Animation* a) { animations.push_back(a); }
 
 void Animator::setFPS(int fps) {
     this->fps = fps;
-    // 
-    // There's a million microseconds in a second. 
-    usPerFrame = 1e6 / fps; 
+    //
+    // There's a million microseconds in a second.
+    usPerFrame = 1e6 / fps;
 }
 
 void Animator::init() {
     pos = 0;
-    Animation *f = animations[pos];
+    Animation* f = animations[pos];
     setFPS(f->getFPSNeeded());
     f->init();
+}
+
+void Animator::printStats() {
+    printf(
+        "%d frames run, %.2f us/frame at %d fps %.2f us/step, %.2f "
+        "us/show %.2f us/frame %d missed frames\n",
+        getFrameCount(), getUsPerFrame(), getFPSNeeded(),
+        getAverageStepTimeUS(), getAverageShowTimeUS(), getAverageFrameTimeUS(),
+        getMissedFrames());
 }
 
 bool Animator::step() {

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pico/mem_ops.h"
 #include "pico/platform.h"
 
 void Row::set(int x, RGB color) {
@@ -126,6 +125,12 @@ void Canvas::add(Strip &strip) {
     renderer.add(strip);
 }
 
+void Canvas::setFractionalBrightness(uint8_t fracBrightness) {
+    for (auto &r : rows) {
+        r.strip->setFractionalBrightness(fracBrightness);
+    }
+}
+
 void Canvas::setBackground(RGB b) { background = b; }
 
 bool Canvas::set(int x, int y, RGB c) {
@@ -171,6 +176,14 @@ void Canvas::fillColumn(uint col, RGB c) {
 void Canvas::fill(RGB c) {
     for (auto r : rows) {
         r.fill(c);
+    }
+}
+
+void Canvas::fillRect(uint x0, uint y0, uint x1, uint y1, RGB c) {
+    for(int i = x0; i <= x1; i++) {
+        for(int j = y0; j <= y1; j++) {
+            set(i, j, c);
+        }
     }
 }
 

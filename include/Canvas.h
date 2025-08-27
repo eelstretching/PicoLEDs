@@ -100,6 +100,12 @@ class Canvas {
     /// @param strip
     void add(Strip &strip);
 
+    /// @brief Sets the fractional brightness for the whole canvas.
+    /// @param fracBrightness A value between 0 and 255 that specifies the
+    /// brightness level of the LEDs in the canvas between 0 (off) and 255 (all
+    /// the way on).
+    void setFractionalBrightness(uint8_t fracBrightness);
+
     /// @brief Set up the canvas for operations.
     void setup() {renderer.setup();};
 
@@ -144,6 +150,14 @@ class Canvas {
     /// @brief Fill the canvas with a given color
     /// @param c the color to fill with.
     void fill(RGB c);
+
+    /// @brief Fills a rectangle with the given color.
+    /// @param x0 The x coordinate of the bottom-left corner of the rectangle.
+    /// @param y0 The y coordinate of the bottom-left corner of the rectangle.
+    /// @param x1 The x coordinate of the top-right corner of the rectangle.
+    /// @param y1 The y coordinate of the top-right corner of the rectangle.
+    /// @param c The color to fill with.
+    void fillRect(uint x0, uint y0, uint x1, uint y1, RGB c);
 
     /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's
     /// algorithm.

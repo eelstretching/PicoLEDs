@@ -8,7 +8,6 @@
 
 #include "hardware/dma.h"
 #include "hardware/irq.h"
-#include "pico/mem_ops.h"
 #include "ws2812.pio.h"
 
 /// @brief A comparator that we can use to sort strips by their pin number.
