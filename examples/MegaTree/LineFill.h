@@ -21,6 +21,9 @@ class LineFill : public Animation {
     /// @brief The number of color bands to use.
     int nBands;
 
+    /// @brief The number of lines that we'll be animating.
+    int nLines;
+
     /// @brief The direction that we're filling to.
     Direction direction;
 
@@ -29,9 +32,6 @@ class LineFill : public Animation {
 
     /// @brief How big a band of colors is.
     int bandSize;
-
-    /// @brief The band we're currently working on.
-    int currBand = 0;
 
     /// @brief How big a gap to leave between lines as they move up.
     int gap = 1;
@@ -52,8 +52,6 @@ class LineFill : public Animation {
 
     void setGap(int gap) { this->gap = gap; };
 
-   protected:
-    void newBand();
 };
 
 #endif

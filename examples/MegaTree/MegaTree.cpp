@@ -90,9 +90,13 @@ int main() {
 
     Animator a(&c, FPS);
 
-    LineFill lf(&c, simpleXmasColors, 4, UP);
-    lf.setGap(9);
-    a.add(&lf);
+    LineFill lfu(&c, simpleXmasColors, 4, UP);
+    lfu.setGap(6);
+    a.add(&lfu);
+
+    LineFill lfd(&c, simpleXmasColors, 4, DOWN);
+    lfd.setGap(7);
+    a.add(&lfd);
 
     // Spiral spiral(&c, simpleXmasColors, 5, 25);
     // a.add(&spiral);

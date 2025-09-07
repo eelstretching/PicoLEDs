@@ -15,44 +15,48 @@ LineFill::LineFill(Canvas* canvas, RGB* colors, int nBands, Direction direction,
         case UP:
         case DOWN:
             bandSize = canvas->getWidth() / nBands;
+            nLines = canvas->getWidth();
             break;
         case LEFT:
         case RIGHT:
             bandSize = canvas->getHeight() / nBands;
+            nLines = canvas->getHeight();
             break;
     }
-    lines = new FillLine*[bandSize];
-    for(int i = 0; i < bandSize; i++) {
+    lines = new FillLine*[nLines];
+    for (int i = 0; i < nLines; i++) {
         lines[i] = nullptr;
     }
 }
 
-void LineFill::newBand() {
+void LineFill::init() {
+    canvas->clear();
     uint16_t startPos;
     uint16_t endPos;
     switch (direction) {
         case UP:
             startPos = 0;
-            endPos = (canvas->getWidth() - 1) - (bandSize * currBand);
+            endPos = (canvas->getWidth() - 1);
             break;
         case DOWN:
             startPos = canvas->getWidth() - 1;
-            endPos = (bandSize * currBand);
+            endPos = 0;
             break;
         case LEFT:
             startPos = 0;
-            endPos = (canvas->getHeight() - 1) - (bandSize * currBand);
+            endPos = (canvas->getHeight() - 1);
             break;
         case RIGHT:
             startPos = canvas->getHeight() - 1;
-            endPos = (bandSize * currBand);
+            endPos = 0;
             break;
     }
-    printf("New band %d startPos=%d endPos=%d\n", currBand, startPos,
-           endPos);
-    for (int i = 0; i < bandSize; i++) {
+
+    int currBand = 0;
+    for (int i = 0; i < nLines; i++) {
         //
-        // Get rid of the old line, if there is one. There shouldn't be, but just to be safe.
+        // Get rid of the old line, if there is one. There shouldn't be, but
+        // just to be safe.
         if (lines[i] != nullptr) {
             delete lines[i];
         }
@@ -68,27 +72,26 @@ void LineFill::newBand() {
         switch (direction) {
             case UP:
             case LEFT:
-                startPos -= (gap+1);
+                startPos -= (gap + 1);
                 endPos--;
                 break;
             case DOWN:
             case RIGHT:
-                startPos += (gap+1);
+                startPos += (gap + 1);
                 endPos++;
                 break;
+        }
+        if ((i + 1) % bandSize == 0) {
+            currBand++;
         }
     }
 }
 
-void LineFill::init() {
-    canvas->clear();
-    currBand = 0;
-    newBand();
-}
-
 bool LineFill::step() {
+    //
+    // How many lines are finished?
     int nf = 0;
-    for (int i = 0; i < bandSize; i++) {
+    for (int i = 0; i < nLines; i++) {
         if (lines[i] != nullptr) {
             //
             // Step the line, and if it finishes, take it out of the running.
@@ -102,13 +105,6 @@ bool LineFill::step() {
         }
     }
     //
-    // If we finished all the lines in this band, move on to the next band.
-    if (nf == bandSize) {
-        currBand++;
-        if (currBand == nBands) {
-            return false;
-        }
-        newBand();
-    }
-    return true;
+    // If we finished all the lines, then we're done.
+    return nf != nLines;
 }
