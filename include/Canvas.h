@@ -51,6 +51,8 @@ class Row {
     /// @return the color of the pixel at the given position.
     RGB get(int x);
 
+    void fade(int x, uint8_t amount);
+
     /// @brief Fills a row with the given color
     /// @param color the color to fill with
     void fill(RGB color);
@@ -127,6 +129,8 @@ class Canvas {
     /// was not on the canvas as it was out-of-bounds.
     bool set(int x, int y, RGB p);
 
+    void fade(int x, int y, uint8_t amount);
+
     /// @brief Gets the value of the pixel at the given coordinates
     RGB get(uint x, uint y);
 
@@ -167,6 +171,15 @@ class Canvas {
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
     void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c);
+
+    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's algorithm, with optional wrap-around.
+    /// @param x0 The x coordinate of the first point.
+    /// @param y0 The y coordinate of the first point.
+    /// @param x1 The x coordinate of the second point.
+    /// @param y1 The y coordinate of the second point.
+    /// @param c The color the line should be.
+    /// @param wrapAround if true, the line will wrap around the canvas edges.
+    void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c, bool wrapAround);
 
     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1)
     /// @param x0 The x coordinate of one corner

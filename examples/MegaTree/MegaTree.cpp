@@ -7,6 +7,7 @@
 #include "Strip.h"
 #include "TripleColor.h"
 #include "Spiral.h"
+#include "LineFill.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -75,7 +76,7 @@ int main() {
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
-    c.setFractionalBrightness(32);
+    c.setFractionalBrightness(16);
     c.setup();
 
     for(int i = 0; i < 3; i++) {
@@ -86,8 +87,11 @@ int main() {
 
     Animator a(&c, FPS);
 
-    Spiral spiral(&c, simpleXmasColors, 3, 10);
-    a.add(&spiral);
+    LineFill lf(&c, simpleXmasColors, 6, UP);
+    a.add(&lf);
+
+    // Spiral spiral(&c, simpleXmasColors, 5, 25);
+    // a.add(&spiral);
 
     // TripleColor tc(&c, simpleXmasColors);
     // a.add(&tc);

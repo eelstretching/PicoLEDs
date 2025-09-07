@@ -34,6 +34,10 @@ RGB Row::get(int x) {
     }
 }
 
+void Row::fade(int x, uint8_t amount) {
+    strip->getData()[start + x].fadeToBlackBy(amount);
+}
+
 void Row::fill(RGB color) { strip->fill(color, start, width); }
 
 int Row::copy(RGB *source, int p, int n) {
@@ -144,6 +148,16 @@ bool Canvas::set(int x, int y, RGB c) {
     return true;
 }
 
+void Canvas::fade(int x, int y, uint8_t amount) {
+    if (x >= width || x < 0 || y >= rows.size() || y < 0) {
+        //
+        // Off the canvas.
+        return;
+    }
+
+    rows[y].fade(x, amount);
+}
+
 RGB Canvas::get(uint x, uint y) { return rows[x].get(y); }
 
 void Canvas::fillRow(uint row, RGB c) {
@@ -180,8 +194,8 @@ void Canvas::fill(RGB c) {
 }
 
 void Canvas::fillRect(uint x0, uint y0, uint x1, uint y1, RGB c) {
-    for(int i = x0; i <= x1; i++) {
-        for(int j = y0; j <= y1; j++) {
+    for (int i = x0; i <= x1; i++) {
+        for (int j = y0; j <= y1; j++) {
             set(i, j, c);
         }
     }
