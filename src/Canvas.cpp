@@ -161,7 +161,7 @@ void Canvas::fade(int x, int y, uint8_t amount) {
 RGB Canvas::get(uint x, uint y) { return rows[x].get(y); }
 
 void Canvas::fillRow(uint row, RGB c) {
-    if (row >= rows.size()) {
+    if (row >= rows.size() || row < 0) {
         return;
     }
 
@@ -179,7 +179,7 @@ void Canvas::copy(RGB *d, int n, int x, int y) {
 }
 
 void Canvas::fillColumn(uint col, RGB c) {
-    if (col >= width) {
+    if (col >= width || col < 0) {
         return;
     }
     for (auto r : rows) {

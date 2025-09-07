@@ -4,54 +4,56 @@
 #pragma once
 
 #include <stdint.h>
-#include "Animation.h"  
-#include "Direction.h"
 
-enum State {
-    FILLING,
-    FLASHING
-};
+#include "Animation.h"
+#include "Direction.h"
+#include "FillLine.h"
+
+enum State { FILLING, FLASHING };
 
 class LineFill : public Animation {
-
     Canvas *canvas;
 
-    /// @brief The colors to use for the fill. The first n of these colors will be used, so it should be at least as big as that.
+    /// @brief The colors to use for the fill. The first n of these colors will
+    /// be used, so it should be at least as big as that.
     RGB *colors;
 
-    /// @brief The number of color stripes to use. 
-    int n;
+    /// @brief The number of color bands to use.
+    int nBands;
 
     /// @brief The direction that we're filling to.
     Direction direction;
 
-    /// @brief The current state of the animation, either filling or flashing a completed line.
-    State state;
+    /// @brief How big a step to take during animation.
+    int stepSize;
 
-    /// @brief The points in the canvas where we should change colors.
-    int *divisions;
+    /// @brief How big a band of colors is.
+    int bandSize;
 
-    /// @brief The current position that we're drawing.
-    int currPos;
+    /// @brief The band we're currently working on.
+    int currBand = 0;
 
-    /// @brief The current target that we're filling towards.
-    int currTarget;
+    /// @brief How big a gap to leave between lines as they move up.
+    int gap = 1;
 
-    /// @brief The index into the colors and targets that we're currently using.
-    int currIndex = 0;
-
-    int flashCount = 5;
-
-    int currFlash = 0;
+    FillLine **lines;
 
    public:
-    LineFill(Canvas *canvas, RGB *colors, int n, Direction direction = DOWN);
+    LineFill(Canvas *canvas, RGB *colors, int n, Direction direction = UP,
+             int stepSize = 1);
 
     ~LineFill() {};
 
-    int getFPSNeeded() override { return 120; };
+    int getFPSNeeded() override { return 60; };
 
     bool step() override;
+
+    void init() override;
+
+    void setGap(int gap) { this->gap = gap; };
+
+   protected:
+    void newBand();
 };
 
 #endif

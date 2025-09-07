@@ -19,7 +19,7 @@
 #define NUM_STRIPS 16
 #define START_PIN 2
 #define STRIP_LEN 136
-#define BRIGHTNESS 16
+#define BRIGHTNESS 8
 #define FPS 30
 
 int main() {
@@ -76,7 +76,7 @@ int main() {
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
-    c.setFractionalBrightness(16);
+    c.setFractionalBrightness(8);
     c.setup();
 
     for(int i = 0; i < 3; i++) {
@@ -85,9 +85,13 @@ int main() {
         sleep_ms(500);
     }
 
+    c.clear();
+    c.show();
+
     Animator a(&c, FPS);
 
-    LineFill lf(&c, simpleXmasColors, 6, UP);
+    LineFill lf(&c, simpleXmasColors, 4, UP);
+    lf.setGap(9);
     a.add(&lf);
 
     // Spiral spiral(&c, simpleXmasColors, 5, 25);
