@@ -8,6 +8,7 @@
 #include "TripleColor.h"
 #include "Spiral.h"
 #include "LineFill.h"
+#include "Marquees.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -19,7 +20,7 @@
 #define NUM_STRIPS 16
 #define START_PIN 2
 #define STRIP_LEN 136
-#define BRIGHTNESS 8
+#define BRIGHTNESS 16
 #define FPS 30
 
 int main() {
@@ -76,7 +77,6 @@ int main() {
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
-    c.setFractionalBrightness(8);
     c.setup();
 
     for(int i = 0; i < 3; i++) {
@@ -90,13 +90,16 @@ int main() {
 
     Animator a(&c, FPS);
 
-    LineFill lfu(&c, simpleXmasColors, 4, UP);
-    lfu.setGap(6);
-    a.add(&lfu);
+    Marquees marq(&c, simpleXmasColors, 4, 17, RIGHT, 16);
+    a.add(&marq);
 
-    LineFill lfd(&c, simpleXmasColors, 4, DOWN);
-    lfd.setGap(7);
-    a.add(&lfd);
+    // LineFill lfu(&c, simpleXmasColors, 4, UP);
+    // lfu.setGap(6);
+    // a.add(&lfu);
+
+    // LineFill lfd(&c, simpleXmasColors, 4, DOWN);
+    // lfd.setGap(7);
+    // a.add(&lfd);
 
     // Spiral spiral(&c, simpleXmasColors, 5, 25);
     // a.add(&spiral);
