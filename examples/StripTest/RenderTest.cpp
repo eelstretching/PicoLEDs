@@ -15,17 +15,9 @@
 #define NUM_STRIPS 16
 #define START_PIN 2
 
-RGB colors[] = {RGB::Red,    RGB::Green,      RGB::Blue,       RGB::Yellow,
-                RGB::Purple, RGB::GhostWhite, RGB::DarkViolet, RGB::FireBrick};
-
-RGB patterns[] = {RGB(0b10101010, 0b10101010, 0b10101010),
-                  RGB(0b01010101, 0b01010101, 0b01010101),
-                  RGB(0b10011001, 0b10011001, 0b10011001),
-                  RGB(0b01100110, 0b01100110, 0b01100110),
-                  RGB(0b00110011, 0b00110011, 0b00110011),
-                  RGB(0b11001100, 0b11001100, 0b11001100),
-                  RGB(0b10001000, 0b10001000, 0b10001000),
-                  RGB(0b00010001, 0b00010001, 0b00010001)};
+ColorMap colorMap({RGB::Black, RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
+                       RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
+                       RGB::FireBrick});
 
 void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
                      int startPin) {
@@ -37,17 +29,17 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     }
     r.setup();
     for (int i = startStrip; i < endStrip; i++) {
-        strips[i]->fill(colors[(startPin + i) % 3]);
+        strips[i]->fill(((startPin + i) % 3)+1);
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 
     for (int i = startStrip; i < endStrip; i++) {
         for (int j = 0; j < strips[i]->getNumPixels(); j++) {
-            strips[i]->putPixel(colors[j % 3], j);
+            strips[i]->putPixel((j % 3)+1, j);
         }
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 
     //
@@ -55,7 +47,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     for (int i = startStrip; i < endStrip; i++) {
         strips[i]->fill(RGB::Black);
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 }
 
@@ -76,20 +68,20 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
 
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
-            strips[j]->fill(colors[j % 3]);
+            strips[j]->fill((j % 3)+1);
         }
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
             for (int k = 0; k < strips[j]->getNumPixels(); k++) {
-                strips[j]->putPixel(colors[k % 3], k);
+                strips[j]->putPixel((k % 3)+1, k);
             }
         }
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 
     //
@@ -99,7 +91,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
             strips[j]->fill(RGB::Black);
         }
     }
-    r.render();
+    r.render(&colorMap);
     sleep_ms(100);
 }
 
@@ -116,7 +108,6 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(8);
     }
 
     while (1) {

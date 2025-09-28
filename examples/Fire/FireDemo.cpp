@@ -16,7 +16,6 @@ int main() {
     Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
     int ns = 3;
     for(int i = 0; i < ns; i++) {
-        strips[i].setFractionalBrightness(32);
         canvas.add(strips[i]);
     }
 

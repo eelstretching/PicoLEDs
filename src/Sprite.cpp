@@ -70,22 +70,22 @@ bool Sprite::step() {
     switch (direction) {
         case UP:
             for(int a = x; a < x + w; a++) {
-                canvas->set(a, prevY, canvas->getBackground());
+                canvas->set(a, prevY, canvas->getBackgroundIndex());
             }
             break;
         case DOWN:
             for(int a = x; a < x + w; a++) {
-                canvas->set(a, prevY+h-1, canvas->getBackground());
+                canvas->set(a, prevY+h-1, canvas->getBackgroundIndex());
             }
             break;
         case LEFT:
             for(int a = y; a < y+h-1; a++) {
-                canvas->set(prevX+w-1, a, canvas->getBackground());
+                canvas->set(prevX+w-1, a, canvas->getBackgroundIndex());
             }
             break;
         case RIGHT:
             for(int a = y; a < y+h-1; a++) {
-                canvas->set(prevX, a, canvas->getBackground());
+                canvas->set(prevX, a, canvas->getBackgroundIndex());
             }
             break;
     }

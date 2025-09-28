@@ -240,7 +240,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     programs.push_back(pip);
 }
 
-void Renderer::render() {
+void Renderer::render(ColorMap *colorMap) {
     if (!setupDone) {
         setup();
     }
@@ -265,16 +265,14 @@ void Renderer::render() {
             // One strip, just put the data in the buffer according to the color
             // order after scaling by the strip's brightness.
             Strip s = strips[pip->startIndex];
-            RGB *data = s.getData();
+            uint8_t *data = s.getData();
             uint32_t *pb = (uint32_t *)pip->buffer;
             for (int i = 0; i < s.getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO program
                 // will be pulling 24 bits and it wants those 24 bits in the
                 // most significant place.
-                *pb = (*data)
-                          .scale8(s.getFractionalBrightness())
-                          .getColor(s.getColorOrder())
+                *pb = colorMap->getColor(*data).getColor(s.getColorOrder())
                       << 8u;
             }
         } else {
@@ -284,7 +282,7 @@ void Renderer::render() {
             for (int i = pip->startIndex, sn = 0;
                  i < pip->startIndex + pip->size; i++, sn++) {
                 Strip s = strips[i];
-                RGB *data = s.getData();
+                uint8_t *data = s.getData();
                 uint32_t pp = 0;
 
                 //
@@ -296,14 +294,11 @@ void Renderer::render() {
                 for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
                     uint8_t *pipbuff = &((uint8_t *)pip->buffer)[pp];
                     //
-                    // Transform the data for color order and brightness. Doing
+                    // Map the color index, then transform for color order. Doing
                     // that old school pointer bumping rather than array
                     // accesses to try to cut down on the time spent prepping
                     // the data.
-                    uint32_t val = data->scale8(s.getFractionalBrightness())
-                                       .getColor(s.getColorOrder());
-
-                    // uint32_t val = data->getColor(s.getColorOrder());
+                    uint32_t val = colorMap->getColor(*data).getColor(s.getColorOrder());
 
                     //
                     // Unrolling the inner loop to save some ops. There's
@@ -386,13 +381,6 @@ void Renderer::render() {
             }
         }
         dw.finish();
-
-        // for(int k = 0; k < pip->buffSize; k++) {
-        //     if(k > 0 && k % 24 == 0) {
-        //         printf("\n");
-        //     }
-        //     printf("%4d %2d %032b\n", k, k % 24, pip->buffer[k]);
-        // }
 
         //
         // We'll keep track of the time for the DMA ops.

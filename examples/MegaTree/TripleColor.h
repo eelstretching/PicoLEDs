@@ -20,7 +20,7 @@ class TripleColor : public Animation {
     /// @brief Construct a TripleColor animation.
     /// @param canvas The canvas to draw on.
     /// @param colors An array of three RGB colors to use for the animation.
-    TripleColor(Canvas *canvas, RGB *colors);
+    TripleColor(Canvas *canvas);
 
     /// @brief Default destructor.
     ~TripleColor();

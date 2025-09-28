@@ -6,8 +6,6 @@
 #include "Animation.h"
 
 class BarberPole : public Animation {
-    RGB *colors;
-
     int nColors;
 
     int stripeWidth;
@@ -20,7 +18,7 @@ class BarberPole : public Animation {
     /// @param canvas the canvas we'll draw on
     /// @param c1 the first color for the barber pole
     /// @param c2 the second color for the barber pole
-    BarberPole(Canvas *canvas, RGB *colors, int nColors) : Animation(canvas), colors(colors), nColors(nColors) {
+    BarberPole(Canvas *canvas, int nColors) : Animation(canvas), nColors(nColors) {
         stripeWidth = 4;
     };
 
@@ -29,8 +27,8 @@ class BarberPole : public Animation {
     /// @param c1 the first color for the barber pole
     /// @param c2 the second color for the barber pole
     /// @param stripeWidth how wide the stripes should be.
-    BarberPole(Canvas *canvas, RGB *colors, int nColors, int stripeWidth)
-        : Animation(canvas), colors(colors), nColors(nColors), stripeWidth(stripeWidth) {
+    BarberPole(Canvas *canvas, int nColors, int stripeWidth)
+        : Animation(canvas), nColors(nColors), stripeWidth(stripeWidth) {
     };
 
     int getFPSNeeded() { return 10; };

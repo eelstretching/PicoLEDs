@@ -29,12 +29,13 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(32);
     }
 
-    RGB colors[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
-                    RGB::Blue, RGB::Indigo, RGB::Violet};
-    int nColors = 7;
+    ColorMap colors({
+        RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+        RGB::Blue,  RGB::Indigo, RGB::Violet
+    });
+    int nColors = colors.getUsed();
 
     while (1) {
         for (int sc = 4; sc <= 12; sc++) {
@@ -44,8 +45,9 @@ int main() {
                     canvas.add(*strips[i + j]);
                 }
                 canvas.setup();
+                canvas.setColorMap(&colors);
                 
-                BarberPole bp(&canvas, colors, nColors, 5);
+                BarberPole bp(&canvas, nColors, 5);
 
                 Animator animator(&canvas);
                 animator.add(&bp);

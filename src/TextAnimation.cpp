@@ -4,7 +4,7 @@
 #include "pico/stdlib.h"
 #include <inttypes.h>
 
-TextElement::TextElement(const char* text, uint x, uint y, RGB color)
+TextElement::TextElement(const char* text, uint x, uint y, uint8_t color)
     : text(text), x(x), y(y), color(color) {}
 
 TextAnimation::TextAnimation(Canvas* canvas, Font* font, uint duration)

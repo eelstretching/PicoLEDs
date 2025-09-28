@@ -104,7 +104,7 @@ class Renderer {
     void add(Strip &strip);
 
     /// @brief Renders the strips.
-    void render();
+    void render(ColorMap *colorMap);
 
     /// @brief Gets the number of times that calls to render blocked on the
     /// semaphore.

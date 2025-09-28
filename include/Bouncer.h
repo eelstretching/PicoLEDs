@@ -19,16 +19,16 @@ class Bouncer : public Animation {
 
     bool right;
 
-    RGB color;
+    uint8_t color;
 
    public:
     /// @brief Creates a bouncer at the given coordinates
     /// @param canvas The canvas we'll draw on.
     /// @param x the initial x position of the bouncer
     /// @param y the initial y position of the bouncer
-    Bouncer(Canvas *canvas, RGB color, int x, int y);
+    Bouncer(Canvas *canvas, uint8_t color, int x, int y);
 
-    Bouncer(Canvas *canvas, RGB color, int x, int y, int maxX, int maxY);
+    Bouncer(Canvas *canvas, uint8_t color, int x, int y, int maxX, int maxY);
     int getFPSNeeded() {return 10;};
     bool step();
 };

@@ -309,6 +309,10 @@ struct RGB {
         return *this;
     }
 
+    inline bool operator==(const RGB& rhs) const {
+        return (r == rhs.r) && (g == rhs.g) && (b == rhs.b);
+    }
+
     /// Scale down a RGB to N/256ths of it's current brightness using
     /// "video" dimming rules. "Video" dimming rules means that unless the scale
     /// factor is ZERO each channel is guaranteed NOT to dim down to zero.  If

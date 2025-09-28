@@ -26,6 +26,13 @@ int main() {
     canvas.add(strips[2]);
     int delay = 100;
 
+    ColorMap colorMap({
+        RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+        RGB::Blue,  RGB::Indigo, RGB::Violet
+    });
+    canvas.setColorMap(&colorMap);
+    canvas.setup();
+
     int x = -1;
     int y = -1;
     bool up = true;
@@ -33,7 +40,7 @@ int main() {
 
     while (1) {
         // printf("Prev %d,%d\n", x, y);
-        canvas.set(x, y, canvas.getBackground());
+        canvas.set(x, y, canvas.getBackgroundIndex());
         if(up) {
             y++;
             if(y == canvas.getHeight()-1) {
@@ -59,7 +66,7 @@ int main() {
         }
 
         printf("Curr %d,%d\n", x, y);
-        canvas.set(x, y, RGB::Green);
+        canvas.set(x, y, 4);
         canvas.show();
 
         sleep_ms(200);

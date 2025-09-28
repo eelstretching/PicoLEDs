@@ -23,7 +23,7 @@ bool BarberPole::step() {
         // For each x, we'll draw the diagonal fully, wrapping around on the x
         // axis if necessary.
         for (int y = 0; y < canvas->getHeight(); y++) {
-            canvas->set(x % canvas->getWidth(), y, colors[ci]);
+            canvas->set(x % canvas->getWidth(), y, ci+1);
             x++;
         }
         if (i % stripeWidth == 0) {

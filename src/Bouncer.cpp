@@ -1,19 +1,19 @@
 #include "Bouncer.h"
 
-Bouncer::Bouncer(Canvas* canvas, RGB color, int x, int y) : Animation(canvas), color(color), x(x), y(y) {
+Bouncer::Bouncer(Canvas* canvas, uint8_t color, int x, int y) : Animation(canvas), color(color), x(x), y(y) {
     maxX=canvas->getWidth() - 1;
     maxY=canvas->getHeight() - 1;
     up = true;
     right = true;
 }
 
-Bouncer::Bouncer(Canvas* canvas, RGB color, int x, int y, int maxX, int maxY) : Animation(canvas), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {
+Bouncer::Bouncer(Canvas* canvas, uint8_t color, int x, int y, int maxX, int maxY) : Animation(canvas), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {
     up = true;
     right = true;
 }
 
 bool Bouncer::step() {
-    canvas->set(x, y, canvas->getBackground());
+    canvas->set(x, y, canvas->getBackgroundIndex());
     if (up) {
         y++;
         if (y == maxY) {

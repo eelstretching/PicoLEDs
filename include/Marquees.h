@@ -8,7 +8,7 @@
 
 class Marquees : public Animation {
    public:
-    Marquees(Canvas *canvas, RGB *colors, int nColors, int width, Direction direction, int nMarquees = -1);
+    Marquees(Canvas *canvas, int nColors, int width, Direction direction, int nMarquees = -1);
 
     ~Marquees();
 

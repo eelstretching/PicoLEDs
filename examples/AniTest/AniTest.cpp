@@ -31,29 +31,28 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(BRIGHTNESS);
     }
 
-    RGB colors[] = {RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
-                    RGB::Blue, RGB::Indigo, RGB::Violet};
-    int nColors = 7;
+    ColorMap colorMap({RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+                    RGB::Blue, RGB::Indigo, RGB::Violet});
+    int nColors = colorMap.getUsed();
 
         //
     // Print the values that we expec the logic analyzer to be able to pick out.
     for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colors[i].getColor(ColorOrder::OGRB));
+        printf("%06X\n", colorMap[i].getColor(ColorOrder::OGRB));
     }
     printf("\nBrightness 64\n");
     for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colors[i].scale8(64).getColor(ColorOrder::OGRB));
+        printf("%06X\n", colorMap[i].scale8(64).getColor(ColorOrder::OGRB));
     }
     printf("\nBrightness 32\n");
     for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colors[i].scale8(32).getColor(ColorOrder::OGRB));
+        printf("%06X\n", colorMap[i].scale8(32).getColor(ColorOrder::OGRB));
     }
     printf("\nBrightness 16\n");
     for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colors[i].scale8(16).getColor(ColorOrder::OGRB));
+        printf("%06X\n", colorMap[i].scale8(16).getColor(ColorOrder::OGRB));
     }
 
     Canvas c2(STRIP_LEN);
@@ -65,7 +64,7 @@ int main() {
     c2.show();
 
 
-    BarberPole bp2(&c2, colors, nColors, 5);
+    BarberPole bp2(&c2, nColors, 5);
 
     Animator a2(&c2, 5);
     a2.add(&bp2);

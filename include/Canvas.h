@@ -28,15 +28,15 @@ class Canvas;
 // A single row in this canvas, which is all or part of a given strip.
 class Row {
     friend class Canvas;
-    Canvas *canvas;
-    Strip *strip;
+    Canvas* canvas;
+    Strip* strip;
     uint start;
     uint width;
     StripDirection dir;
 
    public:
-    Row(Strip *strip, uint start, uint width, StripDirection dir,
-        Canvas *canvas)
+    Row(Strip* strip, uint start, uint width, StripDirection dir,
+        Canvas* canvas)
         : strip(strip), start(start), width(width), dir(dir), canvas(canvas) {}
 
     /// @brief Sets the pixel at position x in this row to the given color.
@@ -44,18 +44,16 @@ class Row {
     /// origin of the canvas holding this row. This value will be translatd to
     /// the appropriate postion in the strip holding this row.
     /// @param color the color to set the pixel to.
-    void set(int x, RGB color);
+    void set(int x, uint8_t color);
 
     /// @brief Gets the value of a pixel at position x in this row.
     /// @param x the position of the pixel relative to the origin of the canvas.
     /// @return the color of the pixel at the given position.
-    RGB get(int x);
-
-    void fade(int x, uint8_t amount);
+    uint8_t get(int x);
 
     /// @brief Fills a row with the given color
     /// @param color the color to fill with
-    void fill(RGB color);
+    void fill(uint8_t color);
 
     /// @brief Copies as many color values from the provided array at the given
     /// position.
@@ -64,11 +62,11 @@ class Row {
     /// @param n How many bytes we want to copy in total
     /// @return the number of bytes that were copied into this row, before we
     /// hit the end.
-    int copy(RGB *source, int p, int n);
+    int copy(uint8_t* source, int p, int n);
 
     /// @brief Copies the data from another row into this one.
     /// @param other the row whose data we should copy.
-    void copy(Row *other);
+    void copy(Row* other);
 };
 
 // A 2-D canvas that we can draw on. If you think of the canvas as a 2-D
@@ -80,6 +78,11 @@ class Canvas {
     uint numPixels;
     uint rowBytes;
 
+    //
+    // The color map that we'll use for this canvas. We could do one per strip,
+    // but that would be really weird, so for now, it's one per canvas.
+    ColorMap* colorMap;
+
     Renderer renderer;
 
     /// @brief The rows that make up this view, which are distributed across the
@@ -87,10 +90,10 @@ class Canvas {
     std::vector<Row> rows;
 
     //
-    // A background color. When we blank something out, when data gets copied in
-    // from hyperspace or whatever, then we use this background color to fill.
-    // By default, it's black.
-    RGB background = RGB::Black;
+    // The background color in the color map. When we blank
+    // something out, when data gets copied in from hyperspace or whatever, then
+    // we use this background color to fill. By default, it's black.
+    RGB background = RGB(0, 0, 0);
 
     /// @brief stats for our show operations.
     StopWatch stats;
@@ -98,18 +101,18 @@ class Canvas {
    public:
     Canvas(uint width);
 
+    void setColorMap(ColorMap* colorMap) { this->colorMap = colorMap; };
+
+    ColorMap* getColorMap() { return colorMap; };
+
+    ColorMap* makeColorMap(uint8_t size);
+
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
-    void add(Strip &strip);
-
-    /// @brief Sets the fractional brightness for the whole canvas.
-    /// @param fracBrightness A value between 0 and 255 that specifies the
-    /// brightness level of the LEDs in the canvas between 0 (off) and 255 (all
-    /// the way on).
-    void setFractionalBrightness(uint8_t fracBrightness);
+    void add(Strip& strip);
 
     /// @brief Set up the canvas for operations.
-    void setup() {renderer.setup();};
+    void setup() { renderer.setup(); };
 
     uint getHeight() { return rows.size(); };
 
@@ -117,9 +120,11 @@ class Canvas {
 
     /// @brief Set the background color.
     /// @param b the color to use.
-    void setBackground(RGB b);
+    void setBackground(RGB background);
 
     RGB getBackground() { return background; };
+
+    inline uint8_t getBackgroundIndex() { return 0; };
 
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel
@@ -127,33 +132,31 @@ class Canvas {
     /// @param p the color the pixel should be set to.
     /// @return true, if it was possible to set this pixel, false if the pixel
     /// was not on the canvas as it was out-of-bounds.
-    bool set(int x, int y, RGB p);
+    bool set(int x, int y, uint8_t p);
 
-    void fade(int x, int y, uint8_t amount);
-
-    /// @brief Gets the value of the pixel at the given coordinates
-    RGB get(uint x, uint y);
+    /// @brief Gets the value of the pixel at the given coordinates, as an index into the color map.
+    uint8_t get(uint x, uint y);
 
     /// @brief Copy the given data into the canvas, starting at position x,y.
     /// @param d the array of data to copy from
     /// @param n the number of pixels to copy in
     /// @param x the x coordinate where we want to do the copying.
     /// @param y the y coordinate where we want to do the copying.
-    void copy(RGB *d, int n, int x, int y);
+    void copy(uint8_t* d, int n, int x, int y);
 
     /// @brief Fills a row with the given color.
     /// @param row the row to fill
     /// @param p the color
-    void fillRow(uint row, RGB p);
+    void fillRow(uint row, uint8_t p);
 
     /// @brief Fills a column with the given color.
     /// @param col the column to fill
     /// @param p the color to fill with.
-    void fillColumn(uint col, RGB p);
+    void fillColumn(uint col, uint8_t p);
 
     /// @brief Fill the canvas with a given color
     /// @param c the color to fill with.
-    void fill(RGB c);
+    void fill(uint8_t c);
 
     /// @brief Fills a rectangle with the given color.
     /// @param x0 The x coordinate of the bottom-left corner of the rectangle.
@@ -161,7 +164,7 @@ class Canvas {
     /// @param x1 The x coordinate of the top-right corner of the rectangle.
     /// @param y1 The y coordinate of the top-right corner of the rectangle.
     /// @param c The color to fill with.
-    void fillRect(uint x0, uint y0, uint x1, uint y1, RGB c);
+    void fillRect(uint x0, uint y0, uint x1, uint y1, uint8_t c);
 
     /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's
     /// algorithm.
@@ -170,16 +173,17 @@ class Canvas {
     /// @param x1 The x coordinate of the second point.
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
-    void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c);
+    void drawLine(uint x0, uint y0, uint x1, uint y1, uint8_t c);
 
-    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's algorithm, with optional wrap-around.
+    /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's
+    /// algorithm, with optional wrap-around.
     /// @param x0 The x coordinate of the first point.
     /// @param y0 The y coordinate of the first point.
     /// @param x1 The x coordinate of the second point.
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
     /// @param wrapAround if true, the line will wrap around the canvas edges.
-    void drawLine(uint x0, uint y0, uint x1, uint y1, RGB c, bool wrapAround);
+    void drawLine(uint x0, uint y0, uint x1, uint y1, uint8_t c, bool wrapAround);
 
     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1)
     /// @param x0 The x coordinate of one corner
@@ -187,7 +191,7 @@ class Canvas {
     /// @param x1 The x coordinate of the other corner
     /// @param y1 The y coordinate of the other corner
     /// @param c The color of the line to draw with.
-    void drawRect(uint x0, uint y0, uint x1, uint y1, RGB c);
+    void drawRect(uint x0, uint y0, uint x1, uint y1, uint8_t c);
 
     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1),
     /// filled with the given color.
@@ -197,7 +201,7 @@ class Canvas {
     /// @param y1 The y coordinate of the other corner
     /// @param l The color of the line to draw with.
     /// @param f The color to fill the rectangle with.
-    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, RGB l, RGB f);
+    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, uint8_t l, uint8_t f);
 
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.
@@ -207,7 +211,7 @@ class Canvas {
     /// given color.
     /// @param n the number of rolls to scroll up by.
     /// @param f The color to fill the emptied rows.
-    void scrollUp(int n, RGB f);
+    void scrollUp(int n, uint8_t f);
 
     /// @brief Scroll the canvas down by one row, filling in the empty row with
     /// the background color.
@@ -217,15 +221,15 @@ class Canvas {
     /// the given color.
     /// @param n
     /// @param f
-    void scrollDown(int n, RGB f);
+    void scrollDown(int n, uint8_t f);
 
-    void scrollLeft() { scrollLeft(1, background); };
+    void scrollLeft() { scrollLeft(1, 0); };
 
-    void scrollLeft(int n, RGB f);
+    void scrollLeft(int n, uint8_t f);
 
-    void scrollRight() { scrollRight(1, background); };
+    void scrollRight() { scrollRight(1, 0); };
 
-    void scrollRight(int n, RGB f);
+    void scrollRight(int n, uint8_t f);
 
     /// @brief Copies data from row src into row dst
     /// @param src The source of data
@@ -305,7 +309,7 @@ class Canvas {
     /// @param x the x coordinate
     /// @param y the y coordinate
     /// @return a pointer into the data array, or NULL if the coords are weird.
-    RGB *getDataPointer(uint x, uint y);
+    uint8_t* getDataPointer(uint x, uint y);
 
     /// @brief Clears the canvas.
     void clear();
@@ -332,7 +336,7 @@ class Canvas {
 
     void printRect(int x, int y, int w, int h);
 
-    StopWatch *getStats();
+    StopWatch* getStats();
 };
 
 #endif

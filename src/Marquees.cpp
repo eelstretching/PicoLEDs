@@ -1,6 +1,6 @@
 #include "Marquees.h"
 
-Marquees::Marquees(Canvas* canvas, RGB* colors, int nColors, int width, Direction direction,
+Marquees::Marquees(Canvas* canvas, int nColors, int width, Direction direction,
                    int nMarquees)
     : Animation(canvas),
       colors(colors),
@@ -16,7 +16,7 @@ Marquees::Marquees(Canvas* canvas, RGB* colors, int nColors, int width, Directio
             marquees = new Marquee*[nMarquees];
             for (int i = 0, j = 0; i < nMarquees; i++, j+=2) {
                 marquees[i] =
-                    new Marquee(canvas, colors, nColors, width, direction, i, i);
+                    new Marquee(canvas, nColors, width, direction, i, i);
             }
             break;
         case LEFT:
@@ -27,7 +27,7 @@ Marquees::Marquees(Canvas* canvas, RGB* colors, int nColors, int width, Directio
             marquees = new Marquee*[nMarquees];
             for (int i = 0, j = 0; i < nMarquees; i++, j += 2) {
                 marquees[i] =
-                    new Marquee(canvas, colors, nColors, width, direction, j, i);
+                    new Marquee(canvas, nColors, width, direction, j, i);
             }
             break;
     }

@@ -20,34 +20,24 @@ int main() {
 
     //
     // Simple test for a few strips of pixels.
-    Strip *strips[NUM_STRIPS];
+    Strip* strips[NUM_STRIPS];
     Renderer renderer;
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(16);
         renderer.add(*strips[i]);
     }
     renderer.setup();
 
-    RGB colors[] = {RGB::Red,        RGB::Green,    RGB::Blue,
-                    RGB::Yellow,     RGB::Purple,   RGB::GhostWhite,
-                    RGB::DarkViolet, RGB::FireBrick};
-
-    RGB patterns[] = {RGB(0b10101010, 0b10101010, 0b10101010),
-                      RGB(0b01010101, 0b01010101, 0b01010101),
-                      RGB(0b10011001, 0b10011001, 0b10011001),
-                      RGB(0b01100110, 0b01100110, 0b01100110),
-                      RGB(0b00110011, 0b00110011, 0b00110011),
-                      RGB(0b11001100, 0b11001100, 0b11001100),
-                      RGB(0b10001000, 0b10001000, 0b10001000),
-                      RGB(0b00010001, 0b00010001, 0b00010001)};
+    ColorMap colorMap({RGB::Black, RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
+                       RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
+                       RGB::FireBrick});
 
     printf("Ready\n");
     for (int i = 0; i < ns; i++) {
-        strips[i]->fill(colors[i % 3]);
-        renderer.render();
+        strips[i]->fill(i % 3);
+        renderer.render(&colorMap);
         sleep_ms(500);
     }
 
@@ -77,7 +67,7 @@ int main() {
     for (int j = 0; j < ns; j++) {
         strips[j]->fill(RGB::Black);
     }
-    renderer.render();
+    renderer.render(&colorMap);
 
     StopWatch fw;
     while (1) {
@@ -89,7 +79,7 @@ int main() {
                     strips[s]->putPixel(RGB::Black, posns[s] - 1);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(colors[s], i);
+                    strips[s]->putPixel(s+1, i);
                 }
                 posns[s]++;
                 if (posns[s] == strips[s]->getNumPixels() - width) {
@@ -100,7 +90,7 @@ int main() {
                     strips[s]->putPixel(RGB::Black, posns[s] + width);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(colors[s], i);
+                    strips[s]->putPixel(s+1, i);
                 }
                 posns[s]--;
                 if (posns[s] == -1) {
@@ -109,7 +99,7 @@ int main() {
                 }
             }
         }
-        renderer.render();
+        renderer.render(&colorMap);
         uint64_t dthis = frame_time_us - (time_us_64() - start);
         if (dthis > 0) {
             sleep_us(dthis);

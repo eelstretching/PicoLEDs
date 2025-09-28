@@ -4,11 +4,13 @@
 
 PacWipe::PacWipe(Canvas *canvas) : Animation(canvas) {
     sprites = new Sprite *[5];
+    ColorMap* colorMap = canvas->getColorMap();
+    canvas->setColorMap(colorMap);
     sprites[0] = new PacMan(canvas, 0, 1);
     sprites[1] = new Ghost(canvas, inkyColor, 0, 1);
-    sprites[2] = new Ghost(*((Ghost *)sprites[1]), blinkyColor, 0, 1);
-    sprites[3] = new Ghost(*((Ghost *)sprites[1]), pinkyColor, 0, 1);
-    sprites[4] = new Ghost(*((Ghost *)sprites[1]), clydeColor, 0, 1);
+    sprites[2] = new Ghost(canvas, blinkyColor, 0, 1);
+    sprites[3] = new Ghost(canvas, pinkyColor, 0, 1);
+    sprites[4] = new Ghost(canvas, clydeColor, 0, 1);
 }
 
 void PacWipe::init() {

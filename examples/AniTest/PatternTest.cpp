@@ -29,13 +29,17 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(255);
     }
 
     //
     // A bit pattern that slowly increases the number of leading
     // zeros on the colors that we're feeding into the LEDS
-    RGB colors[] = {RGB(0b11111111, 0b11111111, 0b11111111),
+    Canvas canvas(STRIP_LEN);
+    for (int i = 0; i < ns; i++) {
+        canvas.add(*strips[i]);
+    }
+    canvas.setup();
+    ColorMap colorMap({RGB(0b11111111, 0b11111111, 0b11111111),
                     RGB(0b11111111, 0b00111111, 0b11111111),
                     RGB(0b11111111, 0b00011111, 0b11111111),
                     RGB(0b11111111, 0b00001111, 0b11111111),
@@ -58,29 +62,25 @@ int main() {
                     RGB(0b00000000, 0b00000000, 0b00000111),
                     RGB(0b00000000, 0b00000000, 0b00000011),
                     RGB(0b00000000, 0b00000000, 0b00000001),
-                    RGB(0b00000000, 0b00000000, 0b00000000)};
-    int nColors = 8;
-
-    Canvas canvas(STRIP_LEN);
-    for (int i = 0; i < ns; i++) {
-        canvas.add(*strips[i]);
-    }
-    canvas.setup();
+                    RGB(0b00000000, 0b00000000, 0b00000000)});
+                    canvas.setColorMap(&colorMap);
     canvas.clear();
     canvas.show();
+    int nColors = colorMap.getUsed();
+
 
     for(int i = 0; i < nColors; i++) {
         printf("Setting %");
-        canvas.setBackground(colors[i]);
+        canvas.setBackground(colorMap.getColor(i));
         canvas.clear();
         canvas.show();
         sleep_ms(1000);
     }
-    canvas.setBackground(RGB(0));
+    canvas.setBackground(colorMap.getColor(0));
     canvas.clear();
     canvas.show();
 
-    BarberPole bp(&canvas, colors, nColors, 10);
+    BarberPole bp(&canvas, nColors, 10);
 
     Animator animator(&canvas, 5);
     animator.add(&bp);

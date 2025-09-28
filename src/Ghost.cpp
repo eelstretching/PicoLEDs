@@ -1,27 +1,26 @@
 #include "Ghost.h"
 
-Ghost::Ghost(Canvas* canvas, RGB color, int startX, int startY)
+Ghost::Ghost(Canvas* canvas, RGB &ghostColor, int startX, int startY)
     : Sprite(canvas, startX, startY) {
     //
     // We get to create the pixmaps, others will copy these, to save precious
     // memory.
     xpms = new Xpm*[2];
-    xpms[0] = new Xpm(ghost1);
-    xpms[1] = new Xpm(ghost2);
+    xpms[0] = new Xpm(ghost1, canvas->getColorMap());
+    xpms[1] = new Xpm(ghost2, canvas->getColorMap());
 
-    setup(color);
+    setup(ghostColor);
 }
 
-Ghost::Ghost(Ghost& o, RGB color, int startX, int startY)
-    : Sprite(o.canvas, startX, startY) {
-    //
-    // We'll borrow the pimaps, and setup with our color.
-    xpms = o.xpms;
-    setup(color);
+Ghost::~Ghost() {
+    for(int i=0; i<2; i++) {
+        delete xpms[i];
+    }
+    delete[] xpms;
 }
 
 /// @brief Do the stuff that we need however we were created.
-void Ghost::setup(RGB color) {
+void Ghost::setup(RGB &ghostColor) {
     //
     // The animation loop. Each state lasts for four frames
     add(xpms[0]);
@@ -34,15 +33,14 @@ void Ghost::setup(RGB color) {
     add(xpms[1]);
 
     //
-    // Set up the color map that we'll render with based on the ghost color we
-    // were given.
-    RGB* gc = xpms[0]->getColors();
-    int nc = xpms[0]->getNumberOfColors();
-    colorMap = new RGB[nc];
-    for (int i = 0; i < nc; i++) {
-        colorMap[i] = gc[i];
-    }
-    colorMap[2] = color;
+    // Add the ghost color to the color map and remember its index.
+    uint8_t ghostColorIndex = xpms[0]->getColorMap()->addColor(ghostColor);
+    uint8_t pupilColorIndex = xpms[0]->getColorMap()->addColor(pupilColor);
+
+    //
+    // Swap out the ghost color in the pixmaps for the one we were given.
+    xpms[0]->replaceColor(xpms[0]->getColorIndexes()[2], ghostColorIndex);
+    xpms[1]->replaceColor(xpms[1]->getColorIndexes()[2], ghostColorIndex);
 }
 
 //
@@ -76,14 +74,14 @@ void Ghost::drawPupils() {
 
     //
     // Put the four pupil-colored pixels into each eye.
-    canvas->set(cx, cy, pupil);
-    canvas->set(cx + 6, cy, pupil);
-    canvas->set(cx + 1, cy, pupil);
-    canvas->set(cx + 7, cy, pupil);
-    canvas->set(cx, cy + 1, pupil);
-    canvas->set(cx + 6, cy + 1, pupil);
-    canvas->set(cx + 1, cy + 1, pupil);
-    canvas->set(cx + 7, cy + 1, pupil);
+    canvas->set(cx, cy, pupilColorIndex);
+    canvas->set(cx + 6, cy, pupilColorIndex);
+    canvas->set(cx + 1, cy, pupilColorIndex);
+    canvas->set(cx + 7, cy, pupilColorIndex);
+    canvas->set(cx, cy + 1, pupilColorIndex);
+    canvas->set(cx + 6, cy + 1, pupilColorIndex);
+    canvas->set(cx + 1, cy + 1, pupilColorIndex);
+    canvas->set(cx + 7, cy + 1, pupilColorIndex);
 }
 
 bool Ghost::step() {

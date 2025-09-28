@@ -39,7 +39,7 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in
     /// @return The width of the rendered text, in pixels.
-    uint render(const char *text, int bx, int by, RGB color);
+    uint render(const char *text, int bx, int by, uint8_t color);
 
     /// @brief Renders a single character onto our canvas at the given pixel
     /// position.
@@ -48,7 +48,7 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in.
     /// @return the width of the rendered character, in pixels.
-    uint render(char c, int bx, int by, RGB color);
+    uint render(char c, int bx, int by, uint8_t color);
 
     /// @brief Gets the width of the given string rendered in this font.
     /// @param text 

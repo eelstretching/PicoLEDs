@@ -13,13 +13,25 @@ class Xpm {
     uint8_t nc;
     uint8_t h;
     uint8_t w;
-    RGB *colors;
+    //
+    // The color map that we'll add our colors to.
+    ColorMap *colorMap;
+    //
+    // The indices of our colors in the color map.
+    uint8_t *colorIndexes;
+    //
+    // The pixel data, as indices into the color map.
     uint8_t *pixels;
 
    public:
     /// @brief Creates a pixmap
     /// @param xpm the definition of the pixmap.
-    Xpm(const char *xpm[]);
+    /// @param colorMap the color map to use for this pixmap.
+    Xpm(const char *xpm[], ColorMap *colorMap);
+    /// @brief Replace on color index with another in the pixmap.
+    /// @param oldColor 
+    /// @param newColor 
+    void replaceColor(uint8_t oldColor, uint8_t newColor);
     /// @brief render this pixmap onto a canvas
     /// @param canvas the canvas to render on
     /// @param x the x coordinate to render at
@@ -36,8 +48,9 @@ class Xpm {
     /// checking on this, so beware.
     /// @param x The x coordinate to render at
     /// @param y the y coordinate to render at
-    bool render(Canvas *canvas, RGB *colorMap, uint x, uint y);
-    RGB *getColors() { return colors; };
+    bool render(Canvas *canvas, ColorMap *colorMap, uint x, uint y);
+    ColorMap *getColorMap() { return colorMap; };
+    uint8_t *getColorIndexes() { return colorIndexes; };
     uint8_t getNumberOfColors() { return nc; };
     uint8_t getHeight() { return h; };
     uint8_t getWidth() { return w; };

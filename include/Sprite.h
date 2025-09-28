@@ -22,7 +22,7 @@ class Sprite : public Animation {
     Direction direction;
 
     /// @brief A color map for rendering.
-    RGB *colorMap;
+    ColorMap *colorMap;
 
    public:
     Sprite(Canvas *canvas, int startX, int startY)

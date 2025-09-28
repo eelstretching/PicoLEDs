@@ -13,7 +13,6 @@ static RGB clydeColor = RGB(255, 184, 81);
 
 //
 // These ghosts have no blue part in their eyes because we'll render that according to their direction
-
 static const char *ghost1[]={
 "14 14 3 1",
 ". c #000000",
@@ -54,18 +53,24 @@ static const char *ghost2[]={
 "####.####.####",
 ".##...##...##."};
 
+static RGB pupilColor = RGB(33, 33, 255);
+
 class Ghost : public Sprite {
    protected:
     Xpm **xpms;
 
-    RGB pupil = RGB(33, 33, 255);
+    //
+    // The index of the ghost color that we're drawing with.
+    uint8_t ghostColorIndex;
+    
+    uint8_t pupilColorIndex;
 
     void drawPupils();
-    void setup(RGB color);
+    void setup(RGB &ghostColor);
 
    public:
-    Ghost(Canvas *canvas, RGB color, int startX, int startY);
-    Ghost(Ghost &o, RGB color, int startX, int startY);
+    Ghost(Canvas *canvas, RGB &ghostColor, int startX, int startY);
+    ~Ghost();
     bool step();
 };
 

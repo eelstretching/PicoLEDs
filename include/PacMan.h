@@ -63,11 +63,12 @@ class PacMan : public Sprite {
 
     protected:
     
-    Xpm xpms[3] = {Xpm(pac1), Xpm(pac2), Xpm(pac3)};
+    Xpm **xpms;
 
     public:
     PacMan(Canvas *canvas, int startX, int startY);
-    Xpm *getXpms() {return xpms;};
+    ~PacMan();
+    Xpm **getXpms() {return xpms;};
 };
 
 #endif

@@ -25,7 +25,7 @@ Font::Font(Canvas* canvas, const uint8_t* fontData) {
     }
 }
 
-uint Font::render(const char* text, int bx, int by, RGB color) {
+uint Font::render(const char* text, int bx, int by, uint8_t color) {
     uint x = bx;
     uint p = 0;
     uint tw = 0;
@@ -61,7 +61,7 @@ uint Font::render(const char* text, int bx, int by, RGB color) {
     return lw == 0 ? tw : lw;
 }
 
-uint Font::render(char c, int bx, int by, RGB color) {
+uint Font::render(char c, int bx, int by, uint8_t color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;

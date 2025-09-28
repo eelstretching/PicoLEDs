@@ -8,52 +8,46 @@
 
 
 Strip::Strip(uint pin, uint numPixels) : pin(pin), numPixels(numPixels) {
-  data = new RGB[numPixels];
+  data = new uint8_t[numPixels];
   pos = 0;
 }
 
-uint Strip::addPixel(RGB c) {
+uint Strip::addPixel(uint8_t index) {
   uint p = pos;
-  data[pos++] = c;
+  data[pos++] = index;
   return p;
 }
 
-uint Strip::addPixel(HSV c) {
-  uint p = pos;
-  hsv2rgb_raw(c, data[pos++]);
-  return p;
-}
-
-void Strip::putPixel(RGB c, uint p) {
+void Strip::putPixel(uint8_t index, uint p) {
   if (p >= numPixels) {
     return;
   }
-  data[p] = c;
+  data[p] = index;
 }
 
-RGB Strip::get(uint p) {
+uint8_t Strip::get(uint p) {
   if (p >= numPixels) {
-    return RGB::Black;
+    return 0;
   }
   return data[p];
 }
 
-void Strip::putPixels(RGB* pixels, uint n) { putPixels(pixels, 0, n); }
+void Strip::putPixels(uint8_t* pixels, uint n) { putPixels(pixels, 0, n); }
 
-void Strip::putPixels(RGB* pixels, uint p, uint n) {
+void Strip::putPixels(uint8_t* pixels, uint p, uint n) {
   if (p >= numPixels) {
     return;
   }
   if (p + n >= numPixels) {
     n = numPixels - p;
   }
-  memcpy(&data[p], pixels, n * sizeof(RGB));
+  memcpy(&data[p], pixels, n * sizeof(uint8_t));
 }
 
-void Strip::fill(RGB c) { fill(c, 0, numPixels); }
+void Strip::fill(uint8_t index) { fill(index, 0, numPixels); }
 
-void Strip::fill(RGB c, uint start, uint n) {
+void Strip::fill(uint8_t index, uint start, uint n) {
   for (int i = start; i < start + n && i < numPixels; i++) {
-    data[i] = c;
+    data[i] = index;
   }
 }

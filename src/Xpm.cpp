@@ -18,7 +18,7 @@ uint8_t hextoi(char c) {
 }
 uint8_t hextoi(char c1, char c2) { return hextoi(c1) << 4 | hextoi(c2); }
 
-Xpm::Xpm(const char *xpm[]) {
+Xpm::Xpm(const char *xpm[], ColorMap *colorMap) : colorMap(colorMap){
     char holder[3];
 
     //
@@ -51,12 +51,12 @@ Xpm::Xpm(const char *xpm[]) {
     //
     // Colors.
     char *cc = new char[nc];
-    colors = new RGB[nc];
+    colorIndexes = new uint8_t[nc];
     for (int i = 0; i < nc; i++) {
         const char *row = xpm[i + 1];
         cc[i] = row[0];
-        colors[i] = RGB(hextoi(row[5], row[6]), hextoi(row[7], row[8]),
-                        hextoi(row[9], row[10]));
+        colorIndexes[i] = colorMap->addColor(RGB(hextoi(row[5], row[6]), hextoi(row[7], row[8]),
+                        hextoi(row[9], row[10])));
     }
 
     //
@@ -73,7 +73,7 @@ Xpm::Xpm(const char *xpm[]) {
             char pc = row[j];
             for (int k = 0; k < nc; k++) {
                 if (cc[k] == pc) {
-                    pixels[p++] = k;
+                    pixels[p++] = colorIndexes[k];
                     break;
                 }
             }
@@ -82,16 +82,24 @@ Xpm::Xpm(const char *xpm[]) {
     delete[] cc;
 }
 
-bool Xpm::render(Canvas *canvas, uint x, uint y) {
-    return render(canvas, colors, x, y);
+void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
+    for (int i = 0; i < w * h; i++) {
+        if (pixels[i] == oldColor) {
+            pixels[i] = newColor;
+        }
+    }
 }
 
-bool Xpm::render(Canvas *canvas, RGB *colorMap, uint x, uint y) {
+bool Xpm::render(Canvas *canvas, uint x, uint y) {
+    return render(canvas, colorMap, x, y);
+}
+
+bool Xpm::render(Canvas *canvas, ColorMap *localColorMap, uint x, uint y) {
     //
     // Maybe we didn't get a color map, in which case, use the colors defined in
     // the pixmap.
-    if (colorMap == NULL) {
-        colorMap = colors;
+    if (localColorMap == NULL) {
+        localColorMap = colorMap;
     }
     bool atLeastOnePixel = false;
     int cy = y + h - 1;
@@ -100,7 +108,7 @@ bool Xpm::render(Canvas *canvas, RGB *colorMap, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            if (canvas->set(cx++, cy, colorMap[pixels[p++]])) {
+            if (canvas->set(cx++, cy, pixels[p++])) {
                 atLeastOnePixel = true;
             }
         }

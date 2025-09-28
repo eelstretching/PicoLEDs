@@ -12,11 +12,11 @@
 /// @brief A text element that can appear in a text animation.
 class TextElement {
    public:
-    TextElement(const char *text, uint x, uint y, RGB color);
+    TextElement(const char *text, uint x, uint y, uint8_t color);
     const char *text;
     uint x;
     uint y;
-    RGB color;
+    uint8_t color;
 };
 
 class TextAnimation : public Animation {

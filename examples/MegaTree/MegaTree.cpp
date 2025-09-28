@@ -35,12 +35,12 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
-        strips[i]->setFractionalBrightness(BRIGHTNESS);
     }
 
     //
     // We want to operate in HSV space so that dimming is easy.
-    HSV hsvColors[] = {
+    ColorMap xmasColors({
+        HSV(0,0,0),
         HSV(139, 179, 242),  // Pine
         HSV(0, 100, 100),    // Red
         HSV(85, 100, 100),   // Green
@@ -49,38 +49,27 @@ int main() {
         HSV(128, 100, 100),  // Cyan
         HSV(213, 100, 100),  // Magenta
         HSV(0, 0, 0)         // Black
-    };
+    });
 
-    int nColors = sizeof(hsvColors) / sizeof(HSV);
-
-    RGB xmasColors[] = {
-        RGB::ForestGreen,
-        RGB(hsvColors[1]),  // Red
-        RGB(hsvColors[2]),  // Green
-        RGB(hsvColors[3]),  // Blue
-        RGB(hsvColors[4]),  // Yellow
-        RGB(hsvColors[5]),  // Cyan
-        RGB(hsvColors[6]),  // Magenta
-        RGB(hsvColors[7])   // Black
-    };
-
-    RGB simpleXmasColors[] = {
+    ColorMap simpleXmasColors({
+        RGB::Black,
         RGB::Red,
         RGB::Green,
         RGB::White, 
         RGB::Blue,
         RGB::Yellow,
         RGB::Orange
-    };
+    });
 
     Canvas c(STRIP_LEN);
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
     c.setup();
+    c.setColorMap(&simpleXmasColors);
 
     for(int i = 0; i < 3; i++) {
-        c.fill(simpleXmasColors[i]);
+        c.fill(i+1);
         c.show();
         sleep_ms(500);
     }
@@ -90,7 +79,7 @@ int main() {
 
     Animator a(&c, FPS);
 
-    Marquees marq(&c, simpleXmasColors, 4, 17, RIGHT, 16);
+    Marquees marq(&c, 4, 17, RIGHT, 16);
     a.add(&marq);
 
     // LineFill lfu(&c, simpleXmasColors, 4, UP);

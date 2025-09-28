@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "colorpalettes.h"
 #include "math8.h"
 #include "pico.h"
 #include "pico/platform.h"
@@ -46,7 +45,7 @@ bool Fire::step() {
 
     // Step 4.  Map from heat cells to LED colors
     for (int j = 0; j < n; j++) {
-        canvas->set(x + j, row, HeatColor(heat[j]));
+        canvas->set(x + j, row, heat[j]);
     }
     aw.finish();
     return true;

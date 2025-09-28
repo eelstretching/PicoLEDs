@@ -87,6 +87,10 @@ class Firework : public Animation {
     /// @param row The row we'll be drawing in
     Firework(Canvas *canvas, uint row);
 
+    /// @brief Gets a color map that we can use for fireworks. The higher the index, the "hotter" the color.
+    /// @return A pointer to a color map that we allocate internally. Delete it when you're done with it!
+    static ColorMap *getColorMap();
+
     /// @brief Resets the simulation when the explosion is done.
     void reset();
 
@@ -127,14 +131,14 @@ class Firework : public Animation {
     /// @brief  Get the color of the flare as it slows and cools
     /// @param val between 0 and 255
     /// @return an appropriate color for the given temperature.
-    virtual RGB getFlareColor(uint val);
+    virtual uint8_t getFlareColor(uint val);
 
     /// @brief Gets a color for a given point in the explosion. By default, we'll do fire colors.
     /// @param val The value of the pixel for HSV
     /// @param c1 A first color to time the explosion
     /// @param c2 A second color to time the explosion
     /// @return an RGB value we can use in the firework
-    virtual RGB getColor(float val, uint c1, uint c2);
+    virtual uint8_t getColor(float val, uint c1, uint c2);
 
     /// @brief The flare explodes.
     void explode();
@@ -142,15 +146,4 @@ class Firework : public Animation {
     bool step();
 };
 
-class PaletteFirework : public Firework {
-    RGBPalette16 *palette;
-
-    public:
-    PaletteFirework(Canvas *canvas, uint row, RGBPalette16 *palette) : Firework(canvas, row), palette(palette) {};
-
-    RGB getFlareColor(uint val);
-    RGB getColor(float val, uint c1, uint c2);
-
-
-};
 #endif

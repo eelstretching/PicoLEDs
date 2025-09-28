@@ -61,6 +61,7 @@ static const char *pilled2[]={
 "##.###..###.##",
 "#...##..##...#"};
 
+static const RGB dotColor = RGB(255, 184, 174);
 
 
 #define PLAIN 1
@@ -70,6 +71,7 @@ class PacChase : public Animation {
     friend class PacWipe;
 
     protected:
+    ColorMap *colorMap;
     Sprite *pacMan;
     uint8_t pmw;
     Sprite **ghosts;
@@ -80,7 +82,7 @@ class PacChase : public Animation {
     Xpm *pill;
     uint8_t piw;
     uint8_t state;
-    RGB dotColor = RGB(255, 184, 174);
+    uint8_t dotColorIndex;
 
     
     public:

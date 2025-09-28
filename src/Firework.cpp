@@ -27,6 +27,24 @@ Firework::Firework(Canvas* canvas, uint row) : Animation(canvas) {
     explosion = new Spark[canvas->getWidth() / EXPLOSION_DIVISOR];
 }
 
+ColorMap *Firework::getColorMap() {
+    ColorMap *cm = new ColorMap(255);
+    //
+    // We're going to do three ranges of 64 colors here. For the main heat. This
+    // leaves some room at the end for a few more colors if we need them. Borrowed
+    // this form HeatColor from FastLED.
+    for(int i = 0; i < 64; i++) {
+        cm->addColor(RGB(i <<= 2, 0, 0));
+    }
+    for(int i = 64; i < 128; i++) {
+        cm->addColor(RGB(255, (i - 64) << 2, 0));
+    }
+    for(int i = 128; i < 192; i++) {    
+        cm->addColor(RGB(255, 255, (i - 128) << 2));
+    }
+    return cm;
+ }
+
 void Firework::reset() {
     //
     // Set the flare to trail along.
@@ -72,8 +90,7 @@ void Firework::rise() {
         s->pos = constrain(s->pos + s->vel, 0, canvas->getWidth());
         s->vel -= gravity;
         s->val = constrain(s->vel * 1000, 0, 255);
-        RGB sc = getFlareColor(s->val);
-        canvas->set(s->pos, row, sc);
+        canvas->set(s->pos, row, getFlareColor(s->val));
     }
 }
 
@@ -119,19 +136,23 @@ void Firework::startExplosion() {
     state = EXPLODING;
 }
 
-RGB Firework::getFlareColor(uint val) {
-    RGB sc = HeatColor(val);
-    sc %= 50;
-    return sc;
+uint8_t Firework::getFlareColor(uint val) {
+    return (uint8_t) val / 2;
 }
 
-RGB Firework::getColor(float val, uint c1, uint c2) {
+uint8_t Firework::getColor(float val, uint c1, uint c2) {
     if (val > c1) {
-        return RGB(255, 255, (255 * (val - c1)) / (255 - c1));
-    } else if (val < c2) {  // fade from red to black
-        return RGB((255 * val) / c2, 0, 0);
-    } else {  // fade from yellow to red
-        return RGB(255, (255 * (val - c2)) / (c1 - c2), 0);
+        //
+        // Something from the hot part of the map, from 128 to 192
+        return (uint8_t) (((uint) (255 * (val - c1))) % 64) + 128;
+    } else if (val < c2) {  
+        //
+        // Something from the cool end of the map, from 0 to 64
+        return (uint8_t) ((255 * val) / c2) % 64;
+    } else {  
+        //
+        // Something in the middle, fade from yellow to red.
+        return (uint8_t) ((uint) (((255 * (val - c2)) / (c1 - c2))) % 64) + 64;
     }
 }
 
@@ -181,10 +202,3 @@ bool Firework::step() {
     return false;
 }
 
-RGB PaletteFirework::getFlareColor(uint val) {
-    return ColorFromPalette(*palette, val);
-}
-
-RGB PaletteFirework::getColor(float val, uint c1, uint c2) {
-    return ColorFromPalette(*palette, val);
-}

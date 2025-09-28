@@ -29,10 +29,18 @@ int main() {
 
     Font twoP(&canvas, FontTwoPData);
 
+    ColorMap colorMap({
+        RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+        RGB::Blue,  RGB::Indigo, RGB::Violet
+    });
+    canvas.setColorMap(&colorMap);
+    canvas.setup();
+    canvas.clear();
+
     //
     // A couple of animations.
     while (1) {
-        int w = twoP.render("prepared", 10, 8, RGB::ForestGreen);
+        int w = twoP.render("prepared", 10, 8, 4);
         canvas.show();
 
         printf("Render was %d pixels wide\n", w);
