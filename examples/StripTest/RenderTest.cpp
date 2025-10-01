@@ -15,7 +15,7 @@
 #define NUM_STRIPS 16
 #define START_PIN 2
 
-ColorMap colorMap({RGB::Black, RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
+ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
                        RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
                        RGB::FireBrick});
 
@@ -29,14 +29,14 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     }
     r.setup();
     for (int i = startStrip; i < endStrip; i++) {
-        strips[i]->fill(((startPin + i) % 3)+1);
+        strips[i]->fill(((startPin + i) % 3));
     }
     r.render(&colorMap);
     sleep_ms(100);
 
     for (int i = startStrip; i < endStrip; i++) {
         for (int j = 0; j < strips[i]->getNumPixels(); j++) {
-            strips[i]->putPixel((j % 3)+1, j);
+            strips[i]->putPixel((j % 3), j);
         }
     }
     r.render(&colorMap);
@@ -45,7 +45,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     //
     // Blank the strips.
     for (int i = startStrip; i < endStrip; i++) {
-        strips[i]->fill(RGB::Black);
+        strips[i]->fill(255);
     }
     r.render(&colorMap);
     sleep_ms(100);
@@ -68,7 +68,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
 
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
-            strips[j]->fill((j % 3)+1);
+            strips[j]->fill((j % 3));
         }
     }
     r.render(&colorMap);
@@ -77,7 +77,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
             for (int k = 0; k < strips[j]->getNumPixels(); k++) {
-                strips[j]->putPixel((k % 3)+1, k);
+                strips[j]->putPixel((k % 3), k);
             }
         }
     }
@@ -88,7 +88,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
     // Blank the strips.
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
-            strips[j]->fill(RGB::Black);
+            strips[j]->fill(255);
         }
     }
     r.render(&colorMap);
@@ -109,6 +109,8 @@ int main() {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
+
+    colorMap.dim(210);
 
     while (1) {
         // //

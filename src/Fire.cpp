@@ -20,8 +20,7 @@ Fire::Fire(Canvas *canvas,
       cooling(cooling),
       sparking(sparking) {
     end = MIN(x + n, canvas->getWidth());
-    heat = (uint8_t *)malloc(n * sizeof(uint8_t));
-    memset(heat, 0, n * sizeof(uint8_t));
+    heat = (uint8_t *)calloc(n, sizeof(uint8_t));
 }
 
 Fire::~Fire() { free(heat); }

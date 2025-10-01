@@ -1,6 +1,6 @@
 #include "ColorMap.h"
 
-ColorMap::ColorMap(uint8_t size) : size(size), p(0) {
+ColorMap::ColorMap(uint8_t size) : size(size), p(0), background(RGB::Black) {
     entries = new RGB[size];
     for (uint8_t i = 0; i < size; i++) {
         entries[i] = RGB::Black;
@@ -8,7 +8,7 @@ ColorMap::ColorMap(uint8_t size) : size(size), p(0) {
     p = 0;
 }
 
-ColorMap::ColorMap(std::initializer_list<RGB> rhs) : p(rhs.size()), size(rhs.size()) {
+ColorMap::ColorMap(std::initializer_list<RGB> rhs) : p(rhs.size()), size(rhs.size()), background(RGB::Black) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
@@ -17,7 +17,7 @@ ColorMap::ColorMap(std::initializer_list<RGB> rhs) : p(rhs.size()), size(rhs.siz
     p = i;
 }
 
-ColorMap::ColorMap(std::initializer_list<HSV> rhs)  : p(rhs.size()), size(rhs.size()) {
+ColorMap::ColorMap(std::initializer_list<HSV> rhs)  : p(rhs.size()), size(rhs.size()), background(RGB::Black) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
@@ -26,7 +26,7 @@ ColorMap::ColorMap(std::initializer_list<HSV> rhs)  : p(rhs.size()), size(rhs.si
     p = i;
 }
 
-ColorMap::ColorMap(std::initializer_list<uint32_t> rhs) : p(rhs.size()), size(rhs.size()) {
+ColorMap::ColorMap(std::initializer_list<uint32_t> rhs) : p(rhs.size()), size(rhs.size()), background(RGB::Black) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
@@ -34,9 +34,7 @@ ColorMap::ColorMap(std::initializer_list<uint32_t> rhs) : p(rhs.size()), size(rh
     }
 }
 
-ColorMap::ColorMap(const ColorMap& rhs) {
-    size = rhs.size;
-    p = rhs.p;
+ColorMap::ColorMap(const ColorMap& rhs) : p(rhs.p), size(rhs.size), background(RGB::Black){
     entries = new RGB[size];
     for (uint8_t i = 0; i < size; i++) {
         entries[i] = rhs.entries[i];

@@ -30,9 +30,10 @@ int main() {
     }
     renderer.setup();
 
-    ColorMap colorMap({RGB::Black, RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
+    ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
                        RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
                        RGB::FireBrick});
+    colorMap.dim(200);
 
     printf("Ready\n");
     for (int i = 0; i < ns; i++) {
@@ -76,10 +77,10 @@ int main() {
         for (int s = 0; s < ns; s++) {
             if (dirs[s] == 1) {
                 if (posns[s] > 0) {
-                    strips[s]->putPixel(RGB::Black, posns[s] - 1);
+                    strips[s]->putPixel(255, posns[s] - 1);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(s+1, i);
+                    strips[s]->putPixel(s + 1, i);
                 }
                 posns[s]++;
                 if (posns[s] == strips[s]->getNumPixels() - width) {
@@ -87,10 +88,10 @@ int main() {
                 }
             } else {
                 if (posns[s] < strips[s]->getNumPixels() - width) {
-                    strips[s]->putPixel(RGB::Black, posns[s] + width);
+                    strips[s]->putPixel(255, posns[s] + width);
                 }
                 for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(s+1, i);
+                    strips[s]->putPixel(s + 1, i);
                 }
                 posns[s]--;
                 if (posns[s] == -1) {
