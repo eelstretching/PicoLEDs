@@ -120,11 +120,11 @@ class Canvas {
 
     /// @brief Set the background color.
     /// @param b the color to use.
-    void setBackground(RGB background);
+    void setBackground(RGB &background);
 
-    RGB getBackground() { return background; };
+    RGB getBackground() { return colorMap->getBackground(); };
 
-    inline uint8_t getBackgroundIndex() { return 0; };
+    inline uint8_t getBackgroundIndex() { return 255; };
 
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel

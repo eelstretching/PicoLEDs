@@ -132,9 +132,8 @@ void Canvas::add(Strip& strip) {
     renderer.add(strip);
 }
 
-void Canvas::setBackground(RGB background) {
-    this->background = background;
-    colorMap->setColor(0, background);
+void Canvas::setBackground(RGB &background) {
+    colorMap->setBackground(background);
 }
 
 bool Canvas::set(int x, int y, uint8_t c) {

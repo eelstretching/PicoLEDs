@@ -22,7 +22,7 @@ int main() {
 
     //
     // A canvas made out of strips.
-    Strip *strips[NUM_STRIPS];
+    Strip* strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     int pins[NUM_STRIPS];
@@ -40,43 +40,42 @@ int main() {
     }
     canvas.setup();
     ColorMap colorMap({RGB(0b11111111, 0b11111111, 0b11111111),
-                    RGB(0b11111111, 0b00111111, 0b11111111),
-                    RGB(0b11111111, 0b00011111, 0b11111111),
-                    RGB(0b11111111, 0b00001111, 0b11111111),
-                    RGB(0b11111111, 0b00000111, 0b11111111),
-                    RGB(0b11111111, 0b00000011, 0b11111111),
-                    RGB(0b11111111, 0b00000001, 0b11111111),
-                    RGB(0b11111111, 0b00000000, 0b11111111),
-                    RGB(0b01111111, 0b00000000, 0b11111111),
-                    RGB(0b00111111, 0b00000000, 0b11111111),
-                    RGB(0b00011111, 0b00000000, 0b11111111),
-                    RGB(0b00001111, 0b00000000, 0b11111111),
-                    RGB(0b00000111, 0b00000000, 0b11111111),
-                    RGB(0b00000011, 0b00000000, 0b11111111),
-                    RGB(0b00000001, 0b00000000, 0b11111111),
-                    RGB(0b00000000, 0b00000000, 0b11111111),
-                    RGB(0b00000000, 0b00000000, 0b01111111),
-                    RGB(0b00000000, 0b00000000, 0b00111111),
-                    RGB(0b00000000, 0b00000000, 0b00011111),
-                    RGB(0b00000000, 0b00000000, 0b00001111),
-                    RGB(0b00000000, 0b00000000, 0b00000111),
-                    RGB(0b00000000, 0b00000000, 0b00000011),
-                    RGB(0b00000000, 0b00000000, 0b00000001),
-                    RGB(0b00000000, 0b00000000, 0b00000000)});
-                    canvas.setColorMap(&colorMap);
+                       RGB(0b11111111, 0b00111111, 0b11111111),
+                       RGB(0b11111111, 0b00011111, 0b11111111),
+                       RGB(0b11111111, 0b00001111, 0b11111111),
+                       RGB(0b11111111, 0b00000111, 0b11111111),
+                       RGB(0b11111111, 0b00000011, 0b11111111),
+                       RGB(0b11111111, 0b00000001, 0b11111111),
+                       RGB(0b11111111, 0b00000000, 0b11111111),
+                       RGB(0b01111111, 0b00000000, 0b11111111),
+                       RGB(0b00111111, 0b00000000, 0b11111111),
+                       RGB(0b00011111, 0b00000000, 0b11111111),
+                       RGB(0b00001111, 0b00000000, 0b11111111),
+                       RGB(0b00000111, 0b00000000, 0b11111111),
+                       RGB(0b00000011, 0b00000000, 0b11111111),
+                       RGB(0b00000001, 0b00000000, 0b11111111),
+                       RGB(0b00000000, 0b00000000, 0b11111111),
+                       RGB(0b00000000, 0b00000000, 0b01111111),
+                       RGB(0b00000000, 0b00000000, 0b00111111),
+                       RGB(0b00000000, 0b00000000, 0b00011111),
+                       RGB(0b00000000, 0b00000000, 0b00001111),
+                       RGB(0b00000000, 0b00000000, 0b00000111),
+                       RGB(0b00000000, 0b00000000, 0b00000011),
+                       RGB(0b00000000, 0b00000000, 0b00000001),
+                       RGB(0b00000000, 0b00000000, 0b00000000)});
+    canvas.setColorMap(&colorMap);
     canvas.clear();
     canvas.show();
     int nColors = colorMap.getUsed();
 
-
-    for(int i = 0; i < nColors; i++) {
+    for (int i = 0; i < nColors; i++) {
         printf("Setting %");
-        canvas.setBackground(colorMap.getColor(i));
+        colorMap.setBackground(colorMap.getColor(i));
         canvas.clear();
         canvas.show();
         sleep_ms(1000);
     }
-    canvas.setBackground(colorMap.getColor(0));
+    colorMap.setBackground(colorMap.getColor(0));
     canvas.clear();
     canvas.show();
 

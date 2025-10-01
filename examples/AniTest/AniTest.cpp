@@ -13,11 +13,11 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 16
+#define NUM_STRIPS 8
 #define START_PIN 2
 #define STRIP_LEN 137
 #define BRIGHTNESS 8
-#define FPS 40
+#define FPS 60
 
 int main() {
     stdio_init_all();
@@ -33,33 +33,28 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    ColorMap colorMap({RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
                     RGB::Blue, RGB::Indigo, RGB::Violet});
     int nColors = colorMap.getUsed();
-
-        //
+    //
     // Print the values that we expec the logic analyzer to be able to pick out.
     for (int i = 0; i < nColors; i++) {
         printf("%06X\n", colorMap[i].getColor(ColorOrder::OGRB));
     }
-    printf("\nBrightness 64\n");
-    for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colorMap[i].scale8(64).getColor(ColorOrder::OGRB));
-    }
-    printf("\nBrightness 32\n");
-    for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colorMap[i].scale8(32).getColor(ColorOrder::OGRB));
-    }
-    printf("\nBrightness 16\n");
-    for (int i = 0; i < nColors; i++) {
-        printf("%06X\n", colorMap[i].scale8(16).getColor(ColorOrder::OGRB));
-    }
+    colorMap.dim(200);
 
+    //
+    // Print the values that we expec the logic analyzer to be able to pick out.
+    for (int i = 0; i < nColors; i++) {
+        printf("%06X\n", colorMap[i].getColor(ColorOrder::OGRB));
+    }
+ 
     Canvas c2(STRIP_LEN);
     for (int i = 0; i < ns; i++) {
         c2.add(*strips[i]);
     }
     c2.setup();
+    c2.setColorMap(&colorMap);
     c2.clear();
     c2.show();
 
@@ -75,15 +70,7 @@ int main() {
     while (1) {
         a2.step();
         if (a2.getFrameCount() % 200 == 0) {
-            printf(
-                "%d frames run, %.2f us/frame at %d fps %.2f us/step, %.2f us/show %.2f us/frame %d missed frames\n",
-                a2.getFrameCount(), 
-                a2.getUsPerFrame(),
-                a2.getFPSNeeded(),
-                a2.getAverageStepTimeUS(),
-                a2.getAverageShowTimeUS(), 
-                a2.getAverageFrameTimeUS(),
-                a2.getMissedFrames());
+            a2.printStats();
         }
     }
 }

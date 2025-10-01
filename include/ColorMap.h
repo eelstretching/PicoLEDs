@@ -10,14 +10,14 @@
 #include "pico/types.h"
 
 /// @brief A color map that maps from 8-bit values to RGB colors.
-/// By construction we'll use the 0th entry in the color map as the background
-/// for whatever canvas we're drawing on.
+/// We also have a color to use as the background, since that's kind of a separate thing. 
 /// Color maps are a fixed size, but can be added to as they go.
 class ColorMap {
    protected:
     uint8_t size;
     uint8_t p;
     RGB* entries;
+    RGB background = RGB::Black;
 
    public:
     ColorMap(uint8_t size);
@@ -30,6 +30,8 @@ class ColorMap {
     uint8_t getSize() { return size; };
     uint8_t getUsed() { return p; };
 
+    void setBackground(const RGB& color) { background = color; };
+    RGB getBackground() { return background; };
     RGB operator[](uint8_t index);
     uint8_t addColor(const RGB& color);
     uint8_t addColor(const HSV& color);

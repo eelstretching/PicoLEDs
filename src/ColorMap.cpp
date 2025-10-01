@@ -5,25 +5,28 @@ ColorMap::ColorMap(uint8_t size) : size(size), p(0) {
     for (uint8_t i = 0; i < size; i++) {
         entries[i] = RGB::Black;
     }
+    p = 0;
 }
 
-ColorMap::ColorMap(std::initializer_list<RGB> rhs) : p(0), size(rhs.size()) {
+ColorMap::ColorMap(std::initializer_list<RGB> rhs) : p(rhs.size()), size(rhs.size()) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
         entries[i++] = c;
     }
+    p = i;
 }
 
-ColorMap::ColorMap(std::initializer_list<HSV> rhs) {
+ColorMap::ColorMap(std::initializer_list<HSV> rhs)  : p(rhs.size()), size(rhs.size()) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
         entries[i++] = c;
     }
+    p = i;
 }
 
-ColorMap::ColorMap(std::initializer_list<uint32_t> rhs) {
+ColorMap::ColorMap(std::initializer_list<uint32_t> rhs) : p(rhs.size()), size(rhs.size()) {
     entries = new RGB[rhs.size()];
     int i = 0;
     for (auto c : rhs) {
@@ -46,7 +49,7 @@ ColorMap::~ColorMap() {
 
 RGB ColorMap::operator[](uint8_t index) {
     if (index < 0 || index >= size) {
-        return RGB(0, 0, 0);
+        return background;
     }
     return entries[index];
 }
@@ -87,7 +90,7 @@ void ColorMap::setColor(uint8_t index, const HSV& color) {
 }
 
 RGB ColorMap::getColor(uint8_t index) {
-    if (index >= size) return RGB::Black;
+    if(index == 255 || index >= size) return background;
     return entries[index];
 }
 
@@ -106,6 +109,6 @@ uint8_t ColorMap::getIndex(HSV& color) {
 
 void ColorMap::dim(uint8_t value) {
     for (int i = 0; i < p; i++) {
-        entries[i] %= value;
+        entries[i].fadeToBlackBy(value);
     }
 }
