@@ -16,6 +16,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <TimedAnimation.h>
 
 #define NUM_STRIPS 16
 #define START_PIN 2
@@ -52,7 +53,6 @@ int main() {
     });
 
     ColorMap simpleXmasColors({
-        RGB::Black,
         RGB::Red,
         RGB::Green,
         RGB::White, 
@@ -60,6 +60,8 @@ int main() {
         RGB::Yellow,
         RGB::Orange
     });
+
+    simpleXmasColors.dim(210);
 
     Canvas c(STRIP_LEN);
     for (int i = 0; i < ns; i++) {
@@ -80,11 +82,17 @@ int main() {
     Animator a(&c, FPS);
 
     Marquees marq(&c, 4, 17, RIGHT, 16);
-    a.add(&marq);
+    TimedAnimation ta1 = TimedAnimation(&marq, 30000);
+    a.add(&ta1); 
+
+    BarberPole bp(&c, 4);
+    TimedAnimation ta2 = TimedAnimation(&bp, 30000);
+    a.add(&ta2);
 
     // LineFill lfu(&c, simpleXmasColors, 4, UP);
     // lfu.setGap(6);
-    // a.add(&lfu);
+    // TimedAnimation ta3 = TimedAnimation(&lfu, 30000);
+    // a.add(&ta3);
 
     // LineFill lfd(&c, simpleXmasColors, 4, DOWN);
     // lfd.setGap(7);

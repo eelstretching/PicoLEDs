@@ -1,9 +1,8 @@
 #include "LineFill.h"
 
-LineFill::LineFill(Canvas* canvas, RGB* colors, int nBands, Direction direction,
+LineFill::LineFill(Canvas* canvas, int nBands, Direction direction,
                    int stepSize)
     : canvas(canvas),
-      colors(colors),
       nBands(nBands),
       direction(direction),
       stepSize(stepSize) {

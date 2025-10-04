@@ -47,15 +47,15 @@ class Strip {
     Strip(uint pin, uint num_pixels);
 
     /// @brief Adds a pixel to this strip at the next position
-    /// @param index the index into the color map for the pixel
+    /// @param colorIndex the index into the color map for the pixel
     /// @return The position that the pixel was added.
-    uint addPixel(uint8_t index);
+    uint addPixel(uint8_t colorIndex);
 
     /// @brief Puts a color at a specific pixel in the strip.
     /// @param p The position where the pixel should be placed. If this is not
     /// within the bounds of the array, then no change will happen
-    /// @param index The index into the color map for the pixel.
-    void putPixel(uint8_t index, uint p);
+    /// @param colorIndex The index into the color map for the pixel.
+    void putPixel(uint8_t colorIndex, uint p);
 
     /// @brief Gets the index of the color value at a given position in the strip
     /// @param p the position to get the color from
@@ -80,10 +80,10 @@ class Strip {
     void fill(uint8_t index);
 
     /// @brief Fills a range of the strip with a given color
-    /// @param index the index into the color map for the color to fill with
+    /// @param colorIndex the index into the color map for the color to fill with
     /// @param start the index where to start
     /// @param n the number of pixels to fill
-    void fill(uint8_t index, uint start, uint n);
+    void fill(uint8_t colorIndex, uint start, uint n);
 
     uint getNumPixels() { return numPixels; }
 

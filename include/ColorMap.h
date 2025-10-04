@@ -32,6 +32,7 @@ class ColorMap {
 
     void setBackground(const RGB& color) { background = color; };
     RGB getBackground() { return background; };
+    uint8_t getBackgroundIndex() {return 255;};
     RGB operator[](uint8_t index);
     uint8_t addColor(const RGB& color);
     uint8_t addColor(const HSV& color);

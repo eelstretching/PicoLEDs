@@ -14,10 +14,6 @@ enum State { FILLING, FLASHING };
 class LineFill : public Animation {
     Canvas *canvas;
 
-    /// @brief The colors to use for the fill. The first n of these colors will
-    /// be used, so it should be at least as big as that.
-    RGB *colors;
-
     /// @brief The number of color bands to use.
     int nBands;
 
@@ -39,7 +35,7 @@ class LineFill : public Animation {
     FillLine **lines;
 
    public:
-    LineFill(Canvas *canvas, RGB *colors, int n, Direction direction = UP,
+    LineFill(Canvas *canvas, int n, Direction direction = UP,
              int stepSize = 1);
 
     ~LineFill() {};
