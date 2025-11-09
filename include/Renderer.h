@@ -47,6 +47,7 @@ static StripResetDelay *strip_delays[NUM_DMA_CHANNELS] = {};
 class PIOProgram {
    public:
     ~PIOProgram();
+    pio_program_t* pio_program;
     PIO pio;
     uint sm;
     uint offset;

@@ -1,5 +1,7 @@
 #include "LineFill.h"
 
+#include <stdint.h>
+
 LineFill::LineFill(Canvas* canvas, int nBands, Direction direction,
                    int stepSize)
     : canvas(canvas),
@@ -51,7 +53,7 @@ void LineFill::init() {
             break;
     }
 
-    int currBand = 0;
+    uint8_t currBand = 0;
     for (int i = 0; i < nLines; i++) {
         //
         // Get rid of the old line, if there is one. There shouldn't be, but
@@ -62,7 +64,7 @@ void LineFill::init() {
 
         //
         // New line. We'll start with most of them off the canvas.
-        lines[i] = new FillLine(canvas, colors[currBand], direction, startPos,
+        lines[i] = new FillLine(canvas, currBand, direction, startPos,
                                 endPos, stepSize);
 
         //

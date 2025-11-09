@@ -7,7 +7,7 @@
 #include "pico/printf.h"
 
 
-Strip::Strip(uint pin, uint numPixels) : pin(pin), numPixels(numPixels) {
+Strip::Strip(uint pin, uint numPixels, StripType type) : pin(pin), numPixels(numPixels), type(type) {
   data = new uint8_t[numPixels];
   pos = 0;
 }

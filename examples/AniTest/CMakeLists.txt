@@ -6,6 +6,7 @@ add_executable(AniTest AniTest.cpp)
 add_executable(AniStress AniStress.cpp)
 add_executable(PatternTest PatternTest.cpp)
 add_executable(LogicTest LogicTest.cpp)
+add_executable(Fader Fader.cpp)
 
 pico_set_program_name(AniTest "AniTest")
 pico_set_program_version(AniTest "0.1")
@@ -66,6 +67,8 @@ target_link_libraries(PatternTest
   pico_stdlib
 )
 
+pico_add_extra_outputs(PatternTest)
+
 pico_add_extra_outputs(LogicTest)
 
 target_include_directories(LogicTest PRIVATE
@@ -76,6 +79,22 @@ target_include_directories(LogicTest PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(LogicTest
+  PicoLEDs
+  hardware_dma
+  hardware_pio
+  hardware_timer
+  hardware_clocks
+  pico_stdlib
+)
+
+pico_add_extra_outputs(Fader)
+target_include_directories(Fader PRIVATE
+  ../../src
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+)
+# Add any user requested libraries
+target_link_libraries(Fader
   PicoLEDs
   hardware_dma
   hardware_pio

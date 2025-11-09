@@ -11,9 +11,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 100
-#define NUM_STRIPS 1
+#define STRIP_LEN 200
+#define NUM_STRIPS 4
 #define START_PIN 2
+#define WIDTH 10
 
 int main() {
     stdio_init_all();
@@ -31,12 +32,16 @@ int main() {
     }
     printf("Calling setup\n");
     renderer.setup();
+    uint32_t delay = 600;
 
+    sleep_ms(2000);
+
+    // ColorMap colorMap({0xff0000, 0x00ff00, 0x0000ff, 0xffffff});
     ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White, RGB::Yellow,
                        RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
                        RGB::FireBrick});
+                       colorMap.setBrightness(16);
 
-                       printf("Color map has %d colors\n", colorMap.getUsed());
     int dirs[NUM_STRIPS];
     for (int i = 0; i < NUM_STRIPS; i++) {
         //
@@ -45,12 +50,18 @@ int main() {
         dirs[i] = (i + 1) % 2;
     }
 
-    int width = 9;
+    int width = WIDTH;
 
     int posns[NUM_STRIPS];
     for (int i = 0; i < NUM_STRIPS; i++) {
         posns[i] = i % 2 == 0 ? 0 : ((int)strips[0]->getNumPixels() - width);
     }
+
+    for(int i = 0; i < ns; i++) {
+        strips[i]->fill(3);
+    }
+    renderer.render(&colorMap);
+    sleep_ms(2000);
 
     for (int i = 0; i < 2; i++) {
         for (int k = 0; k < colorMap.getUsed(); k++) {
@@ -59,14 +70,14 @@ int main() {
                 strips[j]->fill(k);
             }
             renderer.render(&colorMap);
-            sleep_ms(1000);
+            sleep_ms(delay);
         }
 
         for (int j = 0; j < ns; j++) {
             strips[j]->fill(colorMap.getBackgroundIndex());
         }
         renderer.render(&colorMap);
-        sleep_ms(250);
+        sleep_ms(delay);
     }
 
     float fps = 60;
@@ -114,11 +125,9 @@ int main() {
         }
 
         if (frameWatch.count % 200 == 0) {
-            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ", 
-            
-                frameWatch.count,
-                usPerFrame,
-                frameWatch.getAverageTime());
+            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ",
+
+                   frameWatch.count, usPerFrame, frameWatch.getAverageTime());
 
             printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",

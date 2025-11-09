@@ -8,7 +8,10 @@
 
 #include "hardware/dma.h"
 #include "hardware/irq.h"
+#include "ws2811.pio.h"
 #include "ws2812.pio.h"
+
+#define NUM_PARALLEL_PINS 1
 
 /// @brief A comparator that we can use to sort strips by their pin number.
 /// @param s1 The first strip
@@ -23,8 +26,8 @@ bool pinComparator(Strip s1, Strip s2) { return s1.getPin() < s2.getPin(); }
 /// semaphore associated with this channel, which will allow us to send data on
 /// it again.
 /// @return 0, as we do not wish the alarm to repeat.
-static int64_t reset_delay_complete(alarm_id_t id, void *strip_delay) {
-    StripResetDelay *srd = (StripResetDelay *)strip_delay;
+static int64_t reset_delay_complete(alarm_id_t id, void* strip_delay) {
+    StripResetDelay* srd = (StripResetDelay*)strip_delay;
 
     //
     // Reset the alarm, and release the semaphore.
@@ -69,8 +72,7 @@ static bool isr_installed = false;
 PIOProgram::~PIOProgram() {
     pio_sm_set_enabled(pio, sm, false);
     pio_sm_unclaim(pio, sm);
-    pio_remove_program(
-        pio, size == 1 ? &ws2812_program : &ws2812_parallel_program, offset);
+    pio_remove_program(pio, pio_program, offset);
     dma_channel_abort(dma_channel);
     dma_channel_unclaim(dma_channel);
     if (buffer) {
@@ -98,7 +100,7 @@ Renderer::~Renderer() {
     }
 }
 
-void Renderer::add(Strip &strip) { strips.push_back(strip); }
+void Renderer::add(Strip& strip) { strips.push_back(strip); }
 
 void Renderer::setup() {
     if (setupDone) {
@@ -122,7 +124,8 @@ void Renderer::setup() {
             startIndex = i;
             startPin = s.getPin();
             pinCount = 1;
-        } else if (s.getPin() == startPin + pinCount && pinCount < 8) {
+        } else if (s.getPin() == startPin + pinCount &&
+                   pinCount < NUM_PARALLEL_PINS) {
             //
             // Continuing a run, but no run longer than 8 pins.
             pinCount++;
@@ -142,34 +145,72 @@ void Renderer::setup() {
 }
 
 void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
-    PIOProgram *pip = new PIOProgram();
+    PIOProgram* pip = new PIOProgram();
     pip->startIndex = startIndex;
     pip->startPin = startPin;
     pip->size = pinCount;
-
+    pip->pio_program = nullptr;
+    //
+    // Figure out what PIO program we need for this set of pins.
+    if (pip->size == 1) {
+        switch (strips[startIndex].getType()) {
+            case WS2812:
+                pip->pio_program = (pio_program_t*)&ws2812_program;
+                break;
+            case WS2811:
+                pip->pio_program = (pio_program_t*)&ws2811_program;
+                break;
+        }
+    } else {
+        switch (strips[startIndex].getType()) {
+            case WS2812:
+                pip->pio_program = (pio_program_t*)&ws2812_parallel_program;
+                break;
+            case WS2811:
+                pip->pio_program = (pio_program_t*)&ws2811_parallel_program;
+                break;
+        }
+    }
     // This will find a free pio and state machine for our program (whether
     // serial or parallel) and load it for us.
     //
     // We use
     // pio_claim_free_sm_and_add_program_for_gpio_range (for_gpio_range variant)
     // so we will get a PIO instance suitable for addressing gpios >= 32 if
-    // needed and supported by the hardware
+    // needed and supported by the hardware.
     bool success = pio_claim_free_sm_and_add_program_for_gpio_range(
-        pip->size == 1 ? &ws2812_program : &ws2812_parallel_program, &pip->pio,
-        &pip->sm, &pip->offset, startPin, pip->size, true);
+        pip->pio_program, &pip->pio, &pip->sm, &pip->offset, startPin,
+        pip->size, true);
     hard_assert(success);
 
     if (pip->size == 1) {
-        ws2812_program_init(pip->pio, pip->sm, pip->offset, pip->startPin,
-                            800000);
+        switch (strips[startIndex].getType()) {
+            case WS2812:
+                ws2812_program_init(pip->pio, pip->sm, pip->offset,
+                                    pip->startPin, 800000);
+                break;
+            case WS2811:
+                ws2811_program_init(pip->pio, pip->sm, pip->offset,
+                                    pip->startPin, 800000);
+                break;
+        }
     } else {
-        ws2812_parallel_program_init(pip->pio, pip->sm, pip->offset,
-                                     pip->startPin, pip->size, 800000);
+        switch (strips[startIndex].getType()) {
+            case WS2812:
+                ws2812_parallel_program_init(pip->pio, pip->sm, pip->offset,
+                                             pip->startPin, pip->size, 800000);
+                break;
+            case WS2811:
+
+                ws2811_parallel_program_init(pip->pio, pip->sm, pip->offset,
+                                             pip->startPin, pip->size, 800000);
+                break;
+        }
     }
 
     //
-    // Claim an unused DMA channel (there's 12 in total,, so this should also
-    // usually work out fine)
+    // Claim an unused DMA channel (there's 12 in total,, so this should
+    // also usually work out fine)
     pip->dma_channel = dma_claim_unused_channel(false);
 
     //
@@ -179,20 +220,22 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     //
     // Set up a DMA Channel.
     //
-    // Set up the semaphore that we'll use to decide when it's OK to send data
-    // the next time. We'll leave it posted for the first time through so that
-    // we can send data without delay. Also, we'll put the strip delay into the
-    // global array so that the interrupt service routine can find it.
+    // Set up the semaphore that we'll use to decide when it's OK to send
+    // data the next time. We'll leave it posted for the first time through
+    // so that we can send data without delay. Also, we'll put the strip
+    // delay into the global array so that the interrupt service routine can
+    // find it.
     sem_init(&pip->delay.sem, 1, 1);
     strip_delays[pip->dma_channel] = &pip->delay;
 
     //
-    // Now we'll need a buffer where we can put the pixels while they're being
-    // DMA'd. Most examples seem to do this, as I guess we can be modifying the
-    // existing pixels while the last bunch are being non-blockingly DMAed to
-    // the PIO block. We're naively assuming here that the strips all have the
-    // same number of pixels, so we can just use the size of the first one.
-    // Maybe better to pick the minimum length one?
+    // Now we'll need a buffer where we can put the pixels while they're
+    // being DMA'd. Most examples seem to do this, as I guess we can be
+    // modifying the existing pixels while the last bunch are being
+    // non-blockingly DMAed to the PIO block. We're naively assuming here
+    // that the strips all have the same number of pixels, so we can just
+    // use the size of the first one. Maybe better to pick the minimum
+    // length one?
     dma_channel_transfer_size tsize;
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex].getNumPixels();
@@ -203,13 +246,14 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
         tsize = DMA_SIZE_32;
     } else {
         //
-        // Each pixel on the strip uses 24 bits of color, this array will have
-        // ones where the strips have that bit of color.
+        // Each pixel on the strip uses 24 bits of color, this array will
+        // have ones where the strips have that bit of color.
         pip->buffSize = strips[startIndex].getNumPixels() * 24;
         pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
 
         //
-        // We'll be DMAing a byte at a time with data for 8 parallel channels.
+        // We'll be DMAing a byte at a time with data for 8 parallel
+        // channels.
         tsize = DMA_SIZE_8;
     }
 
@@ -225,8 +269,8 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
 
     if (!isr_installed) {
         //
-        // We only want to install the handler once, which we'll do the first
-        // time that we configure a DMA channel.
+        // We only want to install the handler once, which we'll do the
+        // first time that we configure a DMA channel.
         irq_add_shared_handler(DMA_IRQ_0, dma_complete_handler,
                                PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY);
         irq_set_enabled(DMA_IRQ_0, true);
@@ -235,12 +279,19 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     dma_channel_set_irq0_enabled(pip->dma_channel, true);
 
     //
-    // Looks like we're all set, so add this program to the list of ones that
-    // we'll run.
+    // Set the drive strength on the pins.
+    for(int i = 0; i < pinCount; i++) {
+        pio_gpio_init(pip->pio, startPin + i);
+        gpio_set_drive_strength(startPin + i, GPIO_DRIVE_STRENGTH_4MA);
+    }
+
+    //
+    // Looks like we're all set, so add this program to the list of ones
+    // that we'll run.
     programs.push_back(pip);
 }
 
-void Renderer::render(ColorMap *colorMap) {
+void Renderer::render(ColorMap* colorMap) {
     if (!setupDone) {
         setup();
     }
@@ -254,7 +305,8 @@ void Renderer::render(ColorMap *colorMap) {
         // We need to fill the buffer that we'll DMA to the PIO program. How
         // we fill it depends on how many strips we're sending.
         //
-        // We want to track how long it takes to set up the data for the DMA.
+        // We want to track how long it takes to set up the data for the
+        // DMA.
         dw.start();
 
         //
@@ -262,49 +314,51 @@ void Renderer::render(ColorMap *colorMap) {
         if (pip->size == 1) {
             memset(pip->buffer, 0, pip->buffSize * sizeof(uint32_t));
             //
-            // One strip, just put the data in the buffer according to the color
-            // order after scaling by the strip's brightness.
+            // One strip, just put the data in the buffer according to the
+            // color order after scaling by the strip's brightness.
             Strip s = strips[pip->startIndex];
-            uint8_t *data = s.getData();
-            uint32_t *pb = (uint32_t *)pip->buffer;
+            uint8_t* data = s.getData();
+            uint32_t* pb = (uint32_t*)pip->buffer;
             for (int i = 0; i < s.getNumPixels(); i++, pb++, data++) {
                 //
-                // Note that we're shifting by 8 here because the PIO program
-                // will be pulling 24 bits and it wants those 24 bits in the
-                // most significant place.
+                // Note that we're shifting by 8 here because the PIO
+                // program will be pulling 24 bits and it wants those 24
+                // bits in the most significant place.
                 *pb = colorMap->getColor(*data).getColor(s.getColorOrder())
                       << 8u;
             }
         } else {
             memset(pip->buffer, 0, pip->buffSize * sizeof(uint8_t));
             //
-            // We'll need to turn the data for multiple strips into bit planes.
+            // We'll need to turn the data for multiple strips into bit
+            // planes.
             for (int i = pip->startIndex, sn = 0;
                  i < pip->startIndex + pip->size; i++, sn++) {
                 Strip s = strips[i];
-                uint8_t *data = s.getData();
+                uint8_t* data = s.getData();
                 uint32_t pp = 0;
 
                 //
                 // If there is a one bit at this position in the strips
                 // array, we'll always be or'ing in the same bit, so let's
-                // just make it now. But remember that we need to start from 0
-                // for this program!
+                // just make it now. But remember that we need to start from
+                // 0 for this program!
                 uint8_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
-                    uint8_t *pipbuff = &((uint8_t *)pip->buffer)[pp];
+                    uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
                     //
-                    // Map the color index, then transform for color order. Doing
-                    // that old school pointer bumping rather than array
-                    // accesses to try to cut down on the time spent prepping
-                    // the data.
-                    uint32_t val = colorMap->getColor(*data).getColor(s.getColorOrder());
+                    // Map the color index, then transform for color order.
+                    // Doing that old school pointer bumping rather than
+                    // array accesses to try to cut down on the time spent
+                    // prepping the data.
+                    uint32_t val =
+                        colorMap->getColor(*data).getColor(s.getColorOrder());
 
                     //
                     // Unrolling the inner loop to save some ops. There's
                     // probably some crazy Duff's Device way to do this, but
-                    // this is simple and it cuts about a third of the time in
-                    // this loop.
+                    // this is simple and it cuts about a third of the time
+                    // in this loop.
                     if (val & 0x00800000) {
                         pipbuff[0] |= stripBit;
                     }

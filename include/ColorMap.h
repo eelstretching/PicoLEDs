@@ -20,6 +20,7 @@ class ColorMap {
     RGB background = RGB::Black;
 
    public:
+    ColorMap();
     ColorMap(uint8_t size);
     ColorMap(std::initializer_list<RGB> rhs);
     ColorMap(std::initializer_list<HSV> rhs);
@@ -39,10 +40,13 @@ class ColorMap {
     uint8_t addColors(std::initializer_list<RGB> colors);
     void setColor(uint8_t index, const RGB& color);
     void setColor(uint8_t index, const HSV& color);
+    void fillGradient(uint8_t indexstart, const RGB& colorstart,
+                      uint8_t indexend, const RGB& colorend);
     RGB getColor(uint8_t index);
     uint8_t getIndex(RGB& color);
     uint8_t getIndex(HSV& color);
     void dim(uint8_t value);
+    void setBrightness(uint8_t value);
 };
 
 

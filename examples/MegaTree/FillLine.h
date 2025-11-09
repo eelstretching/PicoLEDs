@@ -6,12 +6,13 @@
 
 #include "Animation.h"
 #include "Direction.h"
+#include "stdlib.h"
 
 class FillLine : public Animation {
     Canvas *canvas;
 
     /// @brief The color we're drawing.
-    RGB c;
+    uint8_t c;
 
     /// @brief Which direction we're moving.
     Direction direction = UP;
@@ -29,7 +30,7 @@ class FillLine : public Animation {
     int16_t endPos;
 
    public:
-    FillLine(Canvas *canvas, RGB c, Direction direction, int16_t startPos,
+    FillLine(Canvas *canvas, uint8_t c, Direction direction, int16_t startPos,
              int16_t endPos, uint8_t stepSize);
 
     ~FillLine() {};
@@ -41,7 +42,7 @@ class FillLine : public Animation {
    protected:
     /// @brief Draws the line as a row or columnat the given position.
     /// @param pos the position to draw at.
-    void draw(uint16_t pos, RGB c);
+    void draw(uint16_t pos, uint8_t c);
 };
 
 #endif

@@ -13,9 +13,9 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 4
+#define NUM_STRIPS 6
 #define START_PIN 2
-#define STRIP_LEN 200
+#define STRIP_LEN 400
 #define CANVAS_WIDTH 100
 
 #define BRIGHTNESS 16
@@ -35,37 +35,32 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
     }
 
-    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
-                    RGB::Blue, RGB::Indigo, RGB::Violet});
-    int nColors = colorMap.getUsed();
-    colorMap.setBrightness(BRIGHTNESS);
-
-    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue});
+    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White, RGB::DarkViolet,
+                    RGB::Orange, RGB::Yellow, RGB::Cyan});
     simpleMap.setBrightness(BRIGHTNESS);
-    // nColors = simpleMap.getUsed();
+    int nColors = simpleMap.getUsed();
 
     Canvas c(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
     c.setup();
-    c.setColorMap(&colorMap);
+    c.setColorMap(&simpleMap);
     c.clear();
     c.show();
 
-
-    BarberPole bp(&c, nColors, 5);
-
-    Animator a(&c, 5);
-    a.add(&bp);
-    a.init();
-    a.setFPS(FPS);
-
-
+    int cn = 0;
+    int row = 0;
     while (1) {
-        a.step();
-        if (a.getFrameCount() % 500 == 0) {
-            a.printStats();
+        c.clear();
+        c.fillRow(row, cn);
+        row = (row + 1) % c.getHeight();
+        if(row == 0) {
+            cn = (cn + 1) % nColors;
         }
+        c.show();
+
+        sleep_ms(50);
     }
+
 }

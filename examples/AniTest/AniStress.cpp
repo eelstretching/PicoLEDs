@@ -13,9 +13,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 16
+#define NUM_STRIPS 4
 #define START_PIN 2
-#define STRIP_LEN 136
+#define STRIP_LEN 200
+#define CANVAS_WIDTH 100
 
 int main() {
     stdio_init_all();
@@ -40,7 +41,7 @@ int main() {
     while (1) {
         for (int sc = 4; sc <= 12; sc++) {
             for (int i = 0; i < ns - (sc - 1); i++) {
-                Canvas canvas(STRIP_LEN);
+                Canvas canvas(CANVAS_WIDTH);
                 for (int j = 0; j < sc; j++) {
                     canvas.add(*strips[i + j]);
                 }

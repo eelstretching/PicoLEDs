@@ -12,6 +12,12 @@
 #include "pico/types.h"
 #include "ColorMap.h"
 
+//
+// @brief The type of strip we're dealing with.
+enum StripType {
+    WS2812,
+    WS2811
+};
 
 class Strip {
    protected:
@@ -40,11 +46,16 @@ class Strip {
     // Where the next pixel will be added.
     uint pos;
 
+    StripType type;
+
     Strip() {};
 
    public:
 
-    Strip(uint pin, uint num_pixels);
+    Strip(uint pin, uint num_pixels, StripType type = WS2811);
+
+    /// @brief Gets the type of strip this is.
+    StripType getType() { return type; }
 
     /// @brief Adds a pixel to this strip at the next position
     /// @param colorIndex the index into the color map for the pixel

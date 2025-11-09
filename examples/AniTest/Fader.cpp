@@ -19,7 +19,7 @@
 #define CANVAS_WIDTH 100
 
 #define BRIGHTNESS 16
-#define FPS 30
+#define FPS 60
 
 int main() {
     stdio_init_all();
@@ -32,40 +32,32 @@ int main() {
     int pins[NUM_STRIPS];
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
-        strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
+        strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
-                    RGB::Blue, RGB::Indigo, RGB::Violet});
-    int nColors = colorMap.getUsed();
-    colorMap.setBrightness(BRIGHTNESS);
-
-    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue});
-    simpleMap.setBrightness(BRIGHTNESS);
-    // nColors = simpleMap.getUsed();
+    ColorMap fadeMap(128);
+    fadeMap.fillGradient(0, RGB::Red, 18, RGB::Orange);
+    fadeMap.fillGradient(19, RGB::Orange, 36, RGB::Yellow);
+    fadeMap.fillGradient(37, RGB::Yellow, 54, RGB::Green);
+    fadeMap.fillGradient(55, RGB::Green, 73, RGB::Blue);
+    fadeMap.fillGradient(74, RGB::Blue, 91, RGB::Indigo);
+    fadeMap.fillGradient(92, RGB::Indigo, 127, RGB::Violet);
+    fadeMap.setBrightness(BRIGHTNESS);
 
     Canvas c(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
+    
     c.setup();
-    c.setColorMap(&colorMap);
-    c.clear();
-    c.show();
-
-
-    BarberPole bp(&c, nColors, 5);
-
-    Animator a(&c, 5);
-    a.add(&bp);
-    a.init();
-    a.setFPS(FPS);
+    c.setColorMap(&fadeMap);
 
 
     while (1) {
-        a.step();
-        if (a.getFrameCount() % 500 == 0) {
-            a.printStats();
+        for(int i = 0; i < fadeMap.getSize(); i++) {
+            c.fill(i);
+            c.show();
+            sleep_ms(2000);
         }
     }
 }

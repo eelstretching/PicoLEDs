@@ -26,7 +26,7 @@ bool BarberPole::step() {
             canvas->set(x % canvas->getWidth(), y, ci);
             x++;
         }
-        if (i % stripeWidth == 0) {
+        if (i > 0 && i % stripeWidth == 0) {
             //
             // Switch colors at the stripe width.
             ci = (ci + 1) % nColors;

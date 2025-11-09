@@ -9,6 +9,7 @@
 #include "Spiral.h"
 #include "LineFill.h"
 #include "Marquees.h"
+#include "ColorCone.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -18,10 +19,11 @@
 #include "pico/types.h"
 #include <TimedAnimation.h>
 
-#define NUM_STRIPS 16
+#define NUM_STRIPS 6
 #define START_PIN 2
-#define STRIP_LEN 136
-#define BRIGHTNESS 16
+#define STRIP_LEN 400
+#define CANVAS_WIDTH 100
+#define BRIGHTNESS 8
 #define FPS 30
 
 int main() {
@@ -55,15 +57,15 @@ int main() {
     ColorMap simpleXmasColors({
         RGB::Red,
         RGB::Green,
-        RGB::White, 
         RGB::Blue,
+        RGB::White, 
         RGB::Yellow,
         RGB::Orange
     });
 
-    simpleXmasColors.dim(210);
+    simpleXmasColors.setBrightness(BRIGHTNESS);
 
-    Canvas c(STRIP_LEN);
+    Canvas c(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
@@ -81,22 +83,23 @@ int main() {
 
     Animator a(&c, FPS);
 
-    Marquees marq(&c, 4, 17, RIGHT, 16);
-    TimedAnimation ta1 = TimedAnimation(&marq, 30000);
-    a.add(&ta1); 
+    ColorCone cone(&c, &simpleXmasColors);
+    TimedAnimation ta1 = TimedAnimation(&cone, 10000);
+    a.add(&ta1);
 
-    BarberPole bp(&c, 4);
-    TimedAnimation ta2 = TimedAnimation(&bp, 30000);
-    a.add(&ta2);
+    Marquees marq(&c, 4, 20, RIGHT, c.getHeight());
+    TimedAnimation ta2 = TimedAnimation(&marq, 10000);
+    a.add(&ta2); 
 
-    // LineFill lfu(&c, simpleXmasColors, 4, UP);
-    // lfu.setGap(6);
-    // TimedAnimation ta3 = TimedAnimation(&lfu, 30000);
-    // a.add(&ta3);
+    LineFill lfu(&c, 4, UP, 1);
+    lfu.setGap(6);
+    TimedAnimation ta3 = TimedAnimation(&lfu, 10000);
+    a.add(&ta3);
 
-    // LineFill lfd(&c, simpleXmasColors, 4, DOWN);
+    // LineFill lfd(&c, 4, DOWN, 1);
     // lfd.setGap(7);
-    // a.add(&lfd);
+    // TimedAnimation ta4 = TimedAnimation(&lfd, 10000);
+    // a.add(&ta4);
 
     // Spiral spiral(&c, simpleXmasColors, 5, 25);
     // a.add(&spiral);

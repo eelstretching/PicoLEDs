@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include "Animation.h"
 #include "Direction.h"
 #include "FillLine.h"
@@ -35,7 +33,7 @@ class LineFill : public Animation {
     FillLine **lines;
 
    public:
-    LineFill(Canvas *canvas, int n, Direction direction = UP,
+    LineFill(Canvas *canvas, int nBands, Direction direction = UP,
              int stepSize = 1);
 
     ~LineFill() {};

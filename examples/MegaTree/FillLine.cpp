@@ -1,6 +1,6 @@
 #include "FillLine.h"
 
-FillLine::FillLine(Canvas* canvas, RGB c, Direction direction, int16_t startPos,
+FillLine::FillLine(Canvas* canvas, uint8_t c, Direction direction, int16_t startPos,
                    int16_t endPos, uint8_t stepSize)
     : canvas(canvas),
       c(c),
@@ -19,7 +19,7 @@ bool FillLine::step() {
     draw(currPos, c);
 
     //
-    // If the current position is the end position, then we're dong.
+    // If the current position is the end position, then we're done.
     if (currPos == endPos) {
         return false;
     }
@@ -49,7 +49,7 @@ bool FillLine::step() {
     return true;
 }
 
-void FillLine::draw(uint16_t pos, RGB color) {
+void FillLine::draw(uint16_t pos, uint8_t color) {
     switch (direction) {
         case UP:
         case DOWN:

@@ -1,0 +1,96 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program ws2811
+.side_set 1
+
+.define public T1 3
+.define public T2 3
+.define public T3 4
+
+.lang_opt python sideset_init = pico.PIO.OUT_HIGH
+.lang_opt python out_init     = pico.PIO.OUT_HIGH
+.lang_opt python out_shiftdir = 1
+
+.wrap_target
+bitloop:
+    out x, 1       side 0 [T3 - 1] ; Side-set still takes place when instruction stalls
+    jmp !x do_zero side 1 [T1 - 1] ; Branch on the bit we shifted out. Positive pulse
+do_one:
+    jmp  bitloop   side 1 [T2 - 1] ; Continue driving high, for a long pulse
+do_zero:
+    nop            side 0 [T2 - 1] ; Or drive low, for a short pulse
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void ws2811_program_init(PIO pio, uint sm, uint offset, uint pin, float freq) {
+
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_config c = ws2811_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&c, pin);
+    sm_config_set_out_shift(&c, false, true, 24);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    int cycles_per_bit = ws2811_T1 + ws2811_T2 + ws2811_T3;
+    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    sm_config_set_clkdiv(&c, div);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
+
+.program ws2811_parallel
+
+; 2811 requires 500ns of high, 700ns of data, and 1300ns of low.
+; This is an 8/8/9 ratio, so 8 cycles of high, 8 cycles of data, and 9 cycles of low.
+.define public T1 3
+.define public T2 4
+.define public T3 5
+.define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
+
+.wrap_target
+out x, 8               ; Read 8 bits from the OSR into X, autopulling from the TX FIFO, blocking until data is ready.
+mov pins, !null [T1-1] ; Write 1 for 500ns
+mov pins, x     [T2-1] ; Write the data bits to the pins for 700ns, autopulls data from TX FIFO.
+mov pins, null  [T3-2] ; Write 0 bits to all pins for 1300, account for the instruction at the top of the loop
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void ws2811_parallel_program_init(PIO pio, uint sm, uint offset, 
+                                                uint pin_base, 
+                                                uint pin_count, float freq) {
+    for(uint i=pin_base; i< pin_base+pin_count; i++) {
+        pio_gpio_init(pio, i);
+        gpio_set_drive_strength(i, GPIO_DRIVE_STRENGTH_4MA);
+    }
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_base, pin_count, true);
+
+    pio_sm_config c = ws2811_parallel_program_get_default_config(offset);
+    sm_config_set_out_shift(&c, true, true, 8);
+    sm_config_set_out_pins(&c, pin_base, pin_count);
+    sm_config_set_in_shift(&c, true, false, 8);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    float div = clock_get_hz(clk_sys) / (freq * ws2811_parallel_CYCLES_FOR_1_BIT);
+    sm_config_set_clkdiv(&c, div);
+    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2811_parallel_CYCLES_FOR_1_BIT, div);
+    printf("non-div cycle time: %.1fns\n", 1000000000.0 / clock_get_hz(clk_sys));
+    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
+    printf("state machine cycle is: %.1fns\n", cycle_time);
+    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2811_parallel_T1 * cycle_time, ws2811_parallel_T2 * cycle_time, ws2811_parallel_T3 * cycle_time);
+    
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

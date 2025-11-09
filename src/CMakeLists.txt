@@ -5,7 +5,7 @@ file(GLOB FILES *.cpp ${PicoLEDsBuild_SOURCE_DIR/}/include/*.h)
 add_library(PicoLEDs ${FILES})
 
 # generate the header file into the source tree as it is included in the RP2040 datasheet
-pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/generated)
+pico_generate_pio_header(PicoLEDs ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio ${CMAKE_CURRENT_LIST_DIR}/ws2811.pio OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/generated)
 
 # Add the standard include files to the build
 target_include_directories(PicoLEDs PUBLIC
