@@ -105,8 +105,6 @@ int main() {
     TimedAnimation ta5 = TimedAnimation(&spiral, 10000);
     a.add(&ta5);
 
-    // TripleColor tc(&c, simpleXmasColors);
-    // a.add(&tc);
     a.init();
 
     while (true) {

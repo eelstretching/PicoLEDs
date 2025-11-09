@@ -1,7 +1,7 @@
 #include "Spiral.h"
 
 Spiral::Spiral(Canvas* canvas, int width, int length)
-    : Animation(canvas), width(width), length(length) {}
+    : canvas(canvas), width(width), length(length) {}
 
 Spiral::~Spiral() {}
 
