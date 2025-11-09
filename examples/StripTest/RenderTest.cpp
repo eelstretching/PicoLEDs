@@ -11,8 +11,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 137
-#define NUM_STRIPS 16
+#define STRIP_LEN 400
+#define CANVAS_WIDTH 100
+
+#define NUM_STRIPS 7
 #define START_PIN 2
 
 ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,

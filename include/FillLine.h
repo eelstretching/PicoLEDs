@@ -12,7 +12,7 @@ class FillLine : public Animation {
     Canvas *canvas;
 
     /// @brief The color we're drawing.
-    uint8_t c;
+    uint8_t colorIndex;
 
     /// @brief Which direction we're moving.
     Direction direction = UP;
@@ -30,7 +30,7 @@ class FillLine : public Animation {
     int16_t endPos;
 
    public:
-    FillLine(Canvas *canvas, uint8_t c, Direction direction, int16_t startPos,
+    FillLine(Canvas *canvas, uint8_t colorIndex, Direction direction, int16_t startPos,
              int16_t endPos, uint8_t stepSize);
 
     ~FillLine() {};
@@ -42,7 +42,7 @@ class FillLine : public Animation {
    protected:
     /// @brief Draws the line as a row or columnat the given position.
     /// @param pos the position to draw at.
-    void draw(uint16_t pos, uint8_t c);
+    void draw(uint16_t pos, uint8_t colorIndex);
 };
 
 #endif

@@ -13,10 +13,11 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 6
+#define NUM_STRIPS 7
 #define START_PIN 2
 #define STRIP_LEN 400
 #define CANVAS_WIDTH 100
+#define DELAY_MS 100
 
 #define BRIGHTNESS 16
 #define FPS 30
@@ -26,7 +27,7 @@ int main() {
 
     //
     // A canvas made out of strips.
-    Strip *strips[NUM_STRIPS];
+    Strip* strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     int pins[NUM_STRIPS];
@@ -35,8 +36,8 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
     }
 
-    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White, RGB::DarkViolet,
-                    RGB::Orange, RGB::Yellow, RGB::Cyan});
+    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
+                        RGB::DarkViolet, RGB::Orange, RGB::Yellow, RGB::Cyan});
     simpleMap.setBrightness(BRIGHTNESS);
     int nColors = simpleMap.getUsed();
 
@@ -50,17 +51,18 @@ int main() {
     c.show();
 
     int cn = 0;
-    int row = 0;
     while (1) {
-        c.clear();
-        c.fillRow(row, cn);
-        row = (row + 1) % c.getHeight();
-        if(row == 0) {
+        for (int i = 0; i < c.getHeight(); i++) {
+            for (int j = 0; j < c.getHeight(); j++) {
+                c.clear();
+                for (int k = 0; k < i; k++) {
+                    c.fillRow((k + j) % c.getHeight(), cn);
+                }
+                c.show();
+
+                sleep_ms(DELAY_MS);
+            }
             cn = (cn + 1) % nColors;
         }
-        c.show();
-
-        sleep_ms(50);
     }
-
 }

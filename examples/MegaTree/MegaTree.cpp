@@ -7,7 +7,7 @@
 #include "Strip.h"
 #include "TripleColor.h"
 #include "Spiral.h"
-#include "LineFill.h"
+#include "LinesFill.h"
 #include "Marquees.h"
 #include "ColorCone.h"
 #include "colorutils.h"
@@ -19,11 +19,11 @@
 #include "pico/types.h"
 #include <TimedAnimation.h>
 
-#define NUM_STRIPS 6
+#define NUM_STRIPS 7
 #define START_PIN 2
 #define STRIP_LEN 400
 #define CANVAS_WIDTH 100
-#define BRIGHTNESS 8
+#define BRIGHTNESS 16
 #define FPS 30
 
 int main() {
@@ -91,18 +91,19 @@ int main() {
     TimedAnimation ta2 = TimedAnimation(&marq, 10000);
     a.add(&ta2); 
 
-    LineFill lfu(&c, 4, UP, 1);
+    LinesFill lfu(&c, 4, UP, 1);
     lfu.setGap(6);
     TimedAnimation ta3 = TimedAnimation(&lfu, 10000);
     a.add(&ta3);
 
-    // LineFill lfd(&c, 4, DOWN, 1);
-    // lfd.setGap(7);
-    // TimedAnimation ta4 = TimedAnimation(&lfd, 10000);
-    // a.add(&ta4);
+    LinesFill lfd(&c, 4, DOWN, 1);
+    lfd.setGap(7);
+    TimedAnimation ta4 = TimedAnimation(&lfd, 10000);
+    a.add(&ta4);
 
-    // Spiral spiral(&c, simpleXmasColors, 5, 25);
-    // a.add(&spiral);
+    Spiral spiral(&c, 5, 25);
+    TimedAnimation ta5 = TimedAnimation(&spiral, 10000);
+    a.add(&ta5);
 
     // TripleColor tc(&c, simpleXmasColors);
     // a.add(&tc);

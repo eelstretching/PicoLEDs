@@ -1,8 +1,8 @@
-#include "LineFill.h"
+#include "LinesFill.h"
 
 #include <stdint.h>
 
-LineFill::LineFill(Canvas* canvas, int nBands, Direction direction,
+LinesFill::LinesFill(Canvas* canvas, int nBands, Direction direction,
                    int stepSize)
     : canvas(canvas),
       nBands(nBands),
@@ -30,7 +30,7 @@ LineFill::LineFill(Canvas* canvas, int nBands, Direction direction,
     }
 }
 
-void LineFill::init() {
+void LinesFill::init() {
     canvas->clear();
     uint16_t startPos;
     uint16_t endPos;
@@ -88,7 +88,7 @@ void LineFill::init() {
     }
 }
 
-bool LineFill::step() {
+bool LinesFill::step() {
     //
     // How many lines are finished?
     int nf = 0;

@@ -1,9 +1,11 @@
 #include "FillLine.h"
 
-FillLine::FillLine(Canvas* canvas, uint8_t c, Direction direction, int16_t startPos,
+#include <stdint.h>
+
+FillLine::FillLine(Canvas* canvas, uint8_t colorIndex, Direction direction, int16_t startPos,
                    int16_t endPos, uint8_t stepSize)
     : canvas(canvas),
-      c(c),
+      colorIndex(colorIndex),
       direction(direction),
       currPos(startPos),
       endPos(endPos),
@@ -12,11 +14,11 @@ FillLine::FillLine(Canvas* canvas, uint8_t c, Direction direction, int16_t start
 bool FillLine::step() {
     // Clear the previous line, if it's on the canvas.
     if (prevPos >= 0) {
-        draw(prevPos, canvas->getBackground());
+        draw(prevPos, canvas->getBackgroundIndex());
     }
     //
     // Draw the current line.
-    draw(currPos, c);
+    draw(currPos, colorIndex);
 
     //
     // If the current position is the end position, then we're done.
@@ -49,15 +51,15 @@ bool FillLine::step() {
     return true;
 }
 
-void FillLine::draw(uint16_t pos, uint8_t color) {
+void FillLine::draw(uint16_t pos, uint8_t colorIndex) {
     switch (direction) {
         case UP:
         case DOWN:
-            canvas->fillColumn(pos, color);
+            canvas->fillColumn(pos, colorIndex);
             break;
         case LEFT:
         case RIGHT:
-            canvas->fillRow(pos, color);
+            canvas->fillRow(pos, colorIndex);
             break;
     }
 }

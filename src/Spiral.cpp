@@ -11,7 +11,7 @@ bool Spiral::step() {
         for (int cy = y, dx = cx, f = 0; cy < y + length; cy++, f++) {
             int mx = dx % canvas->getWidth();
             int my = cy % canvas->getHeight();
-            canvas->set(mx, my, c+1);
+            canvas->set(mx, my, c);
             switch (f) {
                 case 0:
                     break;

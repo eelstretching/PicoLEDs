@@ -3,13 +3,15 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "Animation.h"
 #include "Direction.h"
 #include "FillLine.h"
 
 enum State { FILLING, FLASHING };
 
-class LineFill : public Animation {
+class LinesFill : public Animation {
     Canvas *canvas;
 
     /// @brief The number of color bands to use.
@@ -33,10 +35,10 @@ class LineFill : public Animation {
     FillLine **lines;
 
    public:
-    LineFill(Canvas *canvas, int nBands, Direction direction = UP,
+    LinesFill(Canvas *canvas, int nBands, Direction direction = UP,
              int stepSize = 1);
 
-    ~LineFill() {};
+    ~LinesFill() {};
 
     int getFPSNeeded() override { return 80; };
 

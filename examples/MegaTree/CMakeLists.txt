@@ -2,7 +2,7 @@
 
 pico_sdk_init()
 
-add_executable(MegaTree MegaTree.cpp TripleColor.cpp Spiral.cpp)
+add_executable(MegaTree MegaTree.cpp TripleColor.cpp)
 add_executable(CanvasTest CanvasTest.cpp)
 
 pico_set_program_name(MegaTree "MegaTree")
