@@ -39,6 +39,11 @@ class Animator : public Animation {
     /// @brief Adds an animation to the end of our list.
     /// @param a the animation to add.
     void add(Animation *a);
+    /// @brief Adds a timed animation to the end of our list.
+    /// @param a the animation to add.
+    /// @param durationMS the duration to run the animation for, in
+    /// milliseconds.
+    void addTimed(Animation *a, int durationMS);
     void setFPS(int fps);
     int getFPSNeeded() { return fps; };
     /// @brief Steps through whatever animation that we're currently working on.

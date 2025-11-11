@@ -1,23 +1,21 @@
 #include "Spiral.h"
 
-Spiral::Spiral(Canvas* canvas, int width, int length)
-    : canvas(canvas), width(width), length(length) {}
+Spiral::Spiral(Canvas* canvas, ColorMap *colorMap, int width, int length)
+    : canvas(canvas), colorMap(colorMap), width(width), length(length) {}
 
 Spiral::~Spiral() {}
 
+void Spiral::init() {
+    canvas->setColorMap(colorMap);
+}
+
 bool Spiral::step() {
     canvas->clear();
-    for (int cx = x, c = 0; cx < x + width; cx++, c++) {
-        for (int cy = y, dx = cx, f = 0; cy < y + length; cy++, f++) {
+    for (int cx = x, c = 0; cx < x + width; cx++, c = (c+1) % canvas->getColorMap()->getSize()) {
+        for (int cy = y, dx = cx; cy < y + length; cy++) {
             int mx = dx % canvas->getWidth();
             int my = cy % canvas->getHeight();
             canvas->set(mx, my, c);
-            switch (f) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-            }
             dx = (dx + 1) % canvas->getWidth();
         }
     }

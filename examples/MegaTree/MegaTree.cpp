@@ -23,7 +23,7 @@
 #define START_PIN 2
 #define STRIP_LEN 400
 #define CANVAS_WIDTH 100
-#define BRIGHTNESS 16
+#define BRIGHTNESS 32
 #define FPS 30
 
 int main() {
@@ -51,7 +51,6 @@ int main() {
         HSV(42, 100, 100),   // Yellow
         HSV(128, 100, 100),  // Cyan
         HSV(213, 100, 100),  // Magenta
-        HSV(0, 0, 0)         // Black
     });
 
     ColorMap simpleXmasColors({
@@ -84,26 +83,21 @@ int main() {
     Animator a(&c, FPS);
 
     ColorCone cone(&c, &simpleXmasColors);
-    TimedAnimation ta1 = TimedAnimation(&cone, 10000);
-    a.add(&ta1);
+    a.addTimed(&cone, 10000);
 
     Marquees marq(&c, 4, 20, RIGHT, c.getHeight());
-    TimedAnimation ta2 = TimedAnimation(&marq, 10000);
-    a.add(&ta2); 
+    a.addTimed(&marq, 10000); 
 
     LinesFill lfu(&c, 4, UP, 1);
     lfu.setGap(6);
-    TimedAnimation ta3 = TimedAnimation(&lfu, 10000);
-    a.add(&ta3);
+    a.addTimed(&lfu, 10000);
 
     LinesFill lfd(&c, 4, DOWN, 1);
     lfd.setGap(7);
-    TimedAnimation ta4 = TimedAnimation(&lfd, 10000);
-    a.add(&ta4);
+    a.addTimed(&lfd, 10000);
 
-    Spiral spiral(&c, 5, 25);
-    TimedAnimation ta5 = TimedAnimation(&spiral, 10000);
-    a.add(&ta5);
+    Spiral spiral(&c, &simpleXmasColors, 10, 25);
+    a.addTimed(&spiral, 10000);
 
     a.init();
 

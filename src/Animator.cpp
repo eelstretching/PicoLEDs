@@ -1,4 +1,5 @@
 #include "Animator.h"
+#include "TimedAnimation.h"
 
 Animator::Animator(Canvas* canvas) : Animation(canvas) {
     //
@@ -9,6 +10,11 @@ Animator::Animator(Canvas* canvas) : Animation(canvas) {
 Animator::Animator(Canvas* canvas, int fps) : Animator(canvas) { setFPS(fps); }
 
 void Animator::add(Animation* a) { animations.push_back(a); }
+
+void Animator::addTimed(Animation* a, int durationMS) {
+    TimedAnimation* ta = new TimedAnimation(a, durationMS);
+    animations.push_back(ta);
+}
 
 void Animator::setFPS(int fps) {
     this->fps = fps;

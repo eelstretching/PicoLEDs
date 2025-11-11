@@ -17,9 +17,9 @@
 #define START_PIN 2
 #define STRIP_LEN 400
 #define CANVAS_WIDTH 100
-#define DELAY_MS 100
+#define DELAY_MS 250
 
-#define BRIGHTNESS 16
+#define BRIGHTNESS 32
 #define FPS 30
 
 int main() {
