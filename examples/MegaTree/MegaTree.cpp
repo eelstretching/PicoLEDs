@@ -85,14 +85,14 @@ int main() {
     ColorCone cone(&c, &simpleXmasColors);
     a.addTimed(&cone, 10000);
 
-    Marquees marq(&c, 4, 20, RIGHT, c.getHeight());
+    Marquees marq(&c, simpleXmasColors.getSize(), 20, RIGHT, c.getHeight());
     a.addTimed(&marq, 10000); 
 
-    LinesFill lfu(&c, 4, UP, 1);
+    LinesFill lfu(&c, simpleXmasColors.getSize(), UP, 1);
     lfu.setGap(6);
     a.addTimed(&lfu, 10000);
 
-    LinesFill lfd(&c, 4, DOWN, 1);
+    LinesFill lfd(&c, simpleXmasColors.getSize(), DOWN, 1);
     lfd.setGap(7);
     a.addTimed(&lfd, 10000);
 
