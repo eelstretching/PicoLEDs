@@ -9,7 +9,7 @@
 #include "Direction.h"
 #include "FillLine.h"
 
-enum State { FILLING, FLASHING };
+enum FillState { FILLING, FLASHING };
 
 class LinesFill : public Animation {
     Canvas *canvas;

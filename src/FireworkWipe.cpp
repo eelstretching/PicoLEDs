@@ -29,7 +29,7 @@ FireworkWipe::FireworkWipe(Canvas* canvas, Firework **fw, int nf) : Animation(ca
 void FireworkWipe::init() {
     for (int i = 0; i < canvas->getHeight(); i++) {
         fw[i]->halfFlare();
-        fw[i]->setState(State::START_EXPLOSION);
+        fw[i]->setState(FillState::START_EXPLOSION);
     }
 }
 
@@ -37,7 +37,7 @@ bool FireworkWipe::step() {
     bool keepGoing = true;
     for (int i = 0; i < canvas->getHeight(); i++) {
         fw[i]->step();
-        if (fw[i]->getState() == State::RESET) {
+        if (fw[i]->getState() == FillState::RESET) {
             //
             // If any of them tap out, call it a day.
             keepGoing = false;

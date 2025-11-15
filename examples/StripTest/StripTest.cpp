@@ -12,7 +12,7 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 137
-#define NUM_STRIPS 16
+#define NUM_STRIPS 7
 #define START_PIN 2
 
 int main() {

@@ -27,7 +27,7 @@ class Spark {
     };
 };
 
-enum State {
+enum FillState {
     PAUSE,
     RISING,
     START_EXPLOSION,
@@ -68,7 +68,7 @@ class Firework : public Animation {
     uint maxExplosionSteps = 90;
 
     /// @brief The state of the animation.
-    State state = RESET;
+    FillState state = RESET;
 
     /// @brief Our good old friend gravity. Gravity will be subtracted from
     /// spark velocity as time increases.
@@ -106,7 +106,7 @@ class Firework : public Animation {
 
     /// @brief Gets the current state of the firework.
     /// @return The state.
-    State getState() { return state; };
+    FillState getState() { return state; };
 
     /// @brief Sets the maximum number of steps that an explosion will take. You
     /// can use this to limit the time for an explosion.
@@ -123,7 +123,7 @@ class Firework : public Animation {
 
     /// @brief Sets the current state of the firework.
     /// @param state The state to use.
-    void setState(State state) { this->state = state; };
+    void setState(FillState state) { this->state = state; };
 
     /// @brief Initialize our explosion.
     void startExplosion();

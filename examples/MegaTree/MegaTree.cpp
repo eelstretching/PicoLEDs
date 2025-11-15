@@ -18,6 +18,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 #include <TimedAnimation.h>
+#include "Icicles.h"
 
 #define NUM_STRIPS 7
 #define START_PIN 2
@@ -82,23 +83,27 @@ int main() {
 
     Animator a(&c, FPS);
 
-    ColorCone cone(&c, &simpleXmasColors);
-    a.addTimed(&cone, 10000);
+    printf("MegaTree Animation Starting\n");
 
-    Marquees marq(&c, simpleXmasColors.getSize(), 20, RIGHT, c.getHeight());
-    a.addTimed(&marq, 10000); 
+    // ColorCone cone(&c, &simpleXmasColors);
+    // a.addTimed(&cone, 10000);
 
-    LinesFill lfu(&c, simpleXmasColors.getSize(), UP, 1);
-    lfu.setGap(6);
-    a.addTimed(&lfu, 10000);
+    // Marquees marq(&c, simpleXmasColors.getSize(), 20, RIGHT, c.getHeight());
+    // a.addTimed(&marq, 10000); 
 
-    LinesFill lfd(&c, simpleXmasColors.getSize(), DOWN, 1);
-    lfd.setGap(7);
-    a.addTimed(&lfd, 10000);
+    // LinesFill lfu(&c, simpleXmasColors.getSize(), UP, 1);
+    // lfu.setGap(6);
+    // a.addTimed(&lfu, 10000);
 
-    Spiral spiral(&c, &simpleXmasColors, 10, 25);
-    a.addTimed(&spiral, 10000);
+    // LinesFill lfd(&c, simpleXmasColors.getSize(), DOWN, 1);
+    // lfd.setGap(7);
+    // a.addTimed(&lfd, 10000);
 
+    // Spiral spiral(&c, &simpleXmasColors, 10, 25);
+    // a.addTimed(&spiral, 10000);
+
+    Icicles icicles(&c, 10, 5, RGB::White);
+    a.add(&icicles);
     a.init();
 
     while (true) {
