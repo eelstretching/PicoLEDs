@@ -11,6 +11,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 #include "ColorMap.h"
+#include "Direction.h"
 
 //
 // @brief The type of strip we're dealing with.
@@ -95,6 +96,10 @@ class Strip {
     /// @param start the index where to start
     /// @param n the number of pixels to fill
     void fill(uint8_t colorIndex, uint start, uint n);
+
+    void rotate(Direction direction, int n);
+
+    void rotate(Direction direction);
 
     uint getNumPixels() { return numPixels; }
 

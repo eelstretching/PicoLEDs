@@ -11,9 +11,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 137
+#define STRIP_LEN 300
 #define NUM_STRIPS 7
 #define START_PIN 2
+#define WIDTH 10
 
 int main() {
     stdio_init_all();
@@ -30,95 +31,74 @@ int main() {
     }
     renderer.setup();
 
-    ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
-                       RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
-                       RGB::FireBrick});
-    colorMap.dim(200);
+    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
+                       RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White});
+    colorMap.setBrightness(64);
 
-    printf("Ready\n");
-    for (int i = 0; i < ns; i++) {
-        strips[i]->fill(i % 3);
+    for (int c = 0; c < colorMap.getUsed(); c++) {
+        for (int i = 0; i < ns; i++) {
+            strips[i]->fill(c);
+        }
         renderer.render(&colorMap);
-        sleep_ms(500);
+        sleep_ms(250);
     }
-
-    int dirs[NUM_STRIPS];
-    for (int i = 0; i < NUM_STRIPS; i++) {
-        //
-        // When I originally wrote the code, the even directions were 1, so
-        // there you go.
-        dirs[i] = (i + 1) % 2;
-    }
-
-    float onesec = 1e6;  // 1 second in microseconds
-    float fps = 30;
-    int frame_time_us = (int)(onesec / fps);
-
-    printf("frame_time_us %d\n", frame_time_us);
-
-    int width = 10;
-
-    int posns[NUM_STRIPS];
-    for (int i = 0; i < NUM_STRIPS; i++) {
-        posns[i] = i % 2 == 0 ? 0 : ((int)strips[0]->getNumPixels() - width);
-    }
-
-    //
-    // Blank the strips.
-    for (int j = 0; j < ns; j++) {
-        strips[j]->fill(RGB::Black);
+    for (int i = 0; i < ns; i++) {
+        strips[i]->fill(colorMap.getBackgroundIndex());
     }
     renderer.render(&colorMap);
+    sleep_ms(100);
 
-    StopWatch fw;
-    while (1) {
-        fw.start();
-        uint64_t start = time_us_64();
-        for (int s = 0; s < ns; s++) {
-            if (dirs[s] == 1) {
-                if (posns[s] > 0) {
-                    strips[s]->putPixel(255, posns[s] - 1);
-                }
-                for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(s + 1, i);
-                }
-                posns[s]++;
-                if (posns[s] == strips[s]->getNumPixels() - width) {
-                    dirs[s] = 0;
-                }
-            } else {
-                if (posns[s] < strips[s]->getNumPixels() - width) {
-                    strips[s]->putPixel(255, posns[s] + width);
-                }
-                for (int i = posns[s]; i < posns[s] + width; i++) {
-                    strips[s]->putPixel(s + 1, i);
-                }
-                posns[s]--;
-                if (posns[s] == -1) {
-                    dirs[s] = 1;
-                    posns[s] = 0;
-                }
+    //
+    // Fill with color bands.
+    for (int s = 0; s < ns; s++) {
+        Strip& strip = *strips[s];
+        uint8_t cc = 0;
+        for (int i = 0; i < strip.getNumPixels(); i++) {
+            strip.putPixel(cc, i);
+            if ((i + 1) % WIDTH == 0) {
+                printf("Color change at pixel %d\n", i);
+                cc = (cc + 1) % colorMap.getUsed();
             }
         }
-        renderer.render(&colorMap);
-        uint64_t dthis = frame_time_us - (time_us_64() - start);
-        if (dthis > 0) {
-            sleep_us(dthis);
-        }
-        fw.finish();
+    }
+    renderer.render(&colorMap);
+    sleep_ms(1000);
 
-        if (fw.count % 200 == 0) {
-            printf("%d frames, %.2f f/s\n", fw.count,
-                   fw.count / (fw.totalTime / 1e6));
-            printf("%d blocked\n", renderer.getBlockedCount());
-            printf("%.2f us data setup time\n",
-                   (double)renderer.getDataSetupTime() / fw.count);
+    float fps = 40;
+    float usPerFrame = 1e6 / fps;
+    StopWatch frameWatch;
+    uint32_t missedFrames = 0;
+    int startPos = 0;
+    int width = WIDTH;
+    int currColorIndex = 0;
+    while (1) {
+        frameWatch.start();
+        for (int s = 0; s < ns; s++) {
+            if (s % 2 == 0) {
+                strips[s]->rotate(LEFT);
+            } else {
+                strips[s]->rotate(RIGHT);
+            }
+        }
+
+        renderer.render(&colorMap);
+        frameWatch.finish();
+        uint64_t lus = frameWatch.getLastTime();
+        if (lus < usPerFrame) {
+            sleep_us(usPerFrame - lus);
+        } else {
+            missedFrames++;
+        }
+
+        if (frameWatch.count % 200 == 0) {
+            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ",
+
+                   frameWatch.count, usPerFrame, frameWatch.getAverageTime());
+
+            printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",
-                   (double)renderer.getDMATime() / fw.count);
-            // for (int i = 0; i < ns; i++) {
-            //     StopWatch sw = strips[i]->getStripStats();
-            //     printf("%d %.2fus/show\n", i, sw.getAverageTime());
-            // }
+                   (double)renderer.getDMATime() / frameWatch.count);
         }
     }
+
 }

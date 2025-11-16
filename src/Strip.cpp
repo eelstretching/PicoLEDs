@@ -51,3 +51,28 @@ void Strip::fill(uint8_t index, uint start, uint n) {
     data[i] = index;
   }
 }
+
+void Strip::rotate(Direction direction, int n) {
+  for (int i = 0; i < n; i++) {
+    rotate(direction);
+  }
+}
+
+void Strip::rotate(Direction direction) {
+  uint8_t tmp;
+  switch (direction) {
+    case RIGHT:
+    case UP:
+      tmp = data[numPixels - 1];
+      memcpy(&data[1], &data[0], (numPixels - 1) * sizeof(uint8_t));
+      data[0] = tmp;
+      break;
+    case LEFT:
+    case DOWN:
+      tmp = data[0];
+      memcpy(&data[0], &data[1], (numPixels - 1) * sizeof(uint8_t));
+      data[numPixels - 1] = tmp;
+      break;
+
+  }
+}
