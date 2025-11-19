@@ -19,10 +19,12 @@
 #include "pico/types.h"
 #include <TimedAnimation.h>
 #include "Icicles.h"
+#include <ColorBars.h>
+#include <FadingBars.h>
 
-#define NUM_STRIPS 7
+#define NUM_STRIPS 1
 #define START_PIN 2
-#define STRIP_LEN 400
+#define STRIP_LEN 300
 #define CANVAS_WIDTH 100
 #define BRIGHTNESS 32
 #define FPS 30
@@ -40,19 +42,6 @@ int main() {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
-
-    //
-    // We want to operate in HSV space so that dimming is easy.
-    ColorMap xmasColors({
-        HSV(0,0,0),
-        HSV(139, 179, 242),  // Pine
-        HSV(0, 100, 100),    // Red
-        HSV(85, 100, 100),   // Green
-        HSV(170, 100, 100),  // Blue
-        HSV(42, 100, 100),   // Yellow
-        HSV(128, 100, 100),  // Cyan
-        HSV(213, 100, 100),  // Magenta
-    });
 
     ColorMap simpleXmasColors({
         RGB::Red,
@@ -83,8 +72,6 @@ int main() {
 
     Animator a(&c, FPS);
 
-    printf("MegaTree Animation Starting\n");
-
     // ColorCone cone(&c, &simpleXmasColors);
     // a.addTimed(&cone, 10000);
 
@@ -102,12 +89,23 @@ int main() {
     // Spiral spiral(&c, &simpleXmasColors, 10, 25);
     // a.addTimed(&spiral, 10000);
 
-    Icicles icicles(&c, 10, 5, RGB::White);
-    a.add(&icicles);
+    // Icicles icicles(&c, 10, 5, RGB::White);
+    // a.add(&icicles);
+
+    ColorBars cb1(&c, 20, 2);
+    a.addTimed(&cb1, 5000);
+
+    ColorBars cb2(&c, 15, 3);
+    a.addTimed(&cb2, 5000);
+
+    // FadingBars fb(&c, 20, 2, &simpleXmasColors);
+    // a.add(&fb);
+    // a.addTimed(&fb, 20000);
+
     a.init();
 
     while (true) {
-        a.step();
+        a.step(); 
         if (a.getFrameCount() % 200 == 0) {
             a.printStats();
         }
