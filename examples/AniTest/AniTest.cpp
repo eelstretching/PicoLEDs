@@ -12,6 +12,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 #define NUM_STRIPS 4
 #define START_PIN 2
@@ -35,12 +36,12 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
     }
 
-    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
+    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
                     RGB::Blue, RGB::Indigo, RGB::Violet});
     int nColors = colorMap.getUsed();
     colorMap.setBrightness(BRIGHTNESS);
 
-    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue});
+    ArrayColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue});
     simpleMap.setBrightness(BRIGHTNESS);
     // nColors = simpleMap.getUsed();
 

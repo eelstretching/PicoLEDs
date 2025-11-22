@@ -141,13 +141,13 @@ Icicle::Icicle(Canvas* canvas, uint pos, uint length, Direction direction,
     drip = new Drip(canvas, pos, length, 5, direction);
     //
     // Create a color map that goes from the brightest color to the dimmest.
-    colorMap.addColor(color);
+    colorMap->addColor(color);
     //
     // Ripping off fadeToBlack from FastLED, but for colors.
-    for (int i = 0; i < colorMap.getSize(); i++) {
-        colorMap.addColor(color.nscale8(235));
+    for (int i = 0; i < colorMap->getSize(); i++) {
+        colorMap->addColor(color.nscale8(235));
     }
-    canvas->setColorMap(&colorMap);
+    canvas->setColorMap(colorMap);
 }
 
 void Icicle::setPos(uint pos) {

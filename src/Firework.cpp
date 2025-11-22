@@ -1,4 +1,4 @@
-
+#include "ArrayColorMap.h"
 #include "Firework.h"
 
 #include <stdlib.h>
@@ -28,7 +28,7 @@ Firework::Firework(Canvas* canvas, uint row) : Animation(canvas) {
 }
 
 ColorMap *Firework::getColorMap() {
-    ColorMap *cm = new ColorMap(255);
+    ColorMap *cm = new ArrayColorMap(255);
     //
     // We're going to do three ranges of 64 colors here. For the main heat. This
     // leaves some room at the end for a few more colors if we need them. Borrowed

@@ -12,6 +12,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 #define NUM_STRIPS 4
 #define START_PIN 2
@@ -35,13 +36,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    ColorMap fadeMap(128);
-    fadeMap.fillGradient(0, RGB::Red, 18, RGB::Orange);
-    fadeMap.fillGradient(19, RGB::Orange, 36, RGB::Yellow);
-    fadeMap.fillGradient(37, RGB::Yellow, 54, RGB::Green);
-    fadeMap.fillGradient(55, RGB::Green, 73, RGB::Blue);
-    fadeMap.fillGradient(74, RGB::Blue, 91, RGB::Indigo);
-    fadeMap.fillGradient(92, RGB::Indigo, 127, RGB::Violet);
+    ArrayColorMap fadeMap(128);
     fadeMap.setBrightness(BRIGHTNESS);
 
     Canvas c(CANVAS_WIDTH);

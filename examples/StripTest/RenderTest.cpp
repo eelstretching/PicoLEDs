@@ -1,6 +1,7 @@
 #include <Renderer.h>
 #include <stdlib.h>
 
+#include "ArrayColorMap.h"
 #include "StopWatch.h"
 #include "Strip.h"
 #include "colorutils.h"
@@ -17,7 +18,7 @@
 #define NUM_STRIPS 7
 #define START_PIN 2
 
-ColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
+ArrayColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::Yellow,
                        RGB::Purple, RGB::GhostWhite, RGB::DarkViolet,
                        RGB::FireBrick});
 
@@ -112,7 +113,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    colorMap.dim(210);
+    colorMap.setBrightness(32);
 
     while (1) {
         // //

@@ -11,6 +11,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 #define NUM_LEDS 120
 int main() {
@@ -26,7 +27,7 @@ int main() {
     canvas.add(strips[2]);
     int delay = 100;
 
-    ColorMap colorMap({
+    ArrayColorMap colorMap({
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
         RGB::Blue,  RGB::Indigo, RGB::Violet
     });

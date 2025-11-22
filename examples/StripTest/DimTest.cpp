@@ -1,6 +1,8 @@
 #include <Renderer.h>
 #include <stdlib.h>
 
+#include "FadeColorMap.h"
+#include "ArrayColorMap.h"
 #include "StopWatch.h"
 #include "Strip.h"
 #include "colorutils.h"
@@ -29,20 +31,13 @@ int main() {
     renderer.add(strip);
     renderer.setup();
 
-    ColorMap dimMap(128);
-    dimMap.addColor(RGB(0, 64, 0));
+    ArrayColorMap baseMap(4);
+    baseMap.addColor(RGB(0, 64, 0));
+    baseMap.addColor(RGB(128, 0, 0));
+    ColorMap* fadeMap = new FadeColorMap(&baseMap, 2, 32, 28);
     RGB curr = RGB::Red;
-    for (int i = 0; i < 32; i++) {
-        dimMap.addColor(curr);
-        curr.fadeToBlackBy(40);
-    }
-    strip.fill(dimMap.getBackgroundIndex());
-    renderer.render(&dimMap);
-
-    char buffer[32];
-    for (int i = 0; i < dimMap.getUsed(); i++) {
-        printf("Color %d: %s\n", i, dimMap[i].toString(buffer, 32));
-    }
+    strip.fill(fadeMap->getBackgroundIndex());
+    renderer.render(fadeMap);
 
     float fps = 10;
     float usPerFrame = 1e6 / fps;
@@ -50,12 +45,12 @@ int main() {
     uint32_t missedFrames = 0;
 
     while (true) {
-        strip.fill(dimMap.getBackgroundIndex());
-        for (int i = 1; i < dimMap.getUsed(); i++) {
+        strip.fill(fadeMap->getBackgroundIndex());
+        for (int i = 32; i < fadeMap->getUsed(); i++) {
             frameWatch.start();
             strip.fill(i, 0, 100);
-            strip.putPixel(0, 100 + i);
-            renderer.render(&dimMap);
+            strip.putPixel(0, 100 + (i-32));
+            renderer.render(fadeMap);
             frameWatch.finish();
             uint64_t lus = frameWatch.getLastTime();
             if (lus < usPerFrame) {

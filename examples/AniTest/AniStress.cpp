@@ -12,6 +12,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 #define NUM_STRIPS 4
 #define START_PIN 2
@@ -32,7 +33,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    ColorMap colors({
+    ArrayColorMap colors({
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
         RGB::Blue,  RGB::Indigo, RGB::Violet
     });

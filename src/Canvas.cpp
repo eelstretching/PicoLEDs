@@ -1,7 +1,9 @@
+#include "ArrayColorMap.h"
 #include "Canvas.h"
 
 #include <stdlib.h>
 #include <string.h>
+
 
 #include "pico/platform.h"
 
@@ -35,6 +37,28 @@ uint8_t Row::get(int x) {
 }
 
 void Row::fill(uint8_t color) { strip->fill(color, start, width); }
+
+void Row::rotateRight() {
+    switch(dir) {
+        case StripDirection::FORWARDS: 
+            strip->rotateRight(start, start + width);
+            break;
+        case StripDirection::BACKWARDS:
+            strip->rotateLeft(start, start + width);
+            break;
+    }
+}
+
+void Row::rotateLeft() {
+    switch(dir) {
+        case StripDirection::FORWARDS: 
+            strip->rotateLeft(start, start + width);
+            break;
+        case StripDirection::BACKWARDS:
+            strip->rotateRight(start, start + width);
+            break;
+    }
+}
 
 int Row::copy(uint8_t* source, int p, int n) {
     int tc = MIN(width - p, n);
@@ -85,7 +109,7 @@ Canvas::Canvas(uint width) : width(width) {
 }
 
 ColorMap* Canvas::makeColorMap(uint8_t size) {
-    colorMap = new ColorMap(size + 1);
+    colorMap = new ArrayColorMap(size + 1);
     colorMap->addColor(getBackground());
     return colorMap;
 }
@@ -324,6 +348,18 @@ void Canvas::copyColumn(int src, int dst) {
     }
     for (auto row : rows) {
         row.set(dst, row.get(src));
+    }
+}
+
+void Canvas::rotateRight() {
+    for(auto row : rows) {
+        row.rotateRight();
+    }
+}
+
+void Canvas::rotateLeft() {
+    for(auto row : rows) {
+        row.rotateLeft();
     }
 }
 

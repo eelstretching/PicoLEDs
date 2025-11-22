@@ -11,42 +11,32 @@
 
 /// @brief A color map that maps from 8-bit values to RGB colors.
 /// We also have a color to use as the background, since that's kind of a separate thing. 
-/// Color maps are a fixed size, but can be added to as they go.
+/// This color map is mostly abstract; specific implementations will derive from this class.
 class ColorMap {
    protected:
-    uint8_t size;
-    uint8_t p;
-    RGB* entries;
     RGB background = RGB::Black;
 
    public:
-    ColorMap();
-    ColorMap(uint8_t size);
-    ColorMap(std::initializer_list<RGB> rhs);
-    ColorMap(std::initializer_list<HSV> rhs);
-    ColorMap(std::initializer_list<uint32_t> rhs);
-    ColorMap(const ColorMap& rhs);
-    ~ColorMap();
+    ColorMap() {}
+    ColorMap(RGB background) : background(background) {};
+    ~ColorMap() {};
 
-    uint8_t getSize() { return size; };
-    uint8_t getUsed() { return p; };
+    virtual uint8_t getSize() { return 0; };
+    virtual uint8_t getUsed() { return 0; };
 
     void setBackground(const RGB& color) { background = color; };
     RGB getBackground() { return background; };
     uint8_t getBackgroundIndex() {return 255;};
-    RGB operator[](uint8_t index);
-    uint8_t addColor(const RGB& color);
-    uint8_t addColor(const HSV& color);
-    uint8_t addColors(std::initializer_list<RGB> colors);
-    void setColor(uint8_t index, const RGB& color);
-    void setColor(uint8_t index, const HSV& color);
-    void fillGradient(uint8_t indexstart, const RGB& colorstart,
-                      uint8_t indexend, const RGB& colorend);
-    RGB getColor(uint8_t index);
-    uint8_t getIndex(RGB& color);
-    uint8_t getIndex(HSV& color);
-    void dim(uint8_t value);
-    void setBrightness(uint8_t value);
+    virtual RGB operator[](uint8_t index) { return background; };
+    virtual uint8_t addColor(const RGB& color) {return 0;};
+    virtual uint8_t addColor(const HSV& color) {return 0;};
+    virtual void setColor(uint8_t index, const RGB& color) {};
+    virtual void setColor(uint8_t index, const HSV& color) {};
+    virtual uint8_t addColors(std::initializer_list<RGB> colors) {return 0;};
+    virtual RGB getColor(uint8_t index) {return RGB::Black;};
+    virtual uint8_t getIndex(RGB& color) { return 0;};
+    virtual uint8_t getIndex(HSV& color) { return 0;};
+    virtual void setBrightness(uint8_t value) {};
 };
 
 

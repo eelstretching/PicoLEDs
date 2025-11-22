@@ -21,6 +21,7 @@ target_link_libraries(PicoLEDs PUBLIC
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_runtime
   pico_stdlib
   pico_rand
 )

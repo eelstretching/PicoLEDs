@@ -1,6 +1,7 @@
 #include <Renderer.h>
 #include <stdlib.h>
 
+#include "ArrayColorMap.h"
 #include "StopWatch.h"
 #include "Strip.h"
 #include "colorutils.h"
@@ -29,7 +30,7 @@ int main() {
     renderer.add(strip);
     renderer.setup();
 
-    ColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
+    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
                        RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White});
     colorMap.setBrightness(64);
 

@@ -52,6 +52,22 @@ void Strip::fill(uint8_t index, uint start, uint n) {
   }
 }
 
+void Strip::rotateRight(int start, int end) {
+  //
+  // A place to put the data from the rightmost pixel.
+  uint8_t tmp = data[end - 1];
+  memmove(&data[start + 1], &data[start], (end - start - 1) * sizeof(uint8_t));
+  data[start] = tmp;
+}
+
+void Strip::rotateLeft(int start, int end) {
+  //
+  // A place to put the data from the leftmost pixel.
+  uint8_t tmp = data[start];
+  memmove(&data[start], &data[start + 1], (end - start - 1) * sizeof(uint8_t));
+  data[end - 1] = tmp;
+}
+
 void Strip::rotate(Direction direction, int n) {
   for (int i = 0; i < n; i++) {
     rotate(direction);

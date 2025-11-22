@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "Animator.h"
+#include "ArrayColorMap.h"
 #include "BarberPole.h"
 #include "Bouncer.h"
 #include "Canvas.h"
@@ -36,7 +37,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
     }
 
-    ColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
+    ArrayColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
                         RGB::DarkViolet, RGB::Orange, RGB::Yellow, RGB::Cyan});
     simpleMap.setBrightness(BRIGHTNESS);
     int nColors = simpleMap.getUsed();

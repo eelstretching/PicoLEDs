@@ -12,6 +12,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 #define NUM_STRIPS 16
 #define START_PIN 2
@@ -39,7 +40,7 @@ int main() {
         canvas.add(*strips[i]);
     }
     canvas.setup();
-    ColorMap colorMap({RGB(0b11111111, 0b11111111, 0b11111111),
+    ArrayColorMap colorMap({RGB(0b11111111, 0b11111111, 0b11111111),
                        RGB(0b11111111, 0b00111111, 0b11111111),
                        RGB(0b11111111, 0b00011111, 0b11111111),
                        RGB(0b11111111, 0b00001111, 0b11111111),

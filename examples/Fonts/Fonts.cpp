@@ -12,6 +12,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 int main() {
     stdio_init_all();
@@ -29,7 +30,7 @@ int main() {
 
     Font twoP(&canvas, FontTwoPData);
 
-    ColorMap colorMap({
+    ArrayColorMap colorMap({
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
         RGB::Blue,  RGB::Indigo, RGB::Violet
     });

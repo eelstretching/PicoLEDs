@@ -65,7 +65,7 @@ class Icicle : public Animation {
     /// @brief The direction the icicle is facing, and the direction of gravity.
     Direction direction = LEFT;
 
-    ColorMap colorMap;
+    ColorMap *colorMap;
 
     Drip *drip;
 

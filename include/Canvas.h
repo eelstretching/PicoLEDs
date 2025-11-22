@@ -55,6 +55,13 @@ class Row {
     /// @param color the color to fill with
     void fill(uint8_t color);
 
+    
+    /// @brief Rotate the row to the right by one pixel.
+    void rotateRight();
+
+    /// @brief Rotate the row to the left by one pixel.
+    void rotateLeft();
+
     /// @brief Copies as many color values from the provided array at the given
     /// position.
     /// @param source The array containing values to be copied
@@ -223,11 +230,11 @@ class Canvas {
     /// @param f
     void scrollDown(int n, uint8_t f);
 
-    void scrollLeft() { scrollLeft(1, 0); };
+    void scrollLeft() { scrollLeft(1, colorMap->getBackgroundIndex()); };
 
     void scrollLeft(int n, uint8_t f);
 
-    void scrollRight() { scrollRight(1, 0); };
+    void scrollRight() { scrollRight(1, colorMap->getBackgroundIndex()); };
 
     void scrollRight(int n, uint8_t f);
 
@@ -237,6 +244,10 @@ class Canvas {
     void copyRow(int src, int dst);
 
     void copyColumn(int src, int dst);
+
+    void rotateRight();
+
+    void rotateLeft();
 
     /// @brief Rotate the canvas up by one row, which will make the top row the
     /// bottom row.

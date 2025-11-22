@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "Animator.h"
+#include "ArrayColorMap.h"
 #include "BarberPole.h"
 #include "Bouncer.h"
 #include "Canvas.h"
@@ -21,6 +22,7 @@
 #include "Icicles.h"
 #include <ColorBars.h>
 #include <FadingBars.h>
+#include <RotatingBars.h>
 
 #define NUM_STRIPS 1
 #define START_PIN 2
@@ -43,7 +45,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN);
     }
 
-    ColorMap simpleXmasColors({
+    ArrayColorMap xmasColors({
         RGB::Red,
         RGB::Green,
         RGB::Blue,
@@ -52,14 +54,18 @@ int main() {
         RGB::Orange
     });
 
-    simpleXmasColors.setBrightness(BRIGHTNESS);
+    ArrayColorMap dimXmasColors(xmasColors);
+    dimXmasColors.setBrightness(32);
+
+    ArrayColorMap brightXmasColors(xmasColors);
+    brightXmasColors.setBrightness(128);
 
     Canvas c(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
     c.setup();
-    c.setColorMap(&simpleXmasColors);
+    c.setColorMap(&xmasColors);
 
     for(int i = 0; i < 3; i++) {
         c.fill(i+1);
@@ -92,15 +98,23 @@ int main() {
     // Icicles icicles(&c, 10, 5, RGB::White);
     // a.add(&icicles);
 
-    ColorBars cb1(&c, 20, 2);
-    a.addTimed(&cb1, 5000);
+    // ColorBars cb1(&c, 20, 2);
+    // a.addTimed(&cb1, 5000);
 
-    ColorBars cb2(&c, 15, 3);
-    a.addTimed(&cb2, 5000);
+    // ColorBars cb2(&c, 15, 3);
+    // a.addTimed(&cb2, 5000);
 
-    // FadingBars fb(&c, 20, 2, &simpleXmasColors);
-    // a.add(&fb);
-    // a.addTimed(&fb, 20000);
+    // FadingBars fb1(&c, 20, 2, &brightXmasColors);
+    // a.addTimed(&fb1, 20000);
+
+    // FadingBars fb2(&c, 10, 4, &brightXmasColors);
+    // a.addTimed(&fb2, 20000);
+
+    RotatingBars rb1(&c, &brightXmasColors, 20, 2);
+    a.addTimed(&rb1, 20000);
+
+    RotatingBars rb2(&c, &brightXmasColors, 10, 4);
+    a.addTimed(&rb2, 20000);
 
     a.init();
 
