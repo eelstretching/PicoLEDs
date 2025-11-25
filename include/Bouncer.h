@@ -26,10 +26,11 @@ class Bouncer : public Animation {
     /// @param canvas The canvas we'll draw on.
     /// @param x the initial x position of the bouncer
     /// @param y the initial y position of the bouncer
-    Bouncer(Canvas *canvas, uint8_t color, int x, int y);
+    Bouncer(Canvas* canvas, ColorMap* colorMap, uint8_t color, int x, int y);
 
-    Bouncer(Canvas *canvas, uint8_t color, int x, int y, int maxX, int maxY);
-    int getFPSNeeded() {return 10;};
+    Bouncer(Canvas* canvas, ColorMap* colorMap, uint8_t color, int x, int y,
+            int maxX, int maxY);
+    int getFPSNeeded() { return 10; };
     bool step();
 };
 

@@ -7,8 +7,8 @@
 TextElement::TextElement(const char* text, uint x, uint y, uint8_t color)
     : text(text), x(x), y(y), color(color) {}
 
-TextAnimation::TextAnimation(Canvas* canvas, Font* font, uint duration)
-    : Animation(canvas), font(font) {
+TextAnimation::TextAnimation(Canvas* canvas, ColorMap *colorMap, Font* font, uint duration)
+    : Animation(canvas, colorMap), font(font) {
     //
     // Input is milliseconds, but we'll time in microseconds.
     this->duration = duration * 1000;

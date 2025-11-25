@@ -1,6 +1,6 @@
 #include "ColorCone.h"
 
-ColorCone::ColorCone(Canvas* canvas, ColorMap *colorMap) : Animation(canvas), colorMap(colorMap) {
+ColorCone::ColorCone(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
     bandSize = canvas->getWidth() / colorMap->getUsed();
 }
 

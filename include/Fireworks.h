@@ -14,8 +14,8 @@ class Fireworks : public Animation {
     int nf;
 
    public:
-    Fireworks(Canvas *canvas);
-    Fireworks(Canvas *canvas, Firework **fw, int nf);
+    Fireworks(Canvas *canvas, ColorMap *colorMap);
+    Fireworks(Canvas *canvas, ColorMap *colorMap, Firework **fw, int nf);
     void init();
     bool step();
     void finish();

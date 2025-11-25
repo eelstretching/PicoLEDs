@@ -30,12 +30,12 @@ class Animator : public Animation {
    public:
     /// @brief Creates an animator for the given canvas.
     /// @param canvas
-    Animator(Canvas *canvas);
+    Animator(Canvas *canvas, ColorMap *colorMap);
     /// @brief Creates an animator for the given canvas that will run at the
     /// given number of frames per second.
     /// @param canvas the canvas we're animating on
     /// @param fps the number of frames per second to display.
-    Animator(Canvas *canvas, int fps);
+    Animator(Canvas *canvas, ColorMap *colorMap, int fps);
     /// @brief Adds an animation to the end of our list.
     /// @param a the animation to add.
     void add(Animation *a);

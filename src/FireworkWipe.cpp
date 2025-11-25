@@ -2,13 +2,13 @@
 
 #include "pico/printf.h"
 
-FireworkWipe::FireworkWipe(Canvas* canvas) : Animation(canvas) {
+FireworkWipe::FireworkWipe(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
     //
     // We'll make enough fireworks for the height of the canvas.
     nf = canvas->getHeight();
     fw = new Firework*[nf];
     for (int i = 0; i < nf; i++) {
-        fw[i] = new Firework(canvas, i);
+        fw[i] = new Firework(canvas, colorMap, i);
         if (fw[i] == NULL) {
             printf("No firework for %i!\n", i);
         }
@@ -18,7 +18,7 @@ FireworkWipe::FireworkWipe(Canvas* canvas) : Animation(canvas) {
     }
 }
 
-FireworkWipe::FireworkWipe(Canvas* canvas, Firework **fw, int nf) : Animation(canvas), fw(fw), nf(nf) {
+FireworkWipe::FireworkWipe(Canvas* canvas, ColorMap *colorMap, Firework **fw, int nf) : Animation(canvas, colorMap), fw(fw), nf(nf) {
     for (int i = 0; i < nf; i++) {
         //
         // We want the wipe to last a little longer than the usual one.

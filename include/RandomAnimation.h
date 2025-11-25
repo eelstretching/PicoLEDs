@@ -1,5 +1,5 @@
-#ifndef RANDOMWIPE_H
-#define RANDOMWIPE_H
+#ifndef RANDOMANIMATION_H
+#define RANDOMANIMATION_H
 
 #pragma once
 
@@ -16,7 +16,7 @@ class RandomAnimation : public Animation {
     Animation *curr;
 
     public:
-    RandomAnimation(Canvas *canvas) : Animation(canvas) {};
+    RandomAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {};
     void add(Animation *animation);
     void init();
     bool step();

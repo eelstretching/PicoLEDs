@@ -27,10 +27,12 @@ int main() {
     StopWatch aw;
     StopWatch sw;
 
+    ColorMap *colorMap = Firework::getColorMap();
+
     int nf = canvas.getHeight();
     Firework **fw = new Firework*[nf];
     for(int i = 0; i < nf; i++) {
-        fw[i] = new Firework(&canvas, i);
+        fw[i] = new Firework(&canvas, colorMap, i);
     }
 
     int n = 0;

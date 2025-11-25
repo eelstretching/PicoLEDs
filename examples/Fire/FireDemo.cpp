@@ -6,6 +6,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ArrayColorMap.h>
 
 int main() {
     stdio_init_all();
@@ -24,17 +25,23 @@ int main() {
     canvas.clear();
     StopWatch sw;
 
-    int nf = 3;
-    Fire f[] = {Fire(&canvas, 10, 80, 0, 55, 120),
-                Fire(&canvas, 10, 100, 1, 80, 150),
-                Fire(&canvas, 10, 90, 2, 30, 120)};
+    ArrayColorMap colorMap({
+        RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
+        RGB::Blue,  RGB::Indigo, RGB::Violet
+    });
+    colorMap.setBrightness(32);
 
-    MultiAnimation fires(&canvas);
+    int nf = 3;
+    Fire f[] = {Fire(&canvas, &colorMap, 10, 80, 0, 55, 120),
+                Fire(&canvas, &colorMap, 10, 100, 1, 80, 150),
+                Fire(&canvas, &colorMap, 10, 90, 2, 30, 120)};
+
+    MultiAnimation fires(&canvas, &colorMap);
     for (int i = 0; i < nf; i++) {
         fires.add(&f[i]);
     }
 
-    Animator animator(&canvas, 5);
+    Animator animator(&canvas, &colorMap, 5);
     animator.add(&fires);
     animator.init();
 

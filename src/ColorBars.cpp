@@ -1,6 +1,6 @@
 #include "ColorBars.h"
 
-ColorBars::ColorBars(Canvas *canvas, uint8_t barWidth, uint8_t nColors) : Animation(canvas), barWidth(barWidth), nColors(nColors) {}
+ColorBars::ColorBars(Canvas *canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t nColors) : Animation(canvas, colorMap), barWidth(barWidth), nColors(nColors) {}
 
 bool ColorBars::step() { 
     for(int i = 0; i < canvas->getWidth(); i++) {

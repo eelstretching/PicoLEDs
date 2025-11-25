@@ -15,8 +15,8 @@ class FireworkWipe : public Animation {
     int nf;
 
    public:
-    FireworkWipe(Canvas *canvas);
-    FireworkWipe(Canvas *canvas, Firework **fw, int nf);
+    FireworkWipe(Canvas *canvas, ColorMap *colorMap);
+    FireworkWipe(Canvas *canvas, ColorMap *colorMap, Firework **fw, int nf);
     void init();
     bool step();
     void finish();

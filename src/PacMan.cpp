@@ -2,12 +2,12 @@
 
 #include "Direction.h"
 
-PacMan::PacMan(Canvas* canvas, int startX, int startY)
-    : Sprite(canvas, startX, startY) {
+PacMan::PacMan(Canvas* canvas, ColorMap *colorMap, int startX, int startY)
+    : Sprite(canvas, colorMap, startX, startY) {
     xpms = new Xpm*[3];
-    xpms[0] = new Xpm(pac1, canvas->getColorMap());
-    xpms[1] = new Xpm(pac2, canvas->getColorMap());
-    xpms[2] = new Xpm(pac3, canvas->getColorMap());
+    xpms[0] = new Xpm(pac1, colorMap);
+    xpms[1] = new Xpm(pac2, colorMap);
+    xpms[2] = new Xpm(pac3, colorMap);
 
     //
     // Define the animation loop. We'll have each state last for two frames.

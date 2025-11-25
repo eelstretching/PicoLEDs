@@ -15,7 +15,7 @@ class PacWipe : public Animation {
     Sprite *curr;
 
    public:
-    PacWipe(Canvas *canvas);
+    PacWipe(Canvas *canvas, ColorMap *colorMap);
     void init();
     bool step();
 };

@@ -1,6 +1,6 @@
 #include "ScrollWipe.h"
 
-ScrollWipe::ScrollWipe(Canvas* canvas, Direction dir) : Animation(canvas) {
+ScrollWipe::ScrollWipe(Canvas* canvas, ColorMap *colorMap, Direction dir) : Animation(canvas, colorMap) {
     this->dir = dir;
     scrolled = 0;
     switch (dir) {

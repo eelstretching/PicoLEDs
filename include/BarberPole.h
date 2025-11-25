@@ -18,7 +18,7 @@ class BarberPole : public Animation {
     /// @param canvas the canvas we'll draw on
     /// @param c1 the first color for the barber pole
     /// @param c2 the second color for the barber pole
-    BarberPole(Canvas *canvas, int nColors) : Animation(canvas), nColors(nColors) {
+    BarberPole(Canvas *canvas, ColorMap *colorMap, int nColors) : Animation(canvas, colorMap), nColors(nColors) {
         stripeWidth = 4;
     };
 
@@ -27,8 +27,8 @@ class BarberPole : public Animation {
     /// @param c1 the first color for the barber pole
     /// @param c2 the second color for the barber pole
     /// @param stripeWidth how wide the stripes should be.
-    BarberPole(Canvas *canvas, int nColors, int stripeWidth)
-        : Animation(canvas), nColors(nColors), stripeWidth(stripeWidth) {
+    BarberPole(Canvas *canvas, ColorMap *colorMap, int nColors, int stripeWidth)
+        : Animation(canvas, colorMap), nColors(nColors), stripeWidth(stripeWidth) {
     };
 
     int getFPSNeeded() { return 10; };

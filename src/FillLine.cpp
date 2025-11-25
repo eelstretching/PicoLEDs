@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-FillLine::FillLine(Canvas* canvas, uint8_t colorIndex, Direction direction, int16_t startPos,
+FillLine::FillLine(Canvas* canvas, ColorMap *colorMap, uint8_t colorIndex, Direction direction, int16_t startPos,
                    int16_t endPos, uint8_t stepSize)
-    : canvas(canvas),
+    : Animation(canvas, colorMap),
       colorIndex(colorIndex),
       direction(direction),
       currPos(startPos),

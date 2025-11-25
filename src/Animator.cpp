@@ -1,13 +1,13 @@
 #include "Animator.h"
 #include "TimedAnimation.h"
 
-Animator::Animator(Canvas* canvas) : Animation(canvas) {
+Animator::Animator(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
     //
     // We'll do 30 FPS by default.
     setFPS(30);
 }
 
-Animator::Animator(Canvas* canvas, int fps) : Animator(canvas) { setFPS(fps); }
+Animator::Animator(Canvas* canvas, ColorMap *colorMap, int fps) : Animator(canvas, colorMap) { setFPS(fps); }
 
 void Animator::add(Animation* a) { animations.push_back(a); }
 

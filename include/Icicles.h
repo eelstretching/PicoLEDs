@@ -40,8 +40,8 @@ class Drip : public Animation {
     /// @param pos The position (row or column) to draw in.
     /// @param length The length of the drip.
     /// @param direction The direction the drip is moving.
-    Drip(Canvas* canvas, uint pos, uint length, uint tailLen,
-         Direction direction);
+    Drip(Canvas* canvas, ColorMap* colorMap, uint pos, uint length,
+         uint tailLen, Direction direction);
 
     /// @brief Initializes the animation.
     void init() override;
@@ -65,9 +65,9 @@ class Icicle : public Animation {
     /// @brief The direction the icicle is facing, and the direction of gravity.
     Direction direction = LEFT;
 
-    ColorMap *colorMap;
+    ColorMap* colorMap;
 
-    Drip *drip;
+    Drip* drip;
 
    public:
     /// @brief Constructor for an icicle animation.
@@ -75,7 +75,8 @@ class Icicle : public Animation {
     /// @param pos The column to draw in.
     /// @param length The length of the icicle.
     /// @param color The brightest color of the icicle.
-    Icicle(Canvas* canvas, uint pos, uint length, Direction direction, RGB color = RGB::White);
+    Icicle(Canvas* canvas, ColorMap* colorMap, uint pos, uint length,
+           Direction direction, RGB color = RGB::White);
 
     void setPos(uint pos);
 
@@ -99,7 +100,7 @@ class Icicles : public Animation {
     /// @param numIcicles The number of icicles to draw.
     /// @param length The base length of the icicles, we'll randomize a bit.
     /// @param color The brightest color of the icicles.
-    Icicles(Canvas* canvas, uint numIcicles, uint length,
+    Icicles(Canvas* canvas, ColorMap* colorMap, uint numIcicles, uint length,
             RGB color);
 
     /// @brief Destructor for the icicles animation.

@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-LinesFill::LinesFill(Canvas* canvas, int nBands, Direction direction,
+LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nBands, Direction direction,
                    int stepSize)
-    : canvas(canvas),
+    : Animation(canvas, colorMap),
       nBands(nBands),
       direction(direction),
       stepSize(stepSize) {
@@ -64,7 +64,7 @@ void LinesFill::init() {
 
         //
         // New line. We'll start with most of them off the canvas.
-        lines[i] = new FillLine(canvas, currBand, direction, startPos,
+        lines[i] = new FillLine(canvas, colorMap, currBand, direction, startPos,
                                 endPos, stepSize);
 
         //

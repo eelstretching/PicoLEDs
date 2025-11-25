@@ -33,8 +33,10 @@ int main() {
     canvas.add(strips[3]);
     int delay = 30;
 
-    PacWipe pac(&canvas);
-    Animator animator(&canvas);
+    ColorMap colorMap(128);
+
+    PacWipe pac(&canvas, &colorMap);
+    Animator animator(&canvas, &colorMap);
 
     animator.add(&pac);
 

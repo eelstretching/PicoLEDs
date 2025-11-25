@@ -7,13 +7,14 @@
 #include "pico.h"
 #include "pico/platform.h"
 
-Fire::Fire(Canvas *canvas, 
+Fire::Fire(Canvas *canvas,
+    ColorMap *colorMap,
             uint x, 
             uint n, 
             uint row, 
             uint cooling,
            uint sparking)
-    : canvas(canvas),
+    : Animation(canvas, colorMap),
       x(x),
       n(n),
       row(row),

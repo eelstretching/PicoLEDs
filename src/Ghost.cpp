@@ -1,7 +1,7 @@
 #include "Ghost.h"
 
-Ghost::Ghost(Canvas* canvas, RGB &ghostColor, int startX, int startY)
-    : Sprite(canvas, startX, startY) {
+Ghost::Ghost(Canvas* canvas, ColorMap *colorMap, RGB &ghostColor, int startX, int startY)
+    : Sprite(canvas, colorMap, startX, startY) {
     //
     // We get to create the pixmaps, others will copy these, to save precious
     // memory.

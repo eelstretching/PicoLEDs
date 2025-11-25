@@ -21,12 +21,9 @@ class Sprite : public Animation {
     int y;
     Direction direction;
 
-    /// @brief A color map for rendering.
-    ColorMap *colorMap;
-
    public:
-    Sprite(Canvas *canvas, int startX, int startY)
-        : Animation(canvas), startX(startX), startY(startY){colorMap = NULL; };
+    Sprite(Canvas *canvas, ColorMap *colorMap, int startX, int startY)
+        : Animation(canvas, colorMap), startX(startX), startY(startY){};
     void add(Xpm *frame);
     Sprite(Sprite &o);
     std::vector<Xpm *> &getFrames() { return frames; };

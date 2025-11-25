@@ -22,15 +22,13 @@ class FadingBar : public Animation {
     FadeState state;
 
    public:
-    FadingBar(Canvas* canvas, uint8_t barWidth, uint8_t position,
+    FadingBar(Canvas* canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t position,
               uint8_t brightColorIndex, uint8_t dimColorIndex, FadeState state)
-        : Animation(canvas),
+        : Animation(canvas, colorMap),
           barWidth(barWidth),
           brightColorIndex(brightColorIndex),
           dimColorIndex(dimColorIndex),
-          position(position), initState(state), state(state) {
-            printf("FadingBar at pos %d: width: %d bright %d, dim %d\n", position, barWidth, brightColorIndex, dimColorIndex);
-          }
+          position(position), initState(state), state(state) {};
     int getFPSNeeded() override { return 10; };
     virtual void init() override;
     virtual bool step() override;
@@ -45,8 +43,7 @@ class FadingBars : public Animation {
     FadingBar** bars;
 
    public:
-    FadingBars(Canvas* canvas, uint8_t barWidth, uint8_t nColors,
-               ColorMap* colorMap);
+    FadingBars(Canvas* canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t nColors);
     int getFPSNeeded() override { return 10; };
     virtual void init() override;
     virtual bool step() override;

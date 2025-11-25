@@ -15,7 +15,6 @@ class ColorCone : public Animation {
 
    private:
     
-    ColorMap *colorMap;
     int pos = 0;
     bool buildDone = false;
     uint8_t currCol = 0;

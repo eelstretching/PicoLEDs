@@ -33,7 +33,7 @@ class TextAnimation : public Animation {
     /// @param canvas
     /// @param font
     /// @param duration How long to display the text, in milliseconds.
-    TextAnimation(Canvas *canvas, Font *font, uint duration);
+    TextAnimation(Canvas *canvas, ColorMap *colorMap, Font *font, uint duration);
 
     void add(TextElement *element);
 

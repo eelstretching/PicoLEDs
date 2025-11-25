@@ -1,8 +1,8 @@
 #include "Icicles.h"
 
-Drip::Drip(Canvas* canvas, uint pos, uint length, uint tailLen,
+Drip::Drip(Canvas* canvas, ColorMap *colorMap, uint pos, uint length, uint tailLen,
            Direction direction)
-    : Animation(canvas),
+    : Animation(canvas, colorMap),
       dp(pos),
       length(length),
       tailLen(tailLen),
@@ -135,10 +135,10 @@ bool Drip::step() {
     return true;
 }
 
-Icicle::Icicle(Canvas* canvas, uint pos, uint length, Direction direction,
+Icicle::Icicle(Canvas* canvas, ColorMap *colorMap, uint pos, uint length, Direction direction,
                RGB color)
-    : Animation(canvas), pos(pos), length(length), direction(direction) {
-    drip = new Drip(canvas, pos, length, 5, direction);
+    : Animation(canvas, colorMap), pos(pos), length(length), direction(direction) {
+    drip = new Drip(canvas, colorMap, pos, length, 5, direction);
     //
     // Create a color map that goes from the brightest color to the dimmest.
     colorMap->addColor(color);
@@ -180,13 +180,13 @@ bool Icicle::step() {
     return true;
 }
 
-Icicles::Icicles(Canvas* canvas, uint numIcicles, uint length, RGB color)
-    : Animation(canvas), numIcicles(numIcicles) {
+Icicles::Icicles(Canvas* canvas, ColorMap *colorMap, uint numIcicles, uint length, RGB color)
+    : Animation(canvas, colorMap), numIcicles(numIcicles) {
     icicles = new Icicle*[numIcicles];
 
     for (uint i = 0; i < numIcicles; i++) {
         icicles[i] =
-            new Icicle(canvas, 0, length + random16(0, 6), LEFT, color);
+            new Icicle(canvas, colorMap, 0, length + random16(0, 6), LEFT, color);
     }
 }
 

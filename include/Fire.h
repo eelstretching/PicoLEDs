@@ -6,9 +6,6 @@
 #include "Animation.h"
 
 class Fire : public Animation {
-    /// @brief the canvas that we'll render our fire onto.
-    Canvas *canvas;
-
     /// @brief The row that we'll be animating
     uint row;
 
@@ -35,10 +32,10 @@ class Fire : public Animation {
     uint sparking;
 
    public:
-    Fire(Canvas *canvas, uint row)
-        : Fire(canvas, row, 0, canvas->getWidth(), 55, 120){};
+    Fire(Canvas *canvas, ColorMap *colorMap, uint row)
+        : Fire(canvas, colorMap, row, 0, canvas->getWidth(), 55, 120){};
 
-    Fire(Canvas *canvas, uint row, uint x, uint n, uint cooling, uint sparking);
+    Fire(Canvas *canvas, ColorMap *colorMap, uint row, uint x, uint n, uint cooling, uint sparking);
 
     ~Fire();
 

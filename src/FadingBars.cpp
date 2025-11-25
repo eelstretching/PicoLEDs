@@ -52,9 +52,9 @@ bool FadingBar::step() {
     return true;
 }
 
-FadingBars::FadingBars(Canvas* canvas, uint8_t barWidth, uint8_t nColors,
-                       ColorMap* colorMap)
-    : Animation(canvas), barWidth(barWidth), nColors(nColors) {
+FadingBars::FadingBars(Canvas* canvas,
+                       ColorMap* colorMap, uint8_t barWidth, uint8_t nColors)
+    : Animation(canvas, colorMap), barWidth(barWidth), nColors(nColors) {
     fadeMap = new FadeColorMap(colorMap, nColors, 32, 28);
     canvas->setColorMap(fadeMap);
     nBars = canvas->getWidth() / barWidth;
@@ -65,7 +65,7 @@ FadingBars::FadingBars(Canvas* canvas, uint8_t barWidth, uint8_t nColors,
     for (int i = 0; i < nBars; i++) {
         uint8_t dimIndex = (i % nColors) * 32 + 31;
         uint8_t brightIndex = (i % nColors) * 32;
-        bars[i] = new FadingBar(canvas, barWidth, i * barWidth, brightIndex,
+        bars[i] = new FadingBar(canvas, colorMap, barWidth, i * barWidth, brightIndex,
                                 dimIndex, i % 2 == 0 ? FADING_IN : FADING_OUT);
     }
 }

@@ -14,6 +14,9 @@ class Animation {
     /// @brief The canvas that we're animating on.
     Canvas *canvas;
 
+    /// @brief The color map that we're using for this animation.
+    ColorMap *colorMap;
+
     /// @brief A stop watch to count our animation time.
     StopWatch aw;
 
@@ -22,7 +25,7 @@ class Animation {
     Animation();
     /// @brief Construct an animation that will draw on the given canvas.
     /// @param canvas The canvas we'll draw on.
-    Animation(Canvas *canvas);
+    Animation(Canvas *canvas, ColorMap *colorMap);
 
     /// @brief Gets the frames-per-second this animation requires. Default
     /// is 30.
@@ -56,7 +59,7 @@ class MultiAnimation : public Animation {
     int fps = -1;
 
    public:
-    MultiAnimation(Canvas *canvas) : Animation(canvas){};
+    MultiAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap){};
     void add(Animation *animation) {
         animations.push_back(animation);
         fps = MAX(fps, animation->getFPSNeeded());

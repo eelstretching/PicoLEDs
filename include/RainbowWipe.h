@@ -1,5 +1,5 @@
-#ifndef MIDDLEWIPE_H
-#define MIDDLEWIPE_H
+#ifndef RAINBOWWIPE_H
+#define RAINBOWWIPE_H
 
 #pragma once
 
@@ -14,7 +14,7 @@ class RainbowWipe : public Animation {
 
     public:
 
-    RainbowWipe(Canvas *canvas) : Animation(canvas) {};
+    RainbowWipe(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {};
     void init();
     bool step();
     int getFPSNeeded() {return 55;};

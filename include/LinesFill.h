@@ -12,7 +12,6 @@
 enum FillState { FILLING, FLASHING };
 
 class LinesFill : public Animation {
-    Canvas *canvas;
 
     /// @brief The number of color bands to use.
     int nBands;
@@ -35,7 +34,7 @@ class LinesFill : public Animation {
     FillLine **lines;
 
    public:
-    LinesFill(Canvas *canvas, int nBands, Direction direction = UP,
+    LinesFill(Canvas *canvas, ColorMap *colorMap, int nBands, Direction direction = UP,
              int stepSize = 1);
 
     ~LinesFill() {};

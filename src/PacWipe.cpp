@@ -2,18 +2,17 @@
 
 #include "math8.h"
 
-PacWipe::PacWipe(Canvas *canvas) : Animation(canvas) {
+PacWipe::PacWipe(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
     sprites = new Sprite *[5];
-    ColorMap* colorMap = canvas->getColorMap();
-    canvas->setColorMap(colorMap);
-    sprites[0] = new PacMan(canvas, 0, 1);
-    sprites[1] = new Ghost(canvas, inkyColor, 0, 1);
-    sprites[2] = new Ghost(canvas, blinkyColor, 0, 1);
-    sprites[3] = new Ghost(canvas, pinkyColor, 0, 1);
-    sprites[4] = new Ghost(canvas, clydeColor, 0, 1);
+    sprites[0] = new PacMan(canvas, colorMap, 0, 1);
+    sprites[1] = new Ghost(canvas, colorMap, inkyColor, 0, 1);
+    sprites[2] = new Ghost(canvas, colorMap, blinkyColor, 0, 1);
+    sprites[3] = new Ghost(canvas, colorMap, pinkyColor, 0, 1);
+    sprites[4] = new Ghost(canvas, colorMap, clydeColor, 0, 1);
 }
 
 void PacWipe::init() {
+    canvas->setColorMap(colorMap);
     curr = sprites[random8(0, 4)];
     if (curr == sprites[0]) {
 

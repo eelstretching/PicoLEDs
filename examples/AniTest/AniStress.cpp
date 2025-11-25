@@ -49,9 +49,9 @@ int main() {
                 canvas.setup();
                 canvas.setColorMap(&colors);
                 
-                BarberPole bp(&canvas, nColors, 5);
+                BarberPole bp(&canvas, &colors, nColors, 5);
 
-                Animator animator(&canvas);
+                Animator animator(&canvas, &colors);
                 animator.add(&bp);
                 animator.init();
                 animator.setFPS(60);

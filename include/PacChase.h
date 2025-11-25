@@ -86,8 +86,8 @@ class PacChase : public Animation {
 
     
     public:
-    PacChase(Canvas *canvas);
-    PacChase(PacWipe *wipe);
+    PacChase(Canvas *canvas, ColorMap *colorMap);
+    PacChase(PacWipe *wipe, ColorMap *colorMap);
     void setup();
     void drawDot(int i);
     void init();

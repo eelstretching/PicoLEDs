@@ -69,7 +69,7 @@ class Ghost : public Sprite {
     void setup(RGB &ghostColor);
 
    public:
-    Ghost(Canvas *canvas, RGB &ghostColor, int startX, int startY);
+    Ghost(Canvas *canvas, ColorMap *colorMap, RGB &ghostColor, int startX, int startY);
     ~Ghost();
     bool step();
 };

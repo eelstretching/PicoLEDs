@@ -8,8 +8,8 @@
 
 class Marquee : Animation {
    public:
-    Marquee(Canvas *canvas, int nColors, int width, Direction direction, int pos, int coord)
-        : Animation(canvas), nColors(nColors), width(width), direction(direction), pos(pos), coord(coord) {
+    Marquee(Canvas *canvas, ColorMap *colorMap, int nColors, int width, Direction direction, int pos, int coord)
+        : Animation(canvas, colorMap), nColors(nColors), width(width), direction(direction), pos(pos), coord(coord) {
     }
 
     bool step() override;

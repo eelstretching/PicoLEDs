@@ -9,7 +9,7 @@
 class RandomText : public TextAnimation {
 
     public:
-    RandomText(Canvas *canvas, Font *font, uint duration) : TextAnimation(canvas, font, duration) {
+    RandomText(Canvas *canvas, ColorMap *colorMap, Font *font, uint duration) : TextAnimation(canvas, colorMap, font, duration) {
     };
 
     void init();

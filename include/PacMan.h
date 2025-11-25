@@ -66,7 +66,7 @@ class PacMan : public Sprite {
     Xpm **xpms;
 
     public:
-    PacMan(Canvas *canvas, int startX, int startY);
+    PacMan(Canvas *canvas, ColorMap *colorMap, int startX, int startY);
     ~PacMan();
     Xpm **getXpms() {return xpms;};
 };

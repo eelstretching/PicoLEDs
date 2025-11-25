@@ -9,7 +9,6 @@
 #include "stdlib.h"
 
 class FillLine : public Animation {
-    Canvas *canvas;
 
     /// @brief The color we're drawing.
     uint8_t colorIndex;
@@ -30,7 +29,7 @@ class FillLine : public Animation {
     int16_t endPos;
 
    public:
-    FillLine(Canvas *canvas, uint8_t colorIndex, Direction direction, int16_t startPos,
+    FillLine(Canvas *canvas, ColorMap *colorMap, uint8_t colorIndex, Direction direction, int16_t startPos,
              int16_t endPos, uint8_t stepSize);
 
     ~FillLine() {};

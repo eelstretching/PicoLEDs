@@ -6,23 +6,23 @@
 
 #define PILL_POSITION 61
 
-PacChase::PacChase(Canvas *canvas) : Animation(canvas) {
+PacChase::PacChase(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
     //
     // Make a color map for this animation.
     colorMap = canvas->makeColorMap(32);
-    pacMan = new PacMan(canvas, 0, 1);
+    pacMan = new PacMan(canvas, colorMap, 0, 1);
     ghosts = new Sprite *[4];
-    ghosts[0] = new Ghost(canvas, inkyColor, 0, 1);
-    ghosts[1] = new Ghost(canvas, blinkyColor, 0, 1);
-    ghosts[2] = new Ghost(canvas, pinkyColor, 0, 1);
-    ghosts[3] = new Ghost(canvas, clydeColor, 0, 1);
+    ghosts[0] = new Ghost(canvas, colorMap, inkyColor, 0, 1);
+    ghosts[1] = new Ghost(canvas, colorMap, blinkyColor, 0, 1);
+    ghosts[2] = new Ghost(canvas, colorMap, pinkyColor, 0, 1);
+    ghosts[3] = new Ghost(canvas, colorMap, clydeColor, 0, 1);
     dotColorIndex = canvas->getColorMap()->addColor(dotColor);
     setup();
 }
 
 /// @brief A constructor that lets us borrow the bitmaps from a pac-man wipe.
 /// @param wipe The wipe we'll borrow from.
-PacChase::PacChase(PacWipe *wipe) {
+PacChase::PacChase(PacWipe *wipe, ColorMap *colorMap) : Animation(wipe->canvas, colorMap) {
     canvas = wipe->canvas;
     pacMan = wipe->sprites[0];
     ghosts = &(wipe->sprites[1]);
@@ -33,13 +33,13 @@ void PacChase::setup() {
     pmw = pacMan->getWidth();
     ghw = ghosts[0]->getWidth();
     pilled = new Sprite *[2];
-    pilled[0] = new Sprite(canvas, 0, 0);
-    Xpm *pil1 = new Xpm(pilled1, canvas->getColorMap());
+    pilled[0] = new Sprite(canvas, colorMap, 0, 0);
+    Xpm *pil1 = new Xpm(pilled1, colorMap);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
-    Xpm *pil2 = new Xpm(pilled2, canvas->getColorMap());
+    Xpm *pil2 = new Xpm(pilled2, colorMap);
     pilled[0]->add(pil2);
     pilled[0]->add(pil2);
     pilled[0]->add(pil2);
@@ -47,7 +47,7 @@ void PacChase::setup() {
     pilled[1] = new Sprite(*pilled[0]);
     piw = pilled[0]->getWidth();
     state = PLAIN;
-    pill = new Xpm(power, canvas->getColorMap());
+    pill = new Xpm(power, colorMap);
 }
 
 void PacChase::drawDot(int i) {

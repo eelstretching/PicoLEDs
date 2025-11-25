@@ -20,7 +20,7 @@ class ScrollWipe : public Animation {
     /// @brief Create a scroll wipe on the canvas for the given direction.
     /// @param canvas
     /// @param dir
-    ScrollWipe(Canvas *canvas, Direction dir);
+    ScrollWipe(Canvas *canvas, ColorMap *colorMap, Direction dir);
     /// @brief Initializes the scroll to start from 0 again and scroll all the
     /// way in the given direction.
     void init();
