@@ -63,22 +63,8 @@ int Row::copy(uint8_t* source, int p, int n) {
     int tc = MIN(width - p, n);
     int sp;
     int dp;
-    uint8_t* sd = strip->getData();
-    switch (dir) {
-        case StripDirection::FORWARDS:
-            sp = 0;
-            dp = start + p;
-            while (sp < tc) {
-                *sd++ = source[sp++];
-            }
-            break;
-        case StripDirection::BACKWARDS:
-            sp = tc - 1;
-            dp = start + width - 1 - p;
-            while (sp >= 0) {
-                *sd++ = source[sp--];
-            }
-            break;
+    for(int i = 0, x = p; i < tc; i++, x++) {
+        set(x, source[i]);
     }
     return tc;
 }
@@ -351,7 +337,7 @@ void Canvas::copyRow(int src, int dst) {
 
     //
     // Everything's black off the canvas.
-    if (src > nRows) {
+    if (src >= nRows) {
         fillRow(dst, getBackgroundIndex());
         return;
     }
@@ -387,10 +373,9 @@ void Canvas::rotateUp() {
     //
     // A place to put the data from the top row.
     uint8_t tmp[width];
-    uint8_t from = nRows - 1;
-    Row* rotRow = rows[from];
+    Row* rotRow = rows[nRows-1];
     for (int i = 0; i < width; i++) {
-        tmp[i] = rows[from]->get(i);
+        tmp[i] = rotRow->get(i);
     }
     scrollUp();
     rows[0]->copy(tmp, rows[0]->start, width);
@@ -400,8 +385,9 @@ void Canvas::rotateDown() {
     //
     // A place to put the data from the bottom row.
     uint8_t tmp[width];
+    Row *rotRow = rows[0];
     for (int i = 0; i < width; i++) {
-        tmp[i] = rows[0]->get(i);
+        tmp[i] = rotRow->get(i);
     }
     scrollDown();
     rows[nRows - 1]->copy(tmp, 0, width);

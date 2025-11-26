@@ -30,6 +30,7 @@ class Row {
     friend class Canvas;
     Canvas* canvas;
     Strip* strip;
+    uint8_t *data;
     uint start;
     uint width;
     StripDirection dir;
@@ -37,7 +38,7 @@ class Row {
    public:
     Row(Strip* strip, uint start, uint width, StripDirection dir,
         Canvas* canvas)
-        : strip(strip), start(start), width(width), dir(dir), canvas(canvas) {}
+        : strip(strip), data(&strip->getData()[start]), start(start), width(width), dir(dir), canvas(canvas) {}
 
     /// @brief Sets the pixel at position x in this row to the given color.
     /// @param x the position of the pixel to set. This is relative to the
@@ -71,8 +72,8 @@ class Row {
     int copy(uint8_t* source, int p, int n);
 
     /// @brief Copies the data from another row into this one.
-    /// @param other the row whose data we should copy.
-    void copy(Row* other);
+    /// @param source the row whose data we should copy.
+    void copy(Row* source);
 };
 
 // A 2-D canvas that we can draw on. If you think of the canvas as a 2-D

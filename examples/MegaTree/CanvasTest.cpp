@@ -36,7 +36,7 @@ int main() {
         strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 
-    ArrayColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
+    ArrayColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White, RGB::Gold,
                             RGB::Yellow, RGB::Orange});
 
     colorMap.setBrightness(BRIGHTNESS);
@@ -53,13 +53,18 @@ int main() {
     c.fillRow(1, 1);
     c.fillRow(2, 2);
     c.show();
-    printf("Row 0: %d %d Row 1: %d %d Row 2: %d %d\n", c.getRow(0)->get(0), c.getRow(0)->get(7), c.getRow(1)->get(0), c.getRow(1)->get(7), c.getRow(2)->get(0), c.getRow(2)->get(7));
     sleep_ms(2000);
-    printf("Row 0: %d %d Row 1: %d %d Row 2: %d %d\n", c.getRow(0)->get(0), c.getRow(0)->get(7), c.getRow(1)->get(0), c.getRow(1)->get(7), c.getRow(2)->get(0), c.getRow(2)->get(7));
 
     while (true) {
-        c.rotateUp();
-        c.show();
-        sleep_ms(2000);
+        for (int i = 0; i < 10; i++) {
+            c.rotateDown();
+            c.show();
+            sleep_ms(250);
+        }
+        // for (int i = 0; i < 10; i++) {
+        //     c.rotateDown();
+        //     c.show();
+        //     sleep_ms(250);
+        // }
     }
 }
