@@ -1,16 +1,15 @@
-#include "RotatingBars.h"
+#include "RotatingColumns.h"
 
-RotatingBars::RotatingBars(Canvas* canvas, ColorMap* colorMap, uint8_t barWidth,
+RotatingColumns::RotatingColumns(Canvas* canvas, ColorMap* colorMap, uint8_t colWidth,
                            uint8_t nColors)
     : Animation(canvas, colorMap),
-      colorMap(colorMap),
-      barWidth(barWidth),
+      colWidth(colWidth),
       nColors(nColors) {}
 
-bool RotatingBars::step() {
+bool RotatingColumns::step() {
     if (firstFrame) {
         for (int i = 0; i < canvas->getWidth(); i++) {
-            uint8_t colorIndex = (i / barWidth) % nColors;
+            uint8_t colorIndex = (i / colWidth) % nColors;
             canvas->fillColumn(i, colorIndex);
         }
         firstFrame = false;

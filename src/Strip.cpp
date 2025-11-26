@@ -47,9 +47,7 @@ void Strip::putPixels(uint8_t* pixels, uint p, uint n) {
 void Strip::fill(uint8_t index) { fill(index, 0, numPixels); }
 
 void Strip::fill(uint8_t index, uint start, uint n) {
-  for (int i = start; i < start + n && i < numPixels; i++) {
-    data[i] = index;
-  }
+  memset(&data[start], index, n * sizeof(uint8_t));
 }
 
 void Strip::rotateRight(int start, int end) {

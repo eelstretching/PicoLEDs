@@ -55,7 +55,6 @@ class Row {
     /// @param color the color to fill with
     void fill(uint8_t color);
 
-    
     /// @brief Rotate the row to the right by one pixel.
     void rotateRight();
 
@@ -94,7 +93,10 @@ class Canvas {
 
     /// @brief The rows that make up this view, which are distributed across the
     /// strips that were added.
-    std::vector<Row> rows;
+    Row **rows;
+
+    uint8_t rowsLen = 0;
+    uint8_t nRows = 0;
 
     //
     // The background color in the color map. When we blank
@@ -108,11 +110,15 @@ class Canvas {
    public:
     Canvas(uint width);
 
+    ~Canvas();
+
     void setColorMap(ColorMap* colorMap) { this->colorMap = colorMap; };
 
     ColorMap* getColorMap() { return colorMap; };
 
     ColorMap* makeColorMap(uint8_t size);
+
+    void addRow(Row * row);
 
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
@@ -121,17 +127,19 @@ class Canvas {
     /// @brief Set up the canvas for operations.
     void setup() { renderer.setup(); };
 
-    uint getHeight() { return rows.size(); };
+    uint getHeight() { return nRows; };
 
     uint getWidth() { return width; };
 
     /// @brief Set the background color.
     /// @param b the color to use.
-    void setBackground(RGB &background);
+    void setBackground(RGB& background);
 
     RGB getBackground() { return colorMap->getBackground(); };
 
     inline uint8_t getBackgroundIndex() { return 255; };
+
+    Row* getRow(int y) { return rows[y]; }
 
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel
@@ -141,7 +149,8 @@ class Canvas {
     /// was not on the canvas as it was out-of-bounds.
     bool set(int x, int y, uint8_t p);
 
-    /// @brief Gets the value of the pixel at the given coordinates, as an index into the color map.
+    /// @brief Gets the value of the pixel at the given coordinates, as an index
+    /// into the color map.
     uint8_t get(uint x, uint y);
 
     /// @brief Copy the given data into the canvas, starting at position x,y.
@@ -190,7 +199,8 @@ class Canvas {
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
     /// @param wrapAround if true, the line will wrap around the canvas edges.
-    void drawLine(uint x0, uint y0, uint x1, uint y1, uint8_t c, bool wrapAround);
+    void drawLine(uint x0, uint y0, uint x1, uint y1, uint8_t c,
+                  bool wrapAround);
 
     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1)
     /// @param x0 The x coordinate of one corner
@@ -208,7 +218,8 @@ class Canvas {
     /// @param y1 The y coordinate of the other corner
     /// @param l The color of the line to draw with.
     /// @param f The color to fill the rectangle with.
-    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, uint8_t l, uint8_t f);
+    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, uint8_t l,
+                        uint8_t f);
 
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.

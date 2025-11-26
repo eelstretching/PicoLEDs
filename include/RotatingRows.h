@@ -1,5 +1,5 @@
-#ifndef ROTATINGBARS_H
-#define ROTATINGBARS_H
+#ifndef ROTATINGROWS_H
+#define ROTATINGROWS_H
 
 #pragma once
 #include "pico/stdlib.h"
@@ -7,13 +7,12 @@
 #include "Animation.h"
 #include "Canvas.h"
 
-class RotatingBars : public Animation {
-    ColorMap *colorMap;
-    uint8_t barWidth;
+class RotatingRows : public Animation {
+    uint8_t rowWidth;
     uint8_t nColors; 
     bool firstFrame = true;
 public:
-    RotatingBars(Canvas *canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t nColors);
+    RotatingRows(Canvas *canvas, ColorMap *colorMap, uint8_t rowWidth, uint8_t nColors);
     int getFPSNeeded() override { return 50; };
     virtual void init() override {firstFrame = true; canvas->setColorMap(colorMap);};
     virtual bool step() override;

@@ -1,10 +1,10 @@
+#include <Canvas.h>
+#include <Renderer.h>
 #include <stdlib.h>
 
-#include "Animator.h"
 #include "ArrayColorMap.h"
-#include "BarberPole.h"
-#include "Bouncer.h"
-#include "Canvas.h"
+#include "FadeColorMap.h"
+#include "StopWatch.h"
 #include "Strip.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
@@ -14,12 +14,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define NUM_STRIPS 7
+#define NUM_STRIPS 1
 #define START_PIN 2
-#define STRIP_LEN 400
+#define STRIP_LEN 300
 #define CANVAS_WIDTH 100
-#define DELAY_MS 250
-
 #define BRIGHTNESS 32
 #define FPS 30
 
@@ -34,36 +32,34 @@ int main() {
     int pins[NUM_STRIPS];
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
-        strips[i] = new Strip(pin++, STRIP_LEN, WS2811);
+        strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 
-    ArrayColorMap simpleMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
-                        RGB::DarkViolet, RGB::Orange, RGB::Yellow, RGB::Cyan});
-    simpleMap.setBrightness(BRIGHTNESS);
-    int nColors = simpleMap.getUsed();
+    ArrayColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
+                            RGB::Yellow, RGB::Orange});
+
+    colorMap.setBrightness(BRIGHTNESS);
 
     Canvas c(CANVAS_WIDTH);
+
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
     c.setup();
-    c.setColorMap(&simpleMap);
-    c.clear();
+    c.setColorMap(&colorMap);
+
+    c.fillRow(0, 0);
+    c.fillRow(1, 1);
+    c.fillRow(2, 2);
     c.show();
+    printf("Row 0: %d %d Row 1: %d %d Row 2: %d %d\n", c.getRow(0)->get(0), c.getRow(0)->get(7), c.getRow(1)->get(0), c.getRow(1)->get(7), c.getRow(2)->get(0), c.getRow(2)->get(7));
+    sleep_ms(2000);
+    printf("Row 0: %d %d Row 1: %d %d Row 2: %d %d\n", c.getRow(0)->get(0), c.getRow(0)->get(7), c.getRow(1)->get(0), c.getRow(1)->get(7), c.getRow(2)->get(0), c.getRow(2)->get(7));
 
-    int cn = 0;
-    while (1) {
-        for (int i = 0; i < c.getHeight(); i++) {
-            for (int j = 0; j < c.getHeight(); j++) {
-                c.clear();
-                for (int k = 0; k < i; k++) {
-                    c.fillRow((k + j) % c.getHeight(), cn);
-                }
-                c.show();
-
-                sleep_ms(DELAY_MS);
-            }
-            cn = (cn + 1) % nColors;
-        }
+    while (true) {
+        c.rotateUp();
+        c.show();
+        sleep_ms(2000);
     }
 }

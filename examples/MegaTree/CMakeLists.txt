@@ -31,6 +31,7 @@ target_link_libraries(CanvasTest
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_runtime
   pico_stdlib
 )
 
@@ -44,6 +45,7 @@ target_link_libraries(MegaTree
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_runtime
   pico_stdlib
 )
 

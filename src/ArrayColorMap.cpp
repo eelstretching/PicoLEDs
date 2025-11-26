@@ -21,6 +21,7 @@ ArrayColorMap::ArrayColorMap(std::initializer_list<RGB> rhs)
         entries[i++] = c;
     }
     p = i;
+
 }
 
 ArrayColorMap::ArrayColorMap(std::initializer_list<HSV> rhs)

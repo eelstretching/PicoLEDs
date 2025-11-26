@@ -22,7 +22,8 @@
 #include "Icicles.h"
 #include <ColorBars.h>
 #include <FadingBars.h>
-#include <RotatingBars.h>
+#include <RotatingRows.h>
+#include <RotatingColumns.h>
 
 #define NUM_STRIPS 1
 #define START_PIN 2
@@ -43,6 +44,7 @@ int main() {
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
         strips[i] = new Strip(pin++, STRIP_LEN);
+        strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 
     ArrayColorMap xmasColors({
@@ -113,11 +115,14 @@ int main() {
     FadingBars fb2(&c, &brightXmasColors, 10, 4);
     a.addTimed(&fb2, 20000);
 
-    RotatingBars rb1(&c, &brightXmasColors, 20, 2);
-    a.addTimed(&rb1, 20000);
+    RotatingColumns rc1(&c, &brightXmasColors, 20, 2);
+    a.addTimed(&rc1, 20000);
 
-    RotatingBars rb2(&c, &brightXmasColors, 10, 4);
-    a.addTimed(&rb2, 20000);
+    RotatingColumns rc2(&c, &brightXmasColors, 10, 4);
+    a.addTimed(&rc2, 20000);
+
+    // RotatingRows rr1(&c, &brightXmasColors, 1, 3);
+    // a.add(&rr1);
 
     a.init();
 
