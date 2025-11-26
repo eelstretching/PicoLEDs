@@ -97,8 +97,11 @@ void Row::copy(Row* src) {
     int end = src->start + width;
     int sp = src->start;
     int dp = start + width - 1;
+    uint8_t *srcd = &src->strip->getData()[src->start];
+    uint8_t *dstd = &strip->getData()[dp];
     while (sp < end) {
-        strip->getData()[dp--] = src->strip->getData()[sp++];
+        *dstd-- = *srcd++;
+        sp++;
     }
 }
 
