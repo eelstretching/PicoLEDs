@@ -83,19 +83,22 @@ int Row::copy(uint8_t* source, int p, int n) {
     return tc;
 }
 
-void Row::copy(Row* dst) {
-    if (dir == dst->dir) {
+void Row::copy(Row* src) {
+    if (dir == src->dir) {
         //
         // Same direction, we can memcpy
-        memcpy(&(dst->strip->getData()[dst->start]), &(strip->getData()[start]),
+        memcpy(&(strip->getData()[start]), &(src->strip->getData()[src->start]), 
                width * sizeof(uint8_t));
         return;
     }
 
     //
     // Different directions, copy 1-1
-    for (int i = 0; i < width; i++) {
-        dst->set(i, get(i));
+    int end = src->start + width;
+    int sp = src->start;
+    int dp = start + width - 1;
+    while (sp < end) {
+        strip->getData()[dp--] = src->strip->getData()[sp++];
     }
 }
 
@@ -292,7 +295,6 @@ void Canvas::scrollUp(int n, uint8_t f) {
     //
     // We'll copy rows up 1 by 1 as our layout precludes one big memcpy.
     for (int sr = nRows - n - 1, dr = nRows - 1; sr >= 0; sr--, dr--) {
-        printf("Copy from %d to %d\n", sr, dr);
         copyRow(sr, dr);
     }
     for (int i = 0; i < n; i++) {
@@ -351,7 +353,7 @@ void Canvas::copyRow(int src, int dst) {
         return;
     }
 
-    rows[src]->copy(rows[dst]);
+    rows[dst]->copy(rows[src]);
 }
 
 void Canvas::copyColumn(int src, int dst) {
