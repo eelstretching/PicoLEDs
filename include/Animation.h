@@ -37,7 +37,7 @@ class Animation {
 
     /// @brief Initializes the animation, possibly after it has run to
     /// completion previously.
-    virtual void init(){};
+    virtual void init(){canvas->setColorMap(colorMap);};
 
     /// @brief Takes one step in the animation. Someone in charge of the
     /// animations will call this function. The default implementation doesn't

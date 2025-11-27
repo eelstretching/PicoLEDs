@@ -187,16 +187,16 @@ bool Icicle::step() {
     for (uint i = 0; i < length; i++) {
         switch (direction) {
             case LEFT:
-                canvas->set(canvas->getWidth() - i, pos, 1);
+                canvas->set(canvas->getWidth() - i, pos, 2);
                 break;
             case RIGHT:
-                canvas->set(0 + i, pos, 1);
+                canvas->set(0 + i, pos, 2);
                 break;
             case UP:
-                canvas->set(pos + i, 0, 1);
+                canvas->set(pos + i, 0, 2);
                 break;
             case DOWN:
-                canvas->set(pos, canvas->getHeight() - i, 1);
+                canvas->set(pos, canvas->getHeight() - i, 2);
                 break;
         }
     }
