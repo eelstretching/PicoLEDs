@@ -71,6 +71,7 @@ FadingBars::FadingBars(Canvas* canvas,
 }
 
 void FadingBars::init() {
+    canvas->setColorMap(fadeMap);
     for (int i = 0; i < nBars; i++) {
         bars[i]->init();
     }
