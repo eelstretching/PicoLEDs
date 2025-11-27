@@ -100,8 +100,9 @@ int main() {
     // Spiral spiral(&c, &midXmasColors, 10, 25);
     // a.addTimed(&spiral, 10000);
 
-    // Icicles icicles(&c, 10, 5, RGB::White);
-    // a.add(&icicles);
+    ArrayColorMap icicleMap(8);
+    Icicles icicles(&c, &icicleMap, 2, 6, RGB(128, 128, 128));
+    a.add(&icicles);
 
     // ColorBars cb1(&c, &midXmasColors, 20, 2);
     // a.addTimed(&cb1, 10000);
@@ -115,14 +116,14 @@ int main() {
     // FadingBars fb2(&c, &brightXmasColors, 10, 4);
     // a.addTimed(&fb2, 10000);
 
-    FadingBars fb3(&c, &brightXmasColors, 4, 2);
-    a.addTimed(&fb3, 10000);
+    // FadingBars fb3(&c, &brightXmasColors, 4, 2);
+    // a.addTimed(&fb3, 10000);
 
-    FadingBars fb4(&c, &brightXmasColors, 4, 6);
-    a.addTimed(&fb4, 10000);
+    // FadingBars fb4(&c, &brightXmasColors, 4, 6);
+    // a.addTimed(&fb4, 10000);
 
-    RotatingColumns rc1(&c, &midXmasColors, 20, 2);
-    a.addTimed(&rc1, 10000);
+    // RotatingColumns rc1(&c, &midXmasColors, 20, 2);
+    // a.addTimed(&rc1, 10000);
 
     // RotatingColumns rc2(&c, &midXmasColors, 10, 4);
     // a.addTimed(&rc2, 10000);

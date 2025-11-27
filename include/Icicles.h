@@ -19,13 +19,13 @@ class Drip : public Animation {
     uint pos;
 
     /// @brief The position of the drip.
-    uint dp;
+    int dp;
 
     /// @brief The length of the icicle the drip is coming from.
-    uint length;
+    int length;
 
     /// @brief The length of the tail of the drip while it's falling.
-    uint tailLen;
+    int tailLen;
 
     /// @brief The direction the drip is moving.
     Direction direction;
@@ -106,10 +106,10 @@ class Icicles : public Animation {
     /// @brief Destructor for the icicles animation.
     ~Icicles();
 
+    int getFPSNeeded() override { return 30; };
+
     void init() override;
 
-    /// @brief Steps the animation forward one frame.
-    /// @return True if the animation is still running, false if it's done.
     bool step() override;
 };
 #endif
