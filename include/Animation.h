@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <string.h>
+
 #include "Canvas.h"
 
 /// @brief Animation base class with a virtual function for stepping the
@@ -20,6 +22,8 @@ class Animation {
     /// @brief A stop watch to count our animation time.
     StopWatch aw;
 
+    char name[16];
+
    public:
     /// @brief Default constructor
     Animation();
@@ -34,6 +38,10 @@ class Animation {
 
     /// @brief Virtual destructor!
     virtual ~Animation(){};
+
+    virtual void setName(const char* n) {strncpy(name, n, 15);};
+
+    virtual const char *getName() {return name;};
 
     /// @brief Initializes the animation, possibly after it has run to
     /// completion previously.

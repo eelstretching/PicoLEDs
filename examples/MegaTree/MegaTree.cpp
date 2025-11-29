@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string>
 
 #include "Animator.h"
 #include "ArrayColorMap.h"
@@ -24,6 +25,7 @@
 #include <FadingBars.h>
 #include <RotatingRows.h>
 #include <RotatingColumns.h>
+#include <RandomAnimation.h>
 
 #define NUM_STRIPS 7
 #define START_PIN 2
@@ -67,82 +69,106 @@ int main() {
     ArrayColorMap brightXmasColors(xmasColors);
     brightXmasColors.setBrightness(128);
 
-    Canvas c(CANVAS_WIDTH);
+    Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
-        c.add(*strips[i]);
+        canvas.add(*strips[i]);
     }
-    c.setup();
-    c.setColorMap(&dimXmasColors);
+    canvas.setup();
+    canvas.setColorMap(&dimXmasColors);
 
     for(int i = 0; i < 3; i++) {
-        c.fill(i+1);
-        c.show();
+        canvas.fill(i+1);
+        canvas.show();
         sleep_ms(500);
     }
 
-    c.clear();
-    c.show();
+    canvas.clear();
+    canvas.show();
 
-    Animator a(&c, &dimXmasColors, FPS);
+    Animator animator(&canvas, &dimXmasColors, FPS);
 
-    ColorCone cone(&c, &midXmasColors);
-    a.addTimed(&cone, 10000);
+    RandomAnimation randimation(&canvas, &midXmasColors);
 
-    Marquees marq(&c, &midXmasColors, midXmasColors.getSize(), 20, RIGHT, c.getHeight());
-    a.addTimed(&marq, 10000); 
+    ColorCone cone(&canvas, &midXmasColors);
+    cone.setName("Cone");
+    randimation.addTimed(&cone, 10000);
 
-    LinesFill lfu(&c, &midXmasColors, midXmasColors.getSize(), UP, 1);
+    Marquees marq(&canvas, &midXmasColors, midXmasColors.getSize(), 20, RIGHT, canvas.getHeight());
+    marq.setName("Marquee");
+    randimation.addTimed(&marq, 10000); 
+
+    LinesFill lfu(&canvas, &midXmasColors, midXmasColors.getSize(), UP, 1);
+    lfu.setName("LFU");
     lfu.setGap(6);
-    a.addTimed(&lfu, 10000);
+    randimation.addTimed(&lfu, 10000);
 
-    LinesFill lfd(&c, &midXmasColors, midXmasColors.getSize(), DOWN, 1);
+    LinesFill lfd(&canvas, &midXmasColors, midXmasColors.getSize(), DOWN, 1);
+    lfd.setName("LFD");
     lfd.setGap(7);
-    a.addTimed(&lfd, 10000);
+    randimation.addTimed(&lfd, 10000);
 
-    Spiral spiral(&c, &midXmasColors, 10, 25);
-    a.addTimed(&spiral, 10000);
+    Spiral spiral(&canvas, &midXmasColors, 10, 25);
+    spiral.setName("Spiral");
+    randimation.addTimed(&spiral, 10000);
 
     ArrayColorMap icicleMap(8);
-    Icicles icicles(&c, &icicleMap, 2, 6, RGB(128, 128, 128));
-    a.addTimed(&icicles, 20000);
+    Icicles icicles(&canvas, &icicleMap, 2, 6, RGB(128, 128, 128));
+    icicles.setName("Icicles");
+    randimation.addTimed(&icicles, 20000);
 
-    ColorBars cb1(&c, &midXmasColors, 20, 2);
-    a.addTimed(&cb1, 10000);
+    ColorBars cb1(&canvas, &midXmasColors, 20, 2);
+    cb1.setName("CB1");
+    randimation.addTimed(&cb1, 10000);
 
-    ColorBars cb2(&c, &midXmasColors, 15, 3);
-    a.addTimed(&cb2, 10000);
+    ColorBars cb2(&canvas, &midXmasColors, 15, 3);
+    cb2.setName("CB2");
+    randimation.addTimed(&cb2, 10000);
 
-    FadingBars fb1(&c, &brightXmasColors, 20, 2);
-    a.addTimed(&fb1, 10000);
+    FadingBars fb1(&canvas, &brightXmasColors, 20, 2);
+    fb1.setName("FB1");
+    randimation.addTimed(&fb1, 10000);
 
     ArrayColorMap blucicleMap(8);
-    Icicles blucicles(&c, &blucicleMap, 2, 6, RGB(0, 0, 128));
-    a.addTimed(&blucicles, 20000);
+    Icicles blucicles(&canvas, &blucicleMap, 2, 6, RGB(0, 0, 128));
+    blucicles.setName("Blucicles");
+    randimation.addTimed(&blucicles, 20000);
 
-    FadingBars fb2(&c, &brightXmasColors, 10, 4);
-    a.addTimed(&fb2, 10000);
+    FadingBars fb2(&canvas, &brightXmasColors, 10, 4);
+    fb2.setName("FB2");
+    randimation.addTimed(&fb2, 10000);
 
-    FadingBars fb3(&c, &brightXmasColors, 4, 2);
-    a.addTimed(&fb3, 10000);
+    FadingBars fb3(&canvas, &brightXmasColors, 4, 2);
+    fb3.setName("FB3");
+    randimation.addTimed(&fb3, 10000);
 
-    FadingBars fb4(&c, &brightXmasColors, 4, 6);
-    a.addTimed(&fb4, 10000);
+    FadingBars fb4(&canvas, &brightXmasColors, 4, 6);
+    fb4.setName("FB4");
+    randimation.addTimed(&fb4, 10000);
 
-    RotatingColumns rc1(&c, &midXmasColors, 20, 2);
-    a.addTimed(&rc1, 10000);
+    RotatingColumns rc1(&canvas, &midXmasColors, 20, 2);
+    rc1.setName("RC1");
+    randimation.addTimed(&rc1, 10000);
 
-    RotatingColumns rc2(&c, &midXmasColors, 10, 4);
-    a.addTimed(&rc2, 10000);
+    RotatingColumns rc2(&canvas, &midXmasColors, 10, 4);
+    rc2.setName("RC2");
+    randimation.addTimed(&rc2, 10000);
 
-    RotatingRows rr1(&c, &midXmasColors, 1, 3);
-    a.addTimed(&rr1, 10000);
+    RotatingRows rr1(&canvas, &midXmasColors, 4, 2);
+    rr1.setName("RR1");
+    randimation.addTimed(&rr1, 10000);
 
-    a.init();
+    RotatingRows rr2(&canvas, &midXmasColors, 4, 5);
+    rr2.setName("RR2");
+    randimation.addTimed(&rr2, 10000);
+
+    animator.add(&randimation);
+
+    animator.init();
 
     while (true) {
-        a.step(); 
-        if (a.getFrameCount() % 200 == 0) {
-            a.printStats();
+        animator.step(); 
+        if (animator.getFrameCount() % 200 == 0) {
+            animator.printStats();
         }
     }
 }

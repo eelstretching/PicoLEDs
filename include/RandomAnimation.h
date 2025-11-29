@@ -16,11 +16,16 @@ class RandomAnimation : public Animation {
     Animation *curr;
 
     public:
-    RandomAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {};
+    RandomAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
+        curr = NULL;
+    };
     void add(Animation *animation);
-    void init();
-    bool step();
-    void finish();
+    void addTimed(Animation *animation,  int durationMS);
+    Animation* getCurr();
+    void init() override;
+    bool step() override;
+    void finish() override;
+    int getFPSNeeded() override;
 
 };
 #endif

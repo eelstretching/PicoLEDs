@@ -52,8 +52,8 @@ bool Animator::step() {
     if (!animations[pos]->step()) {
         animations[pos]->finish();
         pos = (pos + 1) % animations.size();
-        setFPS(animations[pos]->getFPSNeeded());
         animations[pos]->init();
+        setFPS(animations[pos]->getFPSNeeded());
     }
     stepWatch.finish();
     showWatch.start();
