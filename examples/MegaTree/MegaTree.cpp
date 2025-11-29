@@ -112,7 +112,7 @@ int main() {
     randimation.addTimed(&spiral, 10000);
 
     ArrayColorMap icicleMap(8);
-    Icicles icicles(&canvas, &icicleMap, 2, 6, RGB(128, 128, 128));
+    Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(128, 128, 128));
     icicles.setName("Icicles");
     randimation.addTimed(&icicles, 20000);
 
@@ -129,7 +129,7 @@ int main() {
     randimation.addTimed(&fb1, 10000);
 
     ArrayColorMap blucicleMap(8);
-    Icicles blucicles(&canvas, &blucicleMap, 2, 6, RGB(0, 0, 128));
+    Icicles blucicles(&canvas, &blucicleMap, 10, 6, RGB(0, 0, 128));
     blucicles.setName("Blucicles");
     randimation.addTimed(&blucicles, 20000);
 
