@@ -9,7 +9,7 @@ pico_set_program_name(MegaTree "MegaTree")
 pico_set_program_version(MegaTree "0.1")
 
 pico_enable_stdio_uart(MegaTree 1)
-pico_enable_stdio_usb(MegaTree 0)
+pico_enable_stdio_usb(MegaTree 1)
 
 # Add the standard include files to the build
 target_include_directories(MegaTree PRIVATE

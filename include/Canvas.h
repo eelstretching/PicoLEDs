@@ -30,7 +30,6 @@ class Row {
     friend class Canvas;
     Canvas* canvas;
     Strip* strip;
-    uint8_t *data;
     uint start;
     uint width;
     StripDirection dir;
@@ -38,7 +37,7 @@ class Row {
    public:
     Row(Strip* strip, uint start, uint width, StripDirection dir,
         Canvas* canvas)
-        : strip(strip), data(&strip->getData()[start]), start(start), width(width), dir(dir), canvas(canvas) {}
+        : strip(strip), start(start), width(width), dir(dir), canvas(canvas) {}
 
     /// @brief Sets the pixel at position x in this row to the given color.
     /// @param x the position of the pixel to set. This is relative to the
@@ -94,10 +93,7 @@ class Canvas {
 
     /// @brief The rows that make up this view, which are distributed across the
     /// strips that were added.
-    Row **rows;
-
-    uint8_t rowsLen = 0;
-    uint8_t nRows = 0;
+    std::vector<Row*> rows;
 
     //
     // The background color in the color map. When we blank
@@ -119,8 +115,6 @@ class Canvas {
 
     ColorMap* makeColorMap(uint8_t size);
 
-    void addRow(Row * row);
-
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
     void add(Strip& strip);
@@ -128,7 +122,7 @@ class Canvas {
     /// @brief Set up the canvas for operations.
     void setup() { renderer.setup(); };
 
-    uint getHeight() { return nRows; };
+    uint getHeight() { return rows.size(); };
 
     uint getWidth() { return width; };
 

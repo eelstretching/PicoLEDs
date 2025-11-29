@@ -25,9 +25,9 @@
 #include <RotatingRows.h>
 #include <RotatingColumns.h>
 
-#define NUM_STRIPS 1
+#define NUM_STRIPS 7
 #define START_PIN 2
-#define STRIP_LEN 300
+#define STRIP_LEN 400
 #define CANVAS_WIDTH 100
 #define BRIGHTNESS 32
 #define FPS 30
@@ -43,7 +43,9 @@ int main() {
     int pins[NUM_STRIPS];
     for (int i = 0; i < ns; i++) {
         pins[i] = pin;
-        strips[i] = new Strip(pin++, STRIP_LEN);
+        //
+        // First strip is a little short at the moment.
+        strips[i] = new Strip(pin++, i == 0 ? STRIP_LEN-100 : STRIP_LEN);
         strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 

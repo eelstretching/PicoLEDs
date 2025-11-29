@@ -94,16 +94,12 @@ void Row::copy(Row* src) {
 Canvas::Canvas(uint width) : width(width) {
     numPixels = 0;
     rowBytes = width * sizeof(uint8_t);
-    rows = new Row*[4];
-    rowsLen = 4;
-    nRows = 0;
 }
 
 Canvas::~Canvas() {
-    for (int i = 0; i < nRows; i++) {
-        delete rows[i];
+    for(Row *row : rows) {
+        delete row;
     }
-    delete rows;
 }
 
 ColorMap* Canvas::makeColorMap(uint8_t size) {
@@ -112,27 +108,18 @@ ColorMap* Canvas::makeColorMap(uint8_t size) {
     return colorMap;
 }
 
-void Canvas::addRow(Row* row) {
-    if (nRows >= rowsLen) {
-        Row** tmp = rows;
-        rows = new Row*[nRows * 2];
-        memcpy(rows, tmp, rowsLen * sizeof(Row*));
-    }
-    rows[nRows++] = row;
-}
-
 void Canvas::add(Strip& strip) {
     uint np = strip.getNumPixels();
 
     if (np == width) {
-        addRow(new Row(&strip, 0, width, StripDirection::FORWARDS, this));
+        rows.push_back(new Row(&strip, 0, width, StripDirection::FORWARDS, this));
         renderer.add(strip);
         return;
     }
 
     if (np < width) {
         printf("Strip added with %d pixels, but width is %d", np, width);
-        addRow(new Row(&strip, 0, np, StripDirection::FORWARDS, this));
+        rows.push_back(new Row(&strip, 0, np, StripDirection::FORWARDS, this));
         renderer.add(strip);
         return;
     }
@@ -149,7 +136,7 @@ void Canvas::add(Strip& strip) {
     int start = 0;
     StripDirection dir = StripDirection::FORWARDS;
     while (np > 0) {
-        addRow(new Row(&strip, start, width, dir, this));
+        rows.push_back(new Row(&strip, start, width, dir, this));
         start += width;
         np -= width;
         if (dir == StripDirection::FORWARDS) {
@@ -168,7 +155,7 @@ void Canvas::setBackground(RGB& background) {
 }
 
 bool Canvas::set(int x, int y, uint8_t c) {
-    if (x >= width || x < 0 || y >= nRows || y < 0) {
+    if (x >= width || x < 0 || y >= rows.size() || y < 0) {
         //
         // Off the canvas.
         return false;
@@ -181,7 +168,7 @@ bool Canvas::set(int x, int y, uint8_t c) {
 uint8_t Canvas::get(uint x, uint y) { return rows[x]->get(y); }
 
 void Canvas::fillRow(uint row, uint8_t c) {
-    if (row >= nRows || row < 0) {
+    if (row >= rows.size() || row < 0) {
         return;
     }
 
@@ -191,7 +178,7 @@ void Canvas::fillRow(uint row, uint8_t c) {
 void Canvas::copy(uint8_t* d, int n, int x, int y) {
     int cp = 0;
     int remain = n;
-    for (int r = y; r < nRows && remain > 0; r++) {
+    for (int r = y; r < rows.size() && remain > 0; r++) {
         int copied = rows[r]->copy(&d[cp], cp, remain);
         cp += copied;
         remain -= copied;
@@ -202,14 +189,14 @@ void Canvas::fillColumn(uint col, uint8_t c) {
     if (col >= width || col < 0) {
         return;
     }
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->set(col, c);
+    for(auto row : rows) {
+        row->set(col, c);
     }
 }
 
 void Canvas::fill(uint8_t c) {
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->fill(c);
+    for(auto row : rows) {
+        row->fill(c);
     }
 }
 
@@ -275,7 +262,7 @@ void Canvas::drawFilledRect(uint x0, uint y0, uint x1, uint y1, uint8_t l,
 void Canvas::scrollUp() { scrollUp(1, getBackgroundIndex()); }
 
 void Canvas::scrollUp(int n, uint8_t f) {
-    if (n >= nRows) {
+    if (n >= rows.size()) {
         //
         // Scrolled too much! Everything's background!.
         fill(getBackgroundIndex());
@@ -283,7 +270,8 @@ void Canvas::scrollUp(int n, uint8_t f) {
     }
     //
     // We'll copy rows up 1 by 1 as our layout precludes one big memcpy.
-    for (int sr = nRows - n - 1, dr = nRows - 1; sr >= 0; sr--, dr--) {
+    for (int sr = rows.size() - n - 1, dr = rows.size() - 1; sr >= 0;
+         sr--, dr--) {
         copyRow(sr, dr);
     }
     for (int i = 0; i < n; i++) {
@@ -296,17 +284,17 @@ void Canvas::scrollDown() { scrollDown(1, getBackgroundIndex()); }
 void Canvas::scrollDown(int n, uint8_t f) {
     //
     // Scroll it all away?
-    if (n > nRows) {
+    if (n > rows.size()) {
         fill(getBackgroundIndex());
         return;
     }
 
-    for (int sr = n, dr = 0; sr < nRows; sr++, dr++) {
+    for (int sr = n, dr = 0; sr < rows.size(); sr++, dr++) {
         copyRow(sr, dr);
     }
 
     for (int i = 0; i < n; i++) {
-        fillRow(nRows - i - 1, f);
+        fillRow(rows.size() - i - 1, f);
     }
 }
 
@@ -337,7 +325,7 @@ void Canvas::copyRow(int src, int dst) {
 
     //
     // Everything's black off the canvas.
-    if (src >= nRows) {
+    if (src > rows.size()) {
         fillRow(dst, getBackgroundIndex());
         return;
     }
@@ -352,20 +340,20 @@ void Canvas::copyColumn(int src, int dst) {
     if (src > width) {
         fillColumn(dst, getBackgroundIndex());
     }
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->set(dst, rows[i]->get(src));
+    for(auto row : rows) {
+        row->set(dst, row->get(src));
     }
 }
 
 void Canvas::rotateRight() {
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->rotateRight();
+    for(auto row : rows) {
+        row->rotateRight();
     }
 }
 
 void Canvas::rotateLeft() {
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->rotateLeft();
+    for(auto row : rows) {
+        row->rotateLeft();
     }
 }
 
@@ -373,7 +361,7 @@ void Canvas::rotateUp() {
     //
     // A place to put the data from the top row.
     uint8_t tmp[width];
-    Row* rotRow = rows[nRows-1];
+    Row* rotRow = rows[rows.size()-1];
     for (int i = 0; i < width; i++) {
         tmp[i] = rotRow->get(i);
     }
@@ -390,7 +378,7 @@ void Canvas::rotateDown() {
         tmp[i] = rotRow->get(i);
     }
     scrollDown();
-    rows[nRows - 1]->copy(tmp, 0, width);
+    rows[rows.size() - 1]->copy(tmp, 0, width);
 }
 
 void Canvas::mirrorLeftToRight() {
@@ -427,33 +415,33 @@ void Canvas::mirrorRightToLeft(int c) {
     }
 }
 
-void Canvas::mirrorTopToBottom() { mirrorTopToBottom(nRows / 2); }
+void Canvas::mirrorTopToBottom() { mirrorTopToBottom(rows.size() / 2); }
 
 void Canvas::mirrorTopToBottom(int r) {
-    if (r > nRows) {
+    if (r > rows.size()) {
         return;
     }
 
-    for (int sp = r, dp = r - 1; sp < nRows && dp >= 0; sp++, dp--) {
+    for (int sp = r, dp = r - 1; sp < rows.size() && dp >= 0; sp++, dp--) {
         copyRow(sp, dp);
     }
 }
 
-void Canvas::mirrorBottomToTop() { mirrorBottomToTop(nRows / 2); }
+void Canvas::mirrorBottomToTop() { mirrorBottomToTop(rows.size() / 2); }
 
 void Canvas::mirrorBottomToTop(int r) {
-    if (r > nRows) {
+    if (r > rows.size()) {
         return;
     }
 
-    for (int sp = r - 1, dp = r; sp >= 0 && dp < nRows; sp--, dp++) {
+    for (int sp = r - 1, dp = r; sp >= 0 && dp < rows.size(); sp--, dp++) {
         copyRow(sp, dp);
     }
 }
 
 void Canvas::clear() {
-    for (int i = 0; i < nRows; i++) {
-        rows[i]->fill(getBackgroundIndex());
+    for (auto row : rows) {
+        row->fill(getBackgroundIndex());
     }
 }
 
@@ -466,7 +454,7 @@ void Canvas::clear(uint x, uint y, uint w, uint h) {
 }
 
 void Canvas::clearRow(int row) {
-    if (row < 0 || row > nRows) {
+    if (row < 0 || row > rows.size()) {
         return;
     }
     rows[row]->fill(getBackgroundIndex());
@@ -480,10 +468,10 @@ void Canvas::clearColumn(int column) {
 }
 
 void Canvas::shiftLeft(int x, int y, uint w, uint h, int n) {
-    if (x >= width || y >= nRows) {
+    if (x >= width || y >= rows.size()) {
         return;
     }
-    uint yf = MIN(y + h, nRows);
+    uint yf = MIN(y + h, rows.size());
     uint xf = MIN(x + w, width);
     for (int r = y; r < yf; r++) {
         Row* row = rows[r];
@@ -497,10 +485,10 @@ void Canvas::shiftLeft(int x, int y, uint w, uint h, int n) {
 }
 
 void Canvas::shiftRight(int x, int y, uint w, uint h, int n) {
-    if (x >= width || y >= nRows) {
+    if (x >= width || y >= rows.size()) {
         return;
     }
-    int yf = MIN(y + h, nRows);
+    int yf = MIN(y + h, rows.size());
     int xsource = MIN(x + w - 1, width);
     int xdest = MIN(xsource + n, width);
     for (int row = y; row < yf; row++) {
@@ -515,10 +503,10 @@ void Canvas::shiftRight(int x, int y, uint w, uint h, int n) {
 }
 
 void Canvas::shiftUp(int x, int y, uint w, uint h, int n) {
-    if (x >= width || y >= nRows) {
+    if (x >= width || y >= rows.size()) {
         return;
     }
-    int yf = MIN(y + h, nRows);
+    int yf = MIN(y + h, rows.size());
     int xf = MIN(x + w, width);
     for (int row = yf - 1; row >= y; row--) {
         Row* src = rows[row - n];
@@ -531,10 +519,10 @@ void Canvas::shiftUp(int x, int y, uint w, uint h, int n) {
 }
 
 void Canvas::shiftDown(int x, int y, uint w, uint h, int n) {
-    if (x >= width || y >= nRows) {
+    if (x >= width || y >= rows.size()) {
         return;
     }
-    int yf = MIN(y + h - 1, nRows);
+    int yf = MIN(y + h - 1, rows.size());
     int xf = MIN(x + w - 1, width);
     for (int row = yf; row >= y; row--) {
         Row* src = rows[row];

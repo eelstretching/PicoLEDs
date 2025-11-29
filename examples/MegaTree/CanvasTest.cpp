@@ -1,11 +1,16 @@
-#include <Canvas.h>
-#include <Renderer.h>
 #include <stdlib.h>
 
+#include "Animator.h"
 #include "ArrayColorMap.h"
-#include "FadeColorMap.h"
-#include "StopWatch.h"
+#include "BarberPole.h"
+#include "Bouncer.h"
+#include "Canvas.h"
 #include "Strip.h"
+#include "TripleColor.h"
+#include "Spiral.h"
+#include "LinesFill.h"
+#include "Marquees.h"
+#include "ColorCone.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -13,10 +18,16 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <TimedAnimation.h>
+#include "Icicles.h"
+#include <ColorBars.h>
+#include <FadingBars.h>
+#include <RotatingRows.h>
+#include <RotatingColumns.h>
 
-#define NUM_STRIPS 1
+#define NUM_STRIPS 7
 #define START_PIN 2
-#define STRIP_LEN 300
+#define STRIP_LEN 400
 #define CANVAS_WIDTH 100
 #define BRIGHTNESS 32
 #define FPS 30
@@ -26,45 +37,57 @@ int main() {
 
     //
     // A canvas made out of strips.
-    Strip* strips[NUM_STRIPS];
+    Strip *strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     int pins[NUM_STRIPS];
-    for (int i = 0; i < ns; i++) {
+    for (int i = 0; i < ns; i++, pin++) {
         pins[i] = pin;
-        strips[i] = new Strip(pin++, STRIP_LEN);
+        //
+        // First strip is a little short at the moment.
+        strips[i] = new Strip(pin, i == 0 ? (STRIP_LEN-100) : STRIP_LEN);
         strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 
-    ArrayColorMap colorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White, RGB::Gold,
-                            RGB::Yellow, RGB::Orange});
+    ArrayColorMap xmasColors({
+        RGB::Red,
+        RGB::Green,
+        RGB::Blue,
+        RGB::White, 
+        RGB::Yellow,
+        RGB::Orange
+    });
 
-    colorMap.setBrightness(BRIGHTNESS);
+    ArrayColorMap dimXmasColors(xmasColors);
+    dimXmasColors.setBrightness(32);
+
+    ArrayColorMap midXmasColors(xmasColors);
+    midXmasColors.setBrightness(64);
+
+    ArrayColorMap brightXmasColors(xmasColors);
+    brightXmasColors.setBrightness(128);
 
     Canvas c(CANVAS_WIDTH);
-
     for (int i = 0; i < ns; i++) {
         c.add(*strips[i]);
     }
     c.setup();
-    c.setColorMap(&colorMap);
+    c.setColorMap(&dimXmasColors);
 
-    c.fillRow(0, 0);
-    c.fillRow(1, 1);
-    c.fillRow(2, 2);
+    for(int i = 0; i < c.getHeight(); i++ ) {
+        c.fillRow(i, i % dimXmasColors.getUsed());
+    }
     c.show();
     sleep_ms(2000);
 
+    int nr = 0;
     while (true) {
-        for (int i = 0; i < 10; i++) {
-            c.rotateDown();
+            c.rotateUp();
             c.show();
             sleep_ms(250);
-        }
-        // for (int i = 0; i < 10; i++) {
-        //     c.rotateDown();
-        //     c.show();
-        //     sleep_ms(250);
-        // }
+            nr++;
+            if(nr % 10 == 0) {
+                printf("Rotated %d times\n", nr);
+            }
     }
 }
