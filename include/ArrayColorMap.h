@@ -31,6 +31,7 @@ class ArrayColorMap : public ColorMap {
     virtual uint8_t getIndex(RGB& color) override;
     virtual uint8_t getIndex(HSV& color) override;
     virtual void setBrightness(uint8_t value) override;
+    void shuffle();
 };
 
 #endif

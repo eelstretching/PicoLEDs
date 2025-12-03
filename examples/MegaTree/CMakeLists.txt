@@ -3,6 +3,7 @@
 pico_sdk_init()
 
 add_executable(MegaTree MegaTree.cpp)
+add_executable(MicroTree MicroTree.cpp)
 add_executable(CanvasTest CanvasTest.cpp)
 
 pico_set_program_name(MegaTree "MegaTree")
@@ -13,6 +14,12 @@ pico_enable_stdio_usb(MegaTree 1)
 
 # Add the standard include files to the build
 target_include_directories(MegaTree PRIVATE
+  ../../src
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+)
+
+target_include_directories(MicroTree PRIVATE
   ../../src
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
@@ -50,4 +57,15 @@ target_link_libraries(MegaTree
 )
 
 pico_add_extra_outputs(MegaTree)
+target_link_libraries(MicroTree 
+  PicoLEDs
+  hardware_dma
+  hardware_pio
+  hardware_timer
+  hardware_clocks
+  pico_runtime
+  pico_stdlib
+)
+
+pico_add_extra_outputs(MicroTree)
 
