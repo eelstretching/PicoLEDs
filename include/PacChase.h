@@ -10,8 +10,8 @@
 
 static const char *power[]={
 "8 8 2 1",
-"# c #ffb8ae",
-". c #000000",
+". c 255",
+"# c 0",
 "..####..",
 ".######.",
 "########",
@@ -23,9 +23,9 @@ static const char *power[]={
 
 static const char *pilled1[]={
 "14 14 3 1",
-". c #000000",
-"# c #2121ff",
-"a c #ffb8ae",
+". c 255",
+"# c 0",
+"a c 1",
 ".....####.....",
 "...########...",
 "..##########..",
@@ -43,9 +43,9 @@ static const char *pilled1[]={
 
 static const char *pilled2[]={
 "14 14 3 1",
-". c #000000",
-"# c #2121ff",
-"a c #ffb8ae",
+". c 255",
+"# c 0",
+"a c 1",
 ".....####.....",
 "...########...",
 "..##########..",
@@ -71,7 +71,7 @@ class PacChase : public Animation {
     friend class PacWipe;
 
     protected:
-    ColorMap *colorMap;
+    Xpm *ghostFrames[2];
     Sprite *pacMan;
     uint8_t pmw;
     Sprite **ghosts;
@@ -86,7 +86,7 @@ class PacChase : public Animation {
 
     
     public:
-    PacChase(Canvas *canvas, ColorMap *colorMap);
+    PacChase(Canvas *canvas);
     PacChase(PacWipe *wipe, ColorMap *colorMap);
     void setup();
     void drawDot(int i);

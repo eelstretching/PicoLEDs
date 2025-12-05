@@ -1,9 +1,9 @@
-#include "RotRandColumns.h"
+#include "RotRandRows.h"
 
-RotRandColumns::RotRandColumns(Canvas* canvas, ColorMap* colorMap, uint8_t nColors)
+RotRandRows::RotRandRows(Canvas* canvas, ColorMap* colorMap, uint8_t nColors)
     : Animation(canvas, colorMap), nColors(nColors) {}
 
-void RotRandColumns::init() {
+void RotRandRows::init() {
     firstFrame = true;
     canvas->setColorMap(colorMap);
     for (int i = 0; i < nColors; i++) {
@@ -26,35 +26,33 @@ void RotRandColumns::init() {
 
     //
     // Random column width, but not too small or big.
-    colWidth = random16(5, canvas->getWidth() / 4);
-    uint8_t nColumns = (canvas->getWidth() / colWidth);
-    if(canvas->getWidth() % colWidth == 0) {
-        nColumns++;
+    rowWidth = random8(canvas->getHeight()/3);
+    rowWidth += 3;
+    uint8_t nRows = (canvas->getHeight() / rowWidth);
+    if (canvas->getHeight() % rowWidth == 0) {
+        nRows++;
     }
 
-    //
-    // Try to keep the start and end bands from matching colors.
-    if(nColumns % 2 == 1) {
-        if(nColors % 2 == 0) {
-            colWidth += 6;
+    if (nRows % 2 == 1) {
+        if (nColors % 2 == 0) {
+            rowWidth += 1;
         }
     } else {
-        if(nColors % 2 == 1) {
-            colWidth += 6;
+        if (nColors % 2 == 1) {
+            rowWidth += 1;
         }
     }
-
 }
 
-bool RotRandColumns::step() {
+bool RotRandRows::step() {
     if (firstFrame) {
-        for (int i = 0; i < canvas->getWidth(); i++) {
-            uint8_t colorIndex = currColors[(i / colWidth) % nColors];
-            canvas->fillColumn(i, colorIndex);
+        for (int i = 0; i < canvas->getHeight(); i++) {
+            uint8_t colorIndex = (i / rowWidth) % nColors;
+            canvas->fillRow(i, colorIndex);
         }
         firstFrame = false;
     } else {
-        canvas->rotateRight();
+        canvas->rotateUp();
     }
     return true;
 }

@@ -1,6 +1,9 @@
+#include <Bursts.h>
 #include <ColorBars.h>
 #include <FadingBars.h>
 #include <RandomAnimation.h>
+#include <RotRandColumns.h>
+#include <RotRandRows.h>
 #include <RotatingColumns.h>
 #include <RotatingRows.h>
 #include <TimedAnimation.h>
@@ -19,7 +22,6 @@
 #include "Marquees.h"
 #include "Spiral.h"
 #include "Strip.h"
-#include "TripleColor.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -27,7 +29,6 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
-#include <RotRandColumns.h>
 
 #define NUM_STRIPS 5
 #define START_PIN 2
@@ -53,18 +54,32 @@ int main() {
         strips[i]->setColorOrder(ColorOrder::OGRB);
     }
 
-    ArrayColorMap xmasColors({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
-                              RGB::Yellow, RGB::Orange});
+    ArrayColorMap xmasColors({
+        RGB::Red,
+        RGB::Green,
+        RGB::White,
+        RGB::Yellow,
+        RGB::Purple,
+        RGB::Orange,
+        RGB::Silver,
+        RGB::FairyLightNCC,
+        RGB(255, 20, 20),    // Bright Red
+        RGB(28, 191, 38),    // Vibrant Green
+        RGB(0, 33, 111),     // Navy
+        RGB(255, 252, 245),  // Warm White
+        RGB(213, 181, 52),   // Gold
+        RGB(242, 18, 18),    // Deep Red
+    });
 
     ArrayColorMap basicXmasColors({RGB::Red, RGB::White, RGB::Green});
 
     basicXmasColors.setBrightness(32);
 
     ArrayColorMap dimXmasColors(xmasColors);
-    dimXmasColors.setBrightness(32);
+    dimXmasColors.setBrightness(16);
 
     ArrayColorMap midXmasColors(xmasColors);
-    midXmasColors.setBrightness(64);
+    midXmasColors.setBrightness(32);
 
     ArrayColorMap brightXmasColors(xmasColors);
     brightXmasColors.setBrightness(128);
@@ -85,12 +100,29 @@ int main() {
     canvas.clear();
     canvas.show();
 
-    Animator animator(&canvas, &dimXmasColors, FPS);
+    Animator animator(&canvas, &midXmasColors, FPS);
 
-    RotRandColumns rc1(&canvas, &basicXmasColors);
+    RotRandColumns rc1(&canvas, &dimXmasColors, 2);
     rc1.setName("RRC1");
     animator.addTimed(&rc1, 10000);
 
+    RotRandColumns rc2(&canvas, &dimXmasColors, 4);
+    rc1.setName("RRC2");
+    animator.addTimed(&rc2, 10000);
+
+    // Marquees marq(&canvas, &dimXmasColors, midXmasColors.getSize(), 20,
+    // RIGHT,
+    //               canvas.getHeight());
+    // marq.setName("Marquee");
+    // animator.add(&marq);
+
+    RotRandRows rr1(&canvas, &dimXmasColors, 4);
+    rr1.setName("RRR1");
+    animator.addTimed(&rr1, 10000);
+
+    RotRandRows rr2(&canvas, &dimXmasColors, 2);
+    rr2.setName("RRR2");
+    animator.addTimed(&rr2, 10000);
 
     animator.init();
 

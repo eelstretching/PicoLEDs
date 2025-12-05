@@ -2,20 +2,30 @@
 
 #include "math8.h"
 
-PacWipe::PacWipe(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
-    sprites = new Sprite *[5];
-    sprites[0] = new PacMan(canvas, colorMap, 0, 1);
-    sprites[1] = new Ghost(canvas, colorMap, inkyColor, 0, 1);
-    sprites[2] = new Ghost(canvas, colorMap, blinkyColor, 0, 1);
-    sprites[3] = new Ghost(canvas, colorMap, pinkyColor, 0, 1);
-    sprites[4] = new Ghost(canvas, colorMap, clydeColor, 0, 1);
+PacWipe::PacWipe(Canvas* canvas, ColorMap* colorMap)
+    : Animation(canvas, colorMap) {
+    uint8_t pupilColorIndex = colorMap->addColor(pupilColor);
+    uint8_t pacColorIndex = colorMap->addColor(pacColor);
+
+    ghostFrames[0] = new Xpm(ghost1);
+    ghostFrames[1] = new Xpm(ghost2);
+
+    sprites = new Sprite*[5];
+    sprites[0] = new PacMan(canvas, pacColorIndex, 0, 1);
+    sprites[1] = new Ghost(canvas, ghostFrames, colorMap->addColor(inkyColor),
+                           pupilColorIndex, 0, 1);
+    sprites[2] = new Ghost(canvas, ghostFrames, colorMap->addColor(blinkyColor),
+                           pupilColorIndex, 0, 1);
+    sprites[3] = new Ghost(canvas, ghostFrames, colorMap->addColor(pinkyColor),
+                           pupilColorIndex, 0, 1);
+    sprites[4] = new Ghost(canvas, ghostFrames, colorMap->addColor(clydeColor),
+                           pupilColorIndex, 0, 1);
 }
 
 void PacWipe::init() {
     canvas->setColorMap(colorMap);
     curr = sprites[random8(0, 4)];
     if (curr == sprites[0]) {
-
         //
         // PacMan can only go right for now!
         curr->setDirection(RIGHT);
@@ -33,9 +43,9 @@ void PacWipe::init() {
     curr->init();
 }
 
-bool PacWipe::step() { 
+bool PacWipe::step() {
     bool ret = curr->step();
-    if(curr->getDirection() == RIGHT) {
+    if (curr->getDirection() == RIGHT) {
         canvas->clearColumn(curr->getX() - 1);
     } else {
         canvas->clearColumn(curr->getX() + curr->getWidth());

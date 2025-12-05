@@ -38,6 +38,7 @@ target_link_libraries(CanvasTest
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_rand
   pico_runtime
   pico_stdlib
 )
@@ -52,17 +53,20 @@ target_link_libraries(MegaTree
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_rand
   pico_runtime
   pico_stdlib
 )
 
 pico_add_extra_outputs(MegaTree)
+
 target_link_libraries(MicroTree 
   PicoLEDs
   hardware_dma
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_rand
   pico_runtime
   pico_stdlib
 )

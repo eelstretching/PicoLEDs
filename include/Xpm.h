@@ -8,16 +8,14 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+/// @brief A slightly modified Xpm format that uses color indices rather than the colors themselves.
 class Xpm {
    protected:
     uint8_t nc;
     uint8_t h;
     uint8_t w;
     //
-    // The color map that we'll add our colors to.
-    ColorMap *colorMap;
-    //
-    // The indices of our colors in the color map.
+    // The color indices in this pixmap.
     uint8_t *colorIndexes;
     //
     // The pixel data, as indices into the color map.
@@ -26,8 +24,8 @@ class Xpm {
    public:
     /// @brief Creates a pixmap
     /// @param xpm the definition of the pixmap.
-    /// @param colorMap the color map to use for this pixmap.
-    Xpm(const char *xpm[], ColorMap *colorMap);
+    Xpm(const char *xpm[]);
+    Xpm(const Xpm& other);
     /// @brief Replace on color index with another in the pixmap.
     /// @param oldColor 
     /// @param newColor 
@@ -44,13 +42,10 @@ class Xpm {
     /// only need one set of bitmaps for several different colored characters
     /// (e.g., the Pac-Man ghosts).
     /// @param canvas The canvas to render on
-    /// @param colorMap The colorMap to use. We're not going to do a lot of
-    /// checking on this, so beware.
+    /// @param remap An array to remap the color indices into a more useful colorMap.
     /// @param x The x coordinate to render at
     /// @param y the y coordinate to render at
-    bool render(Canvas *canvas, ColorMap *colorMap, uint x, uint y);
-    ColorMap *getColorMap() { return colorMap; };
-    uint8_t *getColorIndexes() { return colorIndexes; };
+    bool render(Canvas *canvas, uint8_t *remap, uint x, uint y);
     uint8_t getNumberOfColors() { return nc; };
     uint8_t getHeight() { return h; };
     uint8_t getWidth() { return w; };

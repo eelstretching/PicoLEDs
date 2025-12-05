@@ -13,7 +13,7 @@ class RotRandColumns : public Animation {
     uint8_t currColors[8];
     bool firstFrame = true;
 public:
-    RotRandColumns(Canvas *canvas, ColorMap *colorMap);
+    RotRandColumns(Canvas *canvas, ColorMap *colorMap, uint8_t nColors);
     int getFPSNeeded() override { return 50; };
     virtual void init() override;
     virtual bool step() override;

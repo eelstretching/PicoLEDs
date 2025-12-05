@@ -5,10 +5,12 @@
 
 #include "Sprite.h"
 
+static RGB pacColor(0xaffff00);
+
 static const char *pac1[]={
 "13 13 2 1",
-". c a000000",
-"a c affff00",
+". c 255",
+"a c 0",
 "....aaaaa....",
 "..aaaaaaaaa..",
 ".aaaaaaaaaaa.",
@@ -25,8 +27,8 @@ static const char *pac1[]={
 
 static const char *pac2[]={
 "13 13 2 1",
-". c a000000",
-"a c affff00",
+". c 255",
+"a c 0",
 "....aaaaa....",
 "..aaaaaaaaa..",
 ".aaaaaaaaaaa.",
@@ -43,8 +45,8 @@ static const char *pac2[]={
 
 static const char *pac3[]={
 "13 13 2 1",
-". c a000000",
-"a c affff00",
+". c 255",
+"a c 0",
 "....aaaaa....",
 "..aaaaaaa....",
 ".aaaaaaa.....",
@@ -63,12 +65,13 @@ class PacMan : public Sprite {
 
     protected:
     
-    Xpm **xpms;
+    Xpm *frames[3];
+    uint8_t cmap[2];
 
     public:
-    PacMan(Canvas *canvas, ColorMap *colorMap, int startX, int startY);
+    PacMan(Canvas *canvas, uint8_t pacColorIndex, int startX, int startY);
     ~PacMan();
-    Xpm **getXpms() {return xpms;};
+    Xpm **getXpms() {return frames;};
 };
 
 #endif

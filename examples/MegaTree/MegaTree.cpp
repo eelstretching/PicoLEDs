@@ -7,7 +7,6 @@
 #include "Bouncer.h"
 #include "Canvas.h"
 #include "Strip.h"
-#include "TripleColor.h"
 #include "Spiral.h"
 #include "LinesFill.h"
 #include "Marquees.h"

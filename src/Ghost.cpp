@@ -1,46 +1,25 @@
 #include "Ghost.h"
 
-Ghost::Ghost(Canvas* canvas, ColorMap *colorMap, RGB &ghostColor, int startX, int startY)
-    : Sprite(canvas, colorMap, startX, startY) {
-    //
-    // We get to create the pixmaps, others will copy these, to save precious
-    // memory.
-    xpms = new Xpm*[2];
-    xpms[0] = new Xpm(ghost1, canvas->getColorMap());
-    xpms[1] = new Xpm(ghost2, canvas->getColorMap());
+Ghost::Ghost(Canvas* canvas, Xpm **frames, uint8_t ghostColorIndex, uint8_t pupilColorIndex, int startX, int startY)
+    : Sprite(canvas, colorMap, startX, startY), frames(frames) {
 
-    setup(ghostColor);
+    //
+    // The animation loop. Each state lasts for four frames
+    add(frames[0]);
+    add(frames[0]);
+    add(frames[0]);
+    add(frames[0]);
+    add(frames[1]);
+    add(frames[1]);
+    add(frames[1]);
+    add(frames[1]);
+
+    cmap[0] = 0;
+    cmap[1] = ghostColorIndex;
+    cmap[2] = pupilColorIndex;
 }
 
 Ghost::~Ghost() {
-    for(int i=0; i<2; i++) {
-        delete xpms[i];
-    }
-    delete[] xpms;
-}
-
-/// @brief Do the stuff that we need however we were created.
-void Ghost::setup(RGB &ghostColor) {
-    //
-    // The animation loop. Each state lasts for four frames
-    add(xpms[0]);
-    add(xpms[0]);
-    add(xpms[0]);
-    add(xpms[0]);
-    add(xpms[1]);
-    add(xpms[1]);
-    add(xpms[1]);
-    add(xpms[1]);
-
-    //
-    // Add the ghost color to the color map and remember its index.
-    uint8_t ghostColorIndex = xpms[0]->getColorMap()->addColor(ghostColor);
-    uint8_t pupilColorIndex = xpms[0]->getColorMap()->addColor(pupilColor);
-
-    //
-    // Swap out the ghost color in the pixmaps for the one we were given.
-    xpms[0]->replaceColor(xpms[0]->getColorIndexes()[2], ghostColorIndex);
-    xpms[1]->replaceColor(xpms[1]->getColorIndexes()[2], ghostColorIndex);
 }
 
 //
@@ -51,7 +30,7 @@ void Ghost::drawPupils() {
     //
     // figure out the bottom-left coordinate of the eye on the canvas.
     uint cx, cy;
-    uint h = xpms[0]->getHeight();
+    uint h = frames[0]->getHeight();
 
     switch (direction) {
         case UP:
@@ -74,14 +53,14 @@ void Ghost::drawPupils() {
 
     //
     // Put the four pupil-colored pixels into each eye.
-    canvas->set(cx, cy, pupilColorIndex);
-    canvas->set(cx + 6, cy, pupilColorIndex);
-    canvas->set(cx + 1, cy, pupilColorIndex);
-    canvas->set(cx + 7, cy, pupilColorIndex);
-    canvas->set(cx, cy + 1, pupilColorIndex);
-    canvas->set(cx + 6, cy + 1, pupilColorIndex);
-    canvas->set(cx + 1, cy + 1, pupilColorIndex);
-    canvas->set(cx + 7, cy + 1, pupilColorIndex);
+    canvas->set(cx, cy, cmap[2]);
+    canvas->set(cx + 6, cy, cmap[2]);
+    canvas->set(cx + 1, cy, cmap[2]);
+    canvas->set(cx + 7, cy, cmap[2]);
+    canvas->set(cx, cy + 1, cmap[2]);
+    canvas->set(cx + 6, cy + 1, cmap[2]);
+    canvas->set(cx + 1, cy + 1, cmap[2]);
+    canvas->set(cx + 7, cy + 1, cmap[2]);
 }
 
 bool Ghost::step() {

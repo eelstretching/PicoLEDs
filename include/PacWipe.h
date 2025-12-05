@@ -11,11 +11,13 @@ class PacWipe : public Animation {
     friend class PacChase;
 
    protected:
-    Sprite **sprites;
-    Sprite *curr;
+    Xpm* ghostFrames[2];
+
+    Sprite** sprites;
+    Sprite* curr;
 
    public:
-    PacWipe(Canvas *canvas, ColorMap *colorMap);
+    PacWipe(Canvas* canvas, ColorMap* colorMap);
     void init();
     bool step();
 };

@@ -16,7 +16,6 @@
 #include "Marquees.h"
 #include "Spiral.h"
 #include "Strip.h"
-#include "TripleColor.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"

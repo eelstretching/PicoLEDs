@@ -18,7 +18,14 @@ uint8_t hextoi(char c) {
 }
 uint8_t hextoi(char c1, char c2) { return hextoi(c1) << 4 | hextoi(c2); }
 
-Xpm::Xpm(const char *xpm[], ColorMap *colorMap) : colorMap(colorMap){
+uint8_t remap(uint8_t *remap, uint8_t o) {
+    if(remap == nullptr || o == 255) {
+        return o;
+    }
+    return remap[o];
+}
+
+Xpm::Xpm(const char *xpm[]) {
     char holder[3];
 
     //
@@ -55,8 +62,7 @@ Xpm::Xpm(const char *xpm[], ColorMap *colorMap) : colorMap(colorMap){
     for (int i = 0; i < nc; i++) {
         const char *row = xpm[i + 1];
         cc[i] = row[0];
-        colorIndexes[i] = colorMap->addColor(RGB(hextoi(row[5], row[6]), hextoi(row[7], row[8]),
-                        hextoi(row[9], row[10])));
+        colorIndexes[i] = atoi(&row[3]);
     }
 
     //
@@ -82,6 +88,13 @@ Xpm::Xpm(const char *xpm[], ColorMap *colorMap) : colorMap(colorMap){
     delete[] cc;
 }
 
+Xpm::Xpm(const Xpm& other) : nc(other.nc), h(other.h), w(other.w) {
+    pixels = new uint8_t[w*h];
+    memcpy(pixels, other.pixels, w*h*sizeof(uint8_t));
+    colorIndexes = new uint8_t[nc];
+    memcpy(colorIndexes, other.colorIndexes, nc*sizeof(uint8_t));    
+}
+
 void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
     for (int i = 0; i < w * h; i++) {
         if (pixels[i] == oldColor) {
@@ -91,16 +104,10 @@ void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
 }
 
 bool Xpm::render(Canvas *canvas, uint x, uint y) {
-    return render(canvas, colorMap, x, y);
+    return render(canvas, nullptr, x, y);
 }
 
-bool Xpm::render(Canvas *canvas, ColorMap *localColorMap, uint x, uint y) {
-    //
-    // Maybe we didn't get a color map, in which case, use the colors defined in
-    // the pixmap.
-    if (localColorMap == NULL) {
-        localColorMap = colorMap;
-    }
+bool Xpm::render(Canvas *canvas, uint8_t *map, uint x, uint y) {
     bool atLeastOnePixel = false;
     int cy = y + h - 1;
     int p = 0;
@@ -108,9 +115,10 @@ bool Xpm::render(Canvas *canvas, ColorMap *localColorMap, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            if (canvas->set(cx++, cy, pixels[p++])) {
+            if (canvas->set(cx++, cy, remap(map, p++))) {
                 atLeastOnePixel = true;
             }
+            p++;
         }
         cy--;
     }

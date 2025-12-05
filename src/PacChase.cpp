@@ -6,16 +6,20 @@
 
 #define PILL_POSITION 61
 
-PacChase::PacChase(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
+PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
     //
     // Make a color map for this animation.
+    ghostFrames[0] = new Xpm(ghost1);
+    ghostFrames[1] = new Xpm(ghost2);
     colorMap = canvas->makeColorMap(32);
-    pacMan = new PacMan(canvas, colorMap, 0, 1);
+    uint8_t pupilColorIndex = colorMap->addColor(pupilColor);
+    uint8_t pacColorIndex = colorMap->addColor(pacColor);
+    pacMan = new PacMan(canvas, pacColorIndex, 0, 1);
     ghosts = new Sprite *[4];
-    ghosts[0] = new Ghost(canvas, colorMap, inkyColor, 0, 1);
-    ghosts[1] = new Ghost(canvas, colorMap, blinkyColor, 0, 1);
-    ghosts[2] = new Ghost(canvas, colorMap, pinkyColor, 0, 1);
-    ghosts[3] = new Ghost(canvas, colorMap, clydeColor, 0, 1);
+    ghosts[0] = new Ghost(canvas, ghostFrames, colorMap->addColor(inkyColor), pupilColorIndex, 0, 1);
+    ghosts[1] = new Ghost(canvas, ghostFrames, colorMap->addColor(blinkyColor), pupilColorIndex, 0, 1);
+    ghosts[2] = new Ghost(canvas, ghostFrames, colorMap->addColor(pinkyColor), pupilColorIndex, 0, 1);
+    ghosts[3] = new Ghost(canvas, ghostFrames, colorMap->addColor(clydeColor), pupilColorIndex, 0, 1);
     dotColorIndex = canvas->getColorMap()->addColor(dotColor);
     setup();
 }
@@ -34,12 +38,12 @@ void PacChase::setup() {
     ghw = ghosts[0]->getWidth();
     pilled = new Sprite *[2];
     pilled[0] = new Sprite(canvas, colorMap, 0, 0);
-    Xpm *pil1 = new Xpm(pilled1, colorMap);
+    Xpm *pil1 = new Xpm(pilled1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
-    Xpm *pil2 = new Xpm(pilled2, colorMap);
+    Xpm *pil2 = new Xpm(pilled2);
     pilled[0]->add(pil2);
     pilled[0]->add(pil2);
     pilled[0]->add(pil2);
@@ -47,7 +51,7 @@ void PacChase::setup() {
     pilled[1] = new Sprite(*pilled[0]);
     piw = pilled[0]->getWidth();
     state = PLAIN;
-    pill = new Xpm(power, colorMap);
+    pill = new Xpm(power);
 }
 
 void PacChase::drawDot(int i) {
