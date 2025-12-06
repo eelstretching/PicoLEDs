@@ -2,10 +2,11 @@
 
 #include <stdint.h>
 
-LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nBands, Direction direction,
+LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nColors, uint8_t *colors, Direction direction,
                    int stepSize)
     : Animation(canvas, colorMap),
-      nBands(nBands),
+      nColors(nColors),
+      colors(colors),
       direction(direction),
       stepSize(stepSize) {
     //
@@ -15,12 +16,12 @@ LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nBands, Direction d
     switch (direction) {
         case UP:
         case DOWN:
-            bandSize = canvas->getWidth() / nBands;
+            bandSize = canvas->getWidth() / nColors;
             nLines = canvas->getWidth();
             break;
         case LEFT:
         case RIGHT:
-            bandSize = canvas->getHeight() / nBands;
+            bandSize = canvas->getHeight() / nColors;
             nLines = canvas->getHeight();
             break;
     }
@@ -64,7 +65,7 @@ void LinesFill::init() {
 
         //
         // New line. We'll start with most of them off the canvas.
-        lines[i] = new FillLine(canvas, colorMap, currBand, direction, startPos,
+        lines[i] = new FillLine(canvas, colorMap, colors[currBand], direction, startPos,
                                 endPos, stepSize);
 
         //

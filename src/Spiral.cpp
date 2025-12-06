@@ -1,23 +1,31 @@
 #include "Spiral.h"
 
-Spiral::Spiral(Canvas* canvas, ColorMap *colorMap, int width, int length)
-    : Animation(canvas, colorMap), width(width), length(length) {}
+Spiral::Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t nColors,
+               uint8_t* colors, uint8_t width, uint8_t length)
+    : Animation(canvas, colorMap),
+      nColors(nColors),
+      colors(colors),
+      width(width),
+      length(length) {
+    barWidth = length / nColors;
+}
 
 Spiral::~Spiral() {}
 
-void Spiral::init() {
-    canvas->setColorMap(colorMap);
-}
+void Spiral::init() { canvas->setColorMap(colorMap); }
 
 bool Spiral::step() {
+    int sx = x;
+    int sy = y;
     canvas->clear();
-    for (int cx = x, c = 0; cx < x + width; cx++, c = (c+1) % canvas->getColorMap()->getSize()) {
-        for (int cy = y, dx = cx; cy < y + length; cy++) {
-            int mx = dx % canvas->getWidth();
-            int my = cy % canvas->getHeight();
-            canvas->set(mx, my, c);
-            dx = (dx + 1) % canvas->getWidth();
+    for (int i = 0; i < length; i++) {
+        uint8_t dy = sy + i;
+        uint8_t colorIndex = colors[(i / barWidth) % nColors];
+        for (int j = 0; j < width; j++) {
+            uint8_t dx = sx + j;
+            canvas->set(dx % canvas->getWidth(), dy % canvas->getHeight(), colorIndex);
         }
+        sx++;
     }
     x = (x + 1) % canvas->getWidth();
     y = (y + 1) % canvas->getHeight();

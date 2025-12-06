@@ -5,7 +5,8 @@ RotatingColumns::RotatingColumns(Canvas* canvas, ColorMap* colorMap,
     : Animation(canvas, colorMap),
       colWidth(colWidth),
       colors(colors),
-      nColors(nColors) {}
+      nColors(nColors) {
+      }
 
 bool RotatingColumns::step() {
     if (firstFrame) {

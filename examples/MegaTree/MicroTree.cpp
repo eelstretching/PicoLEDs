@@ -85,6 +85,12 @@ int main() {
     ArrayColorMap brightXmasColors(xmasColors);
     brightXmasColors.setBrightness(128);
 
+    uint8_t rgColors[] = {0, 1};
+    uint8_t rwColors[] = {0, 3};
+    uint8_t rgwColors[] = {0, 1, 3};
+    uint8_t rgbwColors[] = {0, 1, 2, 3};
+    uint8_t rgbwgColors[] = {0, 1, 2, 3, 13};
+
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         canvas.add(*strips[i]);
@@ -103,20 +109,24 @@ int main() {
 
     Animator animator(&canvas, &midXmasColors, FPS);
 
-    uint8_t rc1Colors[] = {0, 1};
-    // RotatingColumns rc1(&canvas, &midXmasColors, 2, rc1Colors, 15);
+    // RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 15);
     // rc1.setName("RC1");
     // animator.addTimed(&rc1, 10000);
 
-    uint8_t rc2Colors[] = {0, 1, 3};
-    // RotatingColumns rc2(&canvas, &midXmasColors, 3, rc2Colors, 10);
+    // RotatingColumns rc2(&canvas, &midXmasColors, 3, rgwColors, 10);
     // rc2.setName("RC2");
     // animator.addTimed(&rc2, 10000);
 
-    uint8_t rc3Colors[] = {0, 1, 2, 3};
 
-    uint8_t fMarqColors[] = {0, 1, 2, 3, 13};
-    Marquees fMarq(&canvas, &midXmasColors, 5, fMarqColors, 20, RIGHT,
+    Spiral spiral(&canvas, &midXmasColors, 2, rwColors, 10, 25);
+    spiral.setName("Spiral");
+    animator.addTimed(&spiral, 10000);
+
+    Spiral sp2(&canvas, &midXmasColors, 1, rwColors, 10, 25);
+    sp2.setName("Spiral");
+    animator.addTimed(&sp2, 10000);
+
+    Marquees fMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
                    canvas.getHeight());
     fMarq.setName("FMarq");
     animator.addTimed(&fMarq, 10000);

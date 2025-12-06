@@ -9,9 +9,11 @@
 
 /// @brief An animation that draws a spiral pattern on the tree.
 class Spiral : public Animation {
-    int width;
-
-    int length;
+    uint8_t width;
+    uint8_t length;
+    uint8_t barWidth;
+    uint8_t nColors;
+    uint8_t *colors;
 
     int x = 0;
     int y = 0;
@@ -21,7 +23,7 @@ class Spiral : public Animation {
     /// @param canvas The canvas to draw on.
     /// @param width The width of the spiral in pixels.
     /// @param length The length of the spiral in pixels.
-    Spiral(Canvas* canvas, ColorMap* colorMap, int width, int length);
+    Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t nColors, uint8_t *colors, uint8_t width, uint8_t length);
 
     /// @brief Default destructor.
     ~Spiral();
