@@ -109,6 +109,10 @@ int main() {
 
     Animator animator(&canvas, &midXmasColors, FPS);
 
+    FadingBars fb1(&canvas, &brightXmasColors, 20, 2);
+    fb1.setName("FB1");
+    animator.addTimed(&fb1, 10000);
+
     RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 15);
     rc1.setName("RC1");
     animator.addTimed(&rc1, 10000);

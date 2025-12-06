@@ -108,16 +108,20 @@ int main() {
     cone.setName("Cone");
     randimation.addTimed(&cone, 10000);
 
-    Marquees fMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
+    Marquees fancyMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
                    canvas.getHeight());
-    fMarq.setName("FMarq");
-    animator.addTimed(&fMarq, 30000);
+    fancyMarq.setName("Fancy Marquee");
+    randimation.addTimed(&fancyMarq, 30000);
 
-    Marquees marq(&canvas, &dimXmasColors, 2, rwColors, 20, RIGHT,
+    Marquees rwMarq(&canvas, &midXmasColors, 2, rwColors, 20, RIGHT,
                   canvas.getHeight());
-    marq.setName("Marquee");
-    randimation.addTimed(&marq, 30000); 
-
+    rwMarq.setName("RW Marquee");
+    randimation.addTimed(&rwMarq, 30000); 
+    
+    Marquees rgMarq(&canvas, &midXmasColors, 2, rgColors, 20, RIGHT,
+                  canvas.getHeight());
+    rgMarq.setName("RG Marquee");
+    randimation.addTimed(&rgMarq, 30000); 
     
     LinesFill lfu(&canvas, &midXmasColors, 5, rgbwgColors, UP, 1);
     lfu.setName("LFU");
@@ -130,16 +134,16 @@ int main() {
     randimation.addTimed(&lfd, 10000);
 
     Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
-    sp1.setName("Spiral");
+    sp1.setName("Spiral 1");
     randimation.addTimed(&sp1, 10000);
 
     Spiral sp2(&canvas, &brightXmasColors, 1, rwColors, 10, 25);
-    sp2.setName("Spiral");
-    animator.addTimed(&sp2, 10000);
+    sp2.setName("Spiral 2");
+    randimation.addTimed(&sp2, 10000);
 
     Spiral sp3(&canvas, &brightXmasColors, 2, rwColors, 10, 25);
     sp3.setName("Spiral 3");
-    animator.addTimed(&sp3, 10000);
+    randimation.addTimed(&sp3, 10000);
 
     ArrayColorMap icicleMap(8);
     Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(128, 128, 128));
