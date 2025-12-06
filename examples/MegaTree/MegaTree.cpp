@@ -92,7 +92,9 @@ int main() {
     cone.setName("Cone");
     randimation.addTimed(&cone, 10000);
 
-    Marquees marq(&canvas, &midXmasColors, midXmasColors.getSize(), 20, RIGHT, canvas.getHeight());
+    uint8_t marqColors[] = {0, 2};
+    Marquees marq(&canvas, &dimXmasColors, 2, marqColors, 20, RIGHT,
+                  canvas.getHeight());
     marq.setName("Marquee");
     randimation.addTimed(&marq, 10000); 
 
@@ -144,19 +146,21 @@ int main() {
     fb4.setName("FB4");
     randimation.addTimed(&fb4, 10000);
 
-    RotatingColumns rc1(&canvas, &midXmasColors, 20, 2);
+    uint8_t rc1Colors[] = {0, 1};
+    RotatingColumns rc1(&canvas, &midXmasColors, 2, rc1Colors, 20);
     rc1.setName("RC1");
     randimation.addTimed(&rc1, 10000);
 
-    RotatingColumns rc2(&canvas, &midXmasColors, 10, 4);
+    uint8_t rc2Colors[] = {0, 1, 2, 3};
+    RotatingColumns rc2(&canvas, &midXmasColors, 4, rc2Colors, 10);
     rc2.setName("RC2");
     randimation.addTimed(&rc2, 10000);
 
-    RotatingRows rr1(&canvas, &midXmasColors, 4, 2);
+    RotatingRows rr1(&canvas, &midXmasColors, 2, rc1Colors, 4);
     rr1.setName("RR1");
     randimation.addTimed(&rr1, 10000);
 
-    RotatingRows rr2(&canvas, &midXmasColors, 4, 5);
+    RotatingRows rr2(&canvas, &midXmasColors, 4, rc2Colors, 5);
     rr2.setName("RR2");
     randimation.addTimed(&rr2, 10000);
 

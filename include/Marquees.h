@@ -7,21 +7,22 @@
 #include "Marquee.h"
 
 class Marquees : public Animation {
-   public:
-    Marquees(Canvas *canvas, ColorMap *colorMap, int nColors, int width, Direction direction, int nMarquees = -1);
+   private:
+    uint8_t *colors;
+    Direction direction;
+    int width;
+    Marquee **marquees;
+    int nMarquees;
+
+    public:
+    Marquees(Canvas *canvas, ColorMap *colorMap, int nColors, uint8_t *colors, int width, Direction direction, int nMarquees = -1);
 
     ~Marquees();
 
     bool step() override;
 
-    int getFPSNeeded() override { return 80; };
+    int getFPSNeeded() override { return 60; };
 
-   private:
-    RGB *colors;
-    Direction direction;
-    int width;
-    Marquee **marquees;
-    int nMarquees;
  };
 
 #endif

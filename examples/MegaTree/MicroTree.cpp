@@ -57,6 +57,7 @@ int main() {
     ArrayColorMap xmasColors({
         RGB::Red,
         RGB::Green,
+        RGB::Blue,
         RGB::White,
         RGB::Yellow,
         RGB::Purple,
@@ -102,27 +103,23 @@ int main() {
 
     Animator animator(&canvas, &midXmasColors, FPS);
 
-    RotRandColumns rc1(&canvas, &dimXmasColors, 2);
-    rc1.setName("RRC1");
-    animator.addTimed(&rc1, 10000);
+    uint8_t rc1Colors[] = {0, 1};
+    // RotatingColumns rc1(&canvas, &midXmasColors, 2, rc1Colors, 15);
+    // rc1.setName("RC1");
+    // animator.addTimed(&rc1, 10000);
 
-    RotRandColumns rc2(&canvas, &dimXmasColors, 4);
-    rc1.setName("RRC2");
-    animator.addTimed(&rc2, 10000);
+    uint8_t rc2Colors[] = {0, 1, 3};
+    // RotatingColumns rc2(&canvas, &midXmasColors, 3, rc2Colors, 10);
+    // rc2.setName("RC2");
+    // animator.addTimed(&rc2, 10000);
 
-    // Marquees marq(&canvas, &dimXmasColors, midXmasColors.getSize(), 20,
-    // RIGHT,
-    //               canvas.getHeight());
-    // marq.setName("Marquee");
-    // animator.add(&marq);
+    uint8_t rc3Colors[] = {0, 1, 2, 3};
 
-    RotRandRows rr1(&canvas, &dimXmasColors, 4);
-    rr1.setName("RRR1");
-    animator.addTimed(&rr1, 10000);
-
-    RotRandRows rr2(&canvas, &dimXmasColors, 2);
-    rr2.setName("RRR2");
-    animator.addTimed(&rr2, 10000);
+    uint8_t fMarqColors[] = {0, 1, 2, 3, 13};
+    Marquees fMarq(&canvas, &midXmasColors, 5, fMarqColors, 20, RIGHT,
+                   canvas.getHeight());
+    fMarq.setName("FMarq");
+    animator.addTimed(&fMarq, 10000);
 
     animator.init();
 

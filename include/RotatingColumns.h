@@ -10,9 +10,10 @@
 class RotatingColumns : public Animation {
     uint8_t colWidth;
     uint8_t nColors; 
+    uint8_t *colors;
     bool firstFrame = true;
 public:
-    RotatingColumns(Canvas *canvas, ColorMap *colorMap, uint8_t colWidth, uint8_t nColors);
+    RotatingColumns(Canvas *canvas, ColorMap *colorMap, uint8_t nColors, uint8_t *colors, uint8_t colWidth);
     int getFPSNeeded() override { return 50; };
     virtual void init() override {firstFrame = true; canvas->setColorMap(colorMap);};
     virtual bool step() override;
