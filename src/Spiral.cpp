@@ -12,7 +12,11 @@ Spiral::Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t nColors,
 
 Spiral::~Spiral() {}
 
-void Spiral::init() { canvas->setColorMap(colorMap); }
+void Spiral::init() {
+    canvas->setColorMap(colorMap);
+    x = 0;
+    y = 0;
+}
 
 bool Spiral::step() {
     int sx = x;
@@ -22,8 +26,8 @@ bool Spiral::step() {
         uint8_t dy = sy + i;
         uint8_t colorIndex = colors[(i / barWidth) % nColors];
         for (int j = 0; j < width; j++) {
-            uint8_t dx = sx + j;
-            canvas->set(dx % canvas->getWidth(), dy % canvas->getHeight(), colorIndex);
+            canvas->set((sx+j) % canvas->getWidth(), dy % canvas->getHeight(),
+                        colorIndex);
         }
         sx++;
     }

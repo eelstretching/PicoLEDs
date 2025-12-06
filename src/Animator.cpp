@@ -1,13 +1,18 @@
 #include "Animator.h"
+
 #include "TimedAnimation.h"
 
-Animator::Animator(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
+Animator::Animator(Canvas* canvas, ColorMap* colorMap)
+    : Animation(canvas, colorMap) {
     //
     // We'll do 30 FPS by default.
     setFPS(30);
 }
 
-Animator::Animator(Canvas* canvas, ColorMap *colorMap, int fps) : Animator(canvas, colorMap) { setFPS(fps); }
+Animator::Animator(Canvas* canvas, ColorMap* colorMap, int fps)
+    : Animator(canvas, colorMap) {
+    setFPS(fps);
+}
 
 void Animator::add(Animation* a) { animations.push_back(a); }
 
@@ -49,11 +54,11 @@ bool Animator::step() {
     // the list if we've reached the end.
     frameWatch.start();
     stepWatch.start();
+    bool changed = false;
     if (!animations[pos]->step()) {
         animations[pos]->finish();
         pos = (pos + 1) % animations.size();
-        animations[pos]->init();
-        setFPS(animations[pos]->getFPSNeeded());
+        changed = true;
     }
     stepWatch.finish();
     showWatch.start();
@@ -61,6 +66,14 @@ bool Animator::step() {
     showWatch.finish();
     frameWatch.finish();
     frameCount++;
+
+    //
+    // We'll do this out here to avoid flashes due to color map changes in
+    // init().
+    if (changed) {
+        animations[pos]->init();
+        setFPS(animations[pos]->getFPSNeeded());
+    }
 
     //
     // Sleep until it's time for the next frame. We're not trying to be

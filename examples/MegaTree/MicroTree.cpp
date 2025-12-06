@@ -109,13 +109,13 @@ int main() {
 
     Animator animator(&canvas, &midXmasColors, FPS);
 
-    // RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 15);
-    // rc1.setName("RC1");
-    // animator.addTimed(&rc1, 10000);
+    RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 15);
+    rc1.setName("RC1");
+    animator.addTimed(&rc1, 10000);
 
-    // RotatingColumns rc2(&canvas, &midXmasColors, 3, rgwColors, 10);
-    // rc2.setName("RC2");
-    // animator.addTimed(&rc2, 10000);
+    RotatingColumns rc2(&canvas, &midXmasColors, 3, rgwColors, 10);
+    rc2.setName("RC2");
+    animator.addTimed(&rc2, 10000);
 
 
     Spiral spiral(&canvas, &midXmasColors, 2, rwColors, 10, 25);

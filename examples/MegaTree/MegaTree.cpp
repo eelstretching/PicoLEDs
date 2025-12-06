@@ -111,12 +111,12 @@ int main() {
     Marquees fMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
                    canvas.getHeight());
     fMarq.setName("FMarq");
-    animator.addTimed(&fMarq, 20000);
+    animator.addTimed(&fMarq, 30000);
 
     Marquees marq(&canvas, &dimXmasColors, 2, rwColors, 20, RIGHT,
                   canvas.getHeight());
     marq.setName("Marquee");
-    randimation.addTimed(&marq, 20000); 
+    randimation.addTimed(&marq, 30000); 
 
     
     LinesFill lfu(&canvas, &midXmasColors, 5, rgbwgColors, UP, 1);
@@ -129,22 +129,22 @@ int main() {
     lfd.setGap(7);
     randimation.addTimed(&lfd, 10000);
 
-    Spiral sp1(&canvas, &midXmasColors, 4, rgbwColors, 10, 25);
+    Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
     sp1.setName("Spiral");
     randimation.addTimed(&sp1, 10000);
 
-    Spiral sp2(&canvas, &midXmasColors, 1, rwColors, 10, 25);
+    Spiral sp2(&canvas, &brightXmasColors, 1, rwColors, 10, 25);
     sp2.setName("Spiral");
     animator.addTimed(&sp2, 10000);
 
-    Spiral sp3(&canvas, &midXmasColors, 2, rwColors, 10, 25);
+    Spiral sp3(&canvas, &brightXmasColors, 2, rwColors, 10, 25);
     sp3.setName("Spiral 3");
     animator.addTimed(&sp3, 10000);
 
     ArrayColorMap icicleMap(8);
     Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(128, 128, 128));
     icicles.setName("Icicles");
-    randimation.addTimed(&icicles, 20000);
+    randimation.addTimed(&icicles, 40000);
 
     ColorBars cb1(&canvas, &midXmasColors, 20, 2);
     cb1.setName("CB1");
@@ -161,7 +161,7 @@ int main() {
     ArrayColorMap blucicleMap(8);
     Icicles blucicles(&canvas, &blucicleMap, 10, 6, RGB(0, 0, 128));
     blucicles.setName("Blucicles");
-    randimation.addTimed(&blucicles, 20000);
+    randimation.addTimed(&blucicles, 40000);
 
     FadingBars fb2(&canvas, &brightXmasColors, 10, 4);
     fb2.setName("FB2");
