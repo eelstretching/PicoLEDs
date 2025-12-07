@@ -82,7 +82,7 @@ int main() {
 
     BarberPole bp(&canvas, &colorMap, nColors, 10);
 
-    Animator animator(&canvas, &colorMap, 5);
+    Animator animator(&canvas, 5);
     animator.add(&bp);
     animator.init();
     animator.setFPS(30);

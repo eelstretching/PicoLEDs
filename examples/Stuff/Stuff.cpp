@@ -36,7 +36,7 @@ int main() {
     ColorMap colorMap(128);
 
     PacWipe pac(&canvas, &colorMap);
-    Animator animator(&canvas, &colorMap);
+    Animator animator(&canvas);
 
     animator.add(&pac);
 

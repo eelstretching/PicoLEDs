@@ -2,18 +2,6 @@
 
 #include "TimedAnimation.h"
 
-Animator::Animator(Canvas* canvas, ColorMap* colorMap)
-    : Animation(canvas, colorMap) {
-    //
-    // We'll do 30 FPS by default.
-    setFPS(30);
-}
-
-Animator::Animator(Canvas* canvas, ColorMap* colorMap, int fps)
-    : Animator(canvas, colorMap) {
-    setFPS(fps);
-}
-
 void Animator::add(Animation* a) { animations.push_back(a); }
 
 void Animator::addTimed(Animation* a, int durationMS) {
@@ -30,6 +18,7 @@ void Animator::setFPS(int fps) {
 
 void Animator::init() {
     pos = 0;
+    animationChanged();
     Animation* f = animations[pos];
     if(f == nullptr) {
         return;
@@ -75,6 +64,7 @@ bool Animator::step() {
     // We'll do this out here to avoid flashes due to color map changes in
     // init().
     if (changed) {
+        animationChanged();
         animations[pos]->init();
         setFPS(animations[pos]->getFPSNeeded());
     }

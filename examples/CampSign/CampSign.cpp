@@ -157,7 +157,7 @@ int main() {
 
     RainbowWipe rainbow(&canvas);
 
-    RandomAnimation wipes(&canvas);
+    RandomAnimator wipes(&canvas);
     wipes.add(&upWipe);
     wipes.add(&downWipe);
     wipes.add(&leftWipe);
