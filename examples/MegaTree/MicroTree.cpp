@@ -79,6 +79,10 @@ int main() {
     ArrayColorMap midXmasColors(xmasColors);
     midXmasColors.setBrightness(16);
 
+    ArrayColorMap xmasTreeColors(xmasColors);
+    xmasTreeColors.setBackground(RGB::ForestGreen);
+    xmasTreeColors.setBrightness(16);
+
     ArrayColorMap brightXmasColors(xmasColors);
     brightXmasColors.setBrightness(128);
 
@@ -94,129 +98,36 @@ int main() {
     }
     canvas.setup();
     canvas.setColorMap(&midXmasColors);
-
-    //
-    // Let's see if we got the pins set correctly.
-
-    for(int i = 0; i < canvas.getHeight(); i++) {
-        canvas.fillRow(i, rgbwColors[i % 4]);
-        canvas.show();
-        sleep_ms(500);
-    }
-
     canvas.clear();
     canvas.show();
 
-    RandomAnimator animator(&canvas, FPS);
+    Animator animator(&canvas, FPS);
 
-    ColorCone cone(&canvas, &midXmasColors);
-    cone.setName("Cone");
-    animator.addTimed(&cone, 10000);
+    // Xpm* ornxpm = new Xpm(ornaPixMap);
+    // MultiAnimation ma(&canvas, &midXmasColors);
+    // Ornament o1(&canvas, ornxpm);
+    // o1.setXY(30, 0);
+    // o1.setColor(0);
+    // ma.add(&o1);
 
-    Marquees fancyMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
-                       canvas.getHeight());
-    fancyMarq.setName("FMarq");
-    animator.addTimed(&fancyMarq, 30000);
+    // Ornament o2(&canvas, ornxpm);
+    // o2.setXY(20, 5);
+    // o2.setColor(2);
+    // ma.add(&o2);
 
-    Marquees rwMarq(&canvas, &midXmasColors, 2, rwColors, 20, RIGHT,
-                    canvas.getHeight());
-    rwMarq.setName("RWMarq");
-    animator.addTimed(&rwMarq, 30000);
+    // Ornament o3(&canvas, ornxpm);
+    // o3.setXY(50, 2);
+    // o3.setColor(1);
+    // ma.add(&o3);
 
-    Marquees rgMarq(&canvas, &midXmasColors, 2, rgColors, 20, RIGHT,
-                    canvas.getHeight());
-    rgMarq.setName("RGMarq");
-    animator.addTimed(&rgMarq, 30000);
+    midXmasColors.setBackground(RGB::ForestGreen);
+    XmasTree xmt(&canvas, &xmasTreeColors, 5, 10);
 
-    LinesFill lfu(&canvas, &midXmasColors, 5, rgbwgColors, UP, 1);
-    lfu.setName("LFU");
-    lfu.setGap(6);
-    animator.addTimed(&lfu, 10000);
-
-    LinesFill lfd(&canvas, &midXmasColors, 5, rgbwgColors, DOWN, 1);
-    lfd.setName("LFD");
-    lfd.setGap(7);
-    animator.addTimed(&lfd, 10000);
-
-    Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
-    sp1.setName("Spiral1");
-    animator.addTimed(&sp1, 10000);
-
-    Spiral sp2(&canvas, &brightXmasColors, 1, rwColors, 10, 25);
-    sp2.setName("Spiral2");
-    animator.addTimed(&sp2, 10000);
-
-    Spiral sp3(&canvas, &brightXmasColors, 2, rwColors, 10, 25);
-    sp3.setName("Spiral3");
-    animator.addTimed(&sp3, 10000);
-
-    ArrayColorMap icicleMap(8);
-    Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(128, 128, 128));
-    icicles.setName("Icicles");
-    animator.addTimed(&icicles, 40000);
-
-    ColorBars cb1(&canvas, &midXmasColors, 20, 2);
-    cb1.setName("CB1");
-    animator.addTimed(&cb1, 10000);
-
-    ColorBars cb2(&canvas, &midXmasColors, 15, 3);
-    cb2.setName("CB2");
-    animator.addTimed(&cb2, 10000);
-
-    FadingBars fb1(&canvas, &brightXmasColors, 20, 2);
-    fb1.setName("FB1");
-    animator.addTimed(&fb1, 10000);
-
-    ArrayColorMap blucicleMap(8);
-    Icicles blucicles(&canvas, &blucicleMap, 10, 6, RGB(0, 0, 128));
-    blucicles.setName("Blucicles");
-    animator.addTimed(&blucicles, 40000);
-
-    FadingBars fb2(&canvas, &brightXmasColors, 10, 4);
-    fb2.setName("FB2");
-    animator.addTimed(&fb2, 10000);
-
-    FadingBars fb3(&canvas, &brightXmasColors, 4, 2);
-    fb3.setName("FB3");
-    animator.addTimed(&fb3, 10000);
-
-    FadingBars fb4(&canvas, &brightXmasColors, 4, 6);
-    fb4.setName("FB4");
-    animator.addTimed(&fb4, 10000);
-
-    RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 20);
-    rc1.setName("RC1");
-    animator.addTimed(&rc1, 10000);
-
-    RotatingColumns rc2(&canvas, &midXmasColors, 4, rgbwColors, 10);
-    rc2.setName("RC2");
-    animator.addTimed(&rc2, 10000);
-
-    RotatingRows rr1(&canvas, &midXmasColors, 2, rgColors, 4);
-    rr1.setName("RR1");
-    animator.addTimed(&rr1, 10000);
-
-    RotatingRows rr2(&canvas, &midXmasColors, 4, rgbwColors, 5);
-    rr2.setName("RR2");
-    animator.addTimed(&rr2, 10000);
-
-    RotRandColumns rrc1(&canvas, &midXmasColors, 2);
-    rrc1.setName("RRC1");
-    animator.addTimed(&rrc1, 10000);
-
-    RotRandColumns rrc2(&canvas, &midXmasColors, 4);
-    rrc2.setName("RRC2");
-    animator.addTimed(&rrc2, 10000);
-
-    RotRandRows rrr1(&canvas, &midXmasColors, 4);
-    rrr1.setName("RRR1");
-    animator.addTimed(&rrr1, 10000);
-
-    RotRandRows rrr2(&canvas, &midXmasColors, 2);
-    rrr2.setName("RRR2");
-    animator.addTimed(&rrr2, 10000);
+    animator.add(&xmt);
 
     animator.init();
+
+
 
     while (true) {
         animator.step();

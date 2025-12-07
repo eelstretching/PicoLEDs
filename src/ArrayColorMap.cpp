@@ -106,5 +106,6 @@ void ArrayColorMap::setBrightness(uint8_t value) {
     for (int i = 0; i < p; i++) {
         entries[i].nscale8_video(value);
     }
+    background.nscale8_video(value);
 }
 

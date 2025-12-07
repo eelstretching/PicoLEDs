@@ -115,7 +115,7 @@ bool Xpm::render(Canvas *canvas, uint8_t *map, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            if (canvas->set(cx++, cy, remap(map, p++))) {
+            if (canvas->set(cx++, cy, remap(map, pixels[p]))) {
                 atLeastOnePixel = true;
             }
             p++;
