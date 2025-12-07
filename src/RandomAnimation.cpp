@@ -2,6 +2,9 @@
 
 #include <TimedAnimation.h>
 
+#include <algorithm>
+#include <random>
+
 #include "math8.h"
 
 void RandomAnimation::add(Animation* animation) {
@@ -10,32 +13,55 @@ void RandomAnimation::add(Animation* animation) {
 
 void RandomAnimation::addTimed(Animation* animation, int durationMS) {
     TimedAnimation* ta = new TimedAnimation(animation, durationMS);
-    printf("%d TA name: %s\n", animations.size(), ta->getName());
     animations.push_back(ta);
 }
 
+void RandomAnimation::shuffle() {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(animations.begin(), animations.end(), g);
+}
+
 Animation* RandomAnimation::getCurr() {
-    if (curr == nullptr) {
-        int p = random8(0, animations.size());
-        curr = animations[p];
-        printf("Choosing random animation: %d %s\n", p, curr->getName());
+    if (currp >= animations.size()) {
+        printf("Shuffling animations...\n");
+        currp = 0;
+        shuffle();
+    }
+    curr = animations[currp];
+    if (initNeeded) {
+        printf("Initializing %s\n", curr->getName());
+        curr->init();
+        initNeeded = false;
     }
     return curr;
 }
 
-void RandomAnimation::init() { 
+void RandomAnimation::init() {
+    printf("Init for %d animations\n", animations.size());
+    initNeeded = true;
+    currp = animations.size() + 1;
     getCurr();
-    curr->init(); }
+}
 
 bool RandomAnimation::step() {
     getCurr();
     if (!curr->step()) {
-        curr = nullptr;
-        return false;
+        printf("Finishing %s\n", curr->getName());
+        //
+        // Move onto the next animation in the list.
+        currp++;
+        initNeeded = true;
     }
     return true;
 }
 
-void RandomAnimation::finish() { getCurr(); curr->finish(); }
+void RandomAnimation::finish() {
+    getCurr();
+    curr->finish();
+}
 
-int RandomAnimation::getFPSNeeded() { getCurr(); return curr->getFPSNeeded(); }
+int RandomAnimation::getFPSNeeded() {
+    getCurr();
+    return curr->getFPSNeeded();
+}

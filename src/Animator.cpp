@@ -31,15 +31,19 @@ void Animator::setFPS(int fps) {
 void Animator::init() {
     pos = 0;
     Animation* f = animations[pos];
+    if(f == nullptr) {
+        return;
+    }
     setFPS(f->getFPSNeeded());
     f->init();
 }
 
 void Animator::printStats() {
+    uint64_t runTime = time_us_64() - startTime;
     printf(
-        "%d frames run, %.2f us/frame at %d fps %.2f us/step, %.2f "
+        "%d frames run, running %.1fs %.2f us/frame at %d fps %.2f us/step, %.2f "
         "us/show %.2f us/frame %d missed frames\n",
-        getFrameCount(), getUsPerFrame(), getFPSNeeded(),
+        getFrameCount(), runTime / 1000000.0, getUsPerFrame(), getFPSNeeded(),
         getAverageStepTimeUS(), getAverageShowTimeUS(), getAverageFrameTimeUS(),
         getMissedFrames());
 }

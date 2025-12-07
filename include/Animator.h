@@ -27,6 +27,8 @@ class Animator : public Animation {
     StopWatch showWatch;
     StopWatch stepWatch;
 
+    uint64_t startTime = time_us_64();
+
    public:
     /// @brief Creates an animator for the given canvas.
     /// @param canvas

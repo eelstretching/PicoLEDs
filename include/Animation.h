@@ -22,7 +22,7 @@ class Animation {
     /// @brief A stop watch to count our animation time.
     StopWatch aw;
 
-    char name[16];
+    char name[20];
 
    public:
     /// @brief Default constructor

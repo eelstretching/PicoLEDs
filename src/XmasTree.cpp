@@ -89,6 +89,7 @@ XmasTree::XmasTree(Canvas* canvas, ColorMap* colorMap, uint8_t nOrnaments,
 void XmasTree::init() {
     state = TreeState::RIBBON;
     canvas->setColorMap(colorMap);
+    canvas->clear();
     ribbon->init();
     for (int i = 0; i < nOrnaments; i++) {
         ornaments[i]->setXY(random8(0, canvas->getWidth()),

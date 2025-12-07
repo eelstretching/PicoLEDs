@@ -1,4 +1,13 @@
+#include <ColorBars.h>
+#include <FadingBars.h>
+#include <RandomAnimation.h>
+#include <RotRandColumns.h>
+#include <RotRandRows.h>
+#include <RotatingColumns.h>
+#include <RotatingRows.h>
+#include <TimedAnimation.h>
 #include <stdlib.h>
+
 #include <string>
 
 #include "Animator.h"
@@ -6,11 +15,12 @@
 #include "BarberPole.h"
 #include "Bouncer.h"
 #include "Canvas.h"
-#include "Strip.h"
-#include "Spiral.h"
+#include "ColorCone.h"
+#include "Icicles.h"
 #include "LinesFill.h"
 #include "Marquees.h"
-#include "ColorCone.h"
+#include "Spiral.h"
+#include "Strip.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -18,13 +28,6 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
-#include <TimedAnimation.h>
-#include "Icicles.h"
-#include <ColorBars.h>
-#include <FadingBars.h>
-#include <RotatingRows.h>
-#include <RotatingColumns.h>
-#include <RandomAnimation.h>
 
 #define NUM_STRIPS 7
 #define START_PIN 2
@@ -33,12 +36,46 @@
 #define BRIGHTNESS 32
 #define FPS 30
 
+int pico_led_init(void) {
+#if defined(PICO_DEFAULT_LED_PIN)
+    // A device like Pico that uses a GPIO for the LED will define
+    // PICO_DEFAULT_LED_PIN so we can use normal GPIO functionality to turn the
+    // led on and off
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    return PICO_OK;
+#elif defined(CYW43_WL_GPIO_LED_PIN)
+    // For Pico W devices we need to initialise the driver etc
+    return cyw43_arch_init();
+#endif
+}
+
+// Turn the led on or off
+void pico_set_led(bool led_on) {
+#if defined(PICO_DEFAULT_LED_PIN)
+    // Just set the GPIO on or off
+    gpio_put(PICO_DEFAULT_LED_PIN, led_on);
+#elif defined(CYW43_WL_GPIO_LED_PIN)
+    // Ask the wifi "driver" to set the GPIO on or off
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
+#endif
+}
+
 int main() {
     stdio_init_all();
 
+    int rc = pico_led_init();
+
+    for (int i = 0; i < 10; i++) {
+        pico_set_led(true);
+        sleep_ms(500);
+        pico_set_led(false);
+        sleep_ms(500);
+    }
+
     //
     // A canvas made out of strips.
-    Strip *strips[NUM_STRIPS];
+    Strip* strips[NUM_STRIPS];
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     int pins[NUM_STRIPS];
@@ -46,8 +83,8 @@ int main() {
         pins[i] = pin;
         //
         // First strip is a little short at the moment.
-        strips[i] = new Strip(pin++, i == 0 ? STRIP_LEN-100 : STRIP_LEN);
-        strips[i]->setColorOrder(ColorOrder::ORGB);
+        strips[i] = new Strip(pin++, i == 0 ? STRIP_LEN - 100 : STRIP_LEN);
+        strips[i]->setColorOrder(ColorOrder::OGRB);
     }
 
     ArrayColorMap xmasColors({
@@ -83,16 +120,19 @@ int main() {
     uint8_t rgbwColors[] = {0, 1, 2, 3};
     uint8_t rgbwgColors[] = {0, 1, 2, 3, 13};
 
-
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
         canvas.add(*strips[i]);
     }
     canvas.setup();
-    canvas.setColorMap(&dimXmasColors);
+    canvas.setColorMap(&midXmasColors);
 
-    for(int i = 0; i < 3; i++) {
-        canvas.fill(i+1);
+    //
+    // Let's see if we got the pins set correctly.
+
+    for(int i = 0; i < canvas.getHeight(); i++) {
+        printf("Row %d\n", i);
+        canvas.fillRow(i, rgbwColors[i % 4]);
         canvas.show();
         sleep_ms(500);
     }
@@ -100,7 +140,7 @@ int main() {
     canvas.clear();
     canvas.show();
 
-    Animator animator(&canvas, &dimXmasColors, FPS);
+    Animator animator(&canvas, &midXmasColors, FPS);
 
     RandomAnimation randimation(&canvas, &midXmasColors);
 
@@ -109,20 +149,20 @@ int main() {
     randimation.addTimed(&cone, 10000);
 
     Marquees fancyMarq(&canvas, &midXmasColors, 5, rgbwgColors, 20, RIGHT,
-                   canvas.getHeight());
-    fancyMarq.setName("Fancy Marquee");
+                       canvas.getHeight());
+    fancyMarq.setName("FMarq");
     randimation.addTimed(&fancyMarq, 30000);
 
     Marquees rwMarq(&canvas, &midXmasColors, 2, rwColors, 20, RIGHT,
-                  canvas.getHeight());
-    rwMarq.setName("RW Marquee");
-    randimation.addTimed(&rwMarq, 30000); 
-    
+                    canvas.getHeight());
+    rwMarq.setName("RWMarq");
+    randimation.addTimed(&rwMarq, 30000);
+
     Marquees rgMarq(&canvas, &midXmasColors, 2, rgColors, 20, RIGHT,
-                  canvas.getHeight());
-    rgMarq.setName("RG Marquee");
-    randimation.addTimed(&rgMarq, 30000); 
-    
+                    canvas.getHeight());
+    rgMarq.setName("RGMarq");
+    randimation.addTimed(&rgMarq, 30000);
+
     LinesFill lfu(&canvas, &midXmasColors, 5, rgbwgColors, UP, 1);
     lfu.setName("LFU");
     lfu.setGap(6);
@@ -134,15 +174,15 @@ int main() {
     randimation.addTimed(&lfd, 10000);
 
     Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
-    sp1.setName("Spiral 1");
+    sp1.setName("Spiral1");
     randimation.addTimed(&sp1, 10000);
 
     Spiral sp2(&canvas, &brightXmasColors, 1, rwColors, 10, 25);
-    sp2.setName("Spiral 2");
+    sp2.setName("Spiral2");
     randimation.addTimed(&sp2, 10000);
 
     Spiral sp3(&canvas, &brightXmasColors, 2, rwColors, 10, 25);
-    sp3.setName("Spiral 3");
+    sp3.setName("Spiral3");
     randimation.addTimed(&sp3, 10000);
 
     ArrayColorMap icicleMap(8);
@@ -195,12 +235,28 @@ int main() {
     rr2.setName("RR2");
     randimation.addTimed(&rr2, 10000);
 
+    RotRandColumns rrc1(&canvas, &midXmasColors, 2);
+    rrc1.setName("RRC1");
+    randimation.addTimed(&rrc1, 10000);
+
+    RotRandColumns rrc2(&canvas, &midXmasColors, 4);
+    rrc2.setName("RRC2");
+    randimation.addTimed(&rrc2, 10000);
+
+    RotRandRows rrr1(&canvas, &midXmasColors, 4);
+    rrr1.setName("RRR1");
+    randimation.addTimed(&rrr1, 10000);
+
+    RotRandRows rrr2(&canvas, &midXmasColors, 2);
+    rrr2.setName("RRR2");
+    randimation.addTimed(&rrr2, 10000);
+
     animator.add(&randimation);
 
     animator.init();
 
     while (true) {
-        animator.step(); 
+        animator.step();
         if (animator.getFrameCount() % 200 == 0) {
             animator.printStats();
         }

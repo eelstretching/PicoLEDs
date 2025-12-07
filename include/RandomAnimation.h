@@ -8,19 +8,24 @@
 #include "Animation.h"
 #include "Canvas.h"
 
-/// @brief A wipe that randomly chooses which wipe to use from a list.
+/// @brief An animation that pulls an animation randomly from a list. Will cycle through
+/// all the animations before re-randomizing the order for the next iteration through.
 class RandomAnimation : public Animation {
 
     protected:
     std::vector<Animation*> animations;
     Animation *curr;
+    uint8_t currp;
+    bool initNeeded;
 
     public:
     RandomAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {
-        curr = NULL;
+        curr = nullptr;
+        currp = 0;
     };
     void add(Animation *animation);
     void addTimed(Animation *animation,  int durationMS);
+    void shuffle();
     Animation* getCurr();
     void init() override;
     bool step() override;

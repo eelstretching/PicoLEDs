@@ -31,7 +31,7 @@ class TimedAnimation : public Animation {
     /// time.
     bool step() override;
     int getFPSNeeded() override { return animation->getFPSNeeded(); };
-    const char* getName() override { return animation->getName(); };
+    const char* getName() override { snprintf(name, 20, "T %s %.1f", animation->getName(), duration/1000000.0); return name; };
 };
 
 #endif
