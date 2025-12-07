@@ -66,7 +66,7 @@ int main() {
 
     int rc = pico_led_init();
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         pico_set_led(true);
         sleep_ms(500);
         pico_set_led(false);
@@ -84,7 +84,7 @@ int main() {
         //
         // First strip is a little short at the moment.
         strips[i] = new Strip(pin++, i == 0 ? STRIP_LEN - 100 : STRIP_LEN);
-        strips[i]->setColorOrder(ColorOrder::OGRB);
+        strips[i]->setColorOrder(ColorOrder::ORGB);
     }
 
     ArrayColorMap xmasColors({
@@ -92,17 +92,17 @@ int main() {
         RGB::Green,
         RGB::Blue,
         RGB::White,
-        RGB::Yellow,
+        RGB(213, 181, 52),   // Gold
         RGB::Purple,
         RGB::Orange,
         RGB::Silver,
-        RGB::FairyLightNCC,
         RGB(255, 20, 20),    // Bright Red
         RGB(28, 191, 38),    // Vibrant Green
         RGB(0, 33, 111),     // Navy
         RGB(255, 252, 245),  // Warm White
-        RGB(213, 181, 52),   // Gold
+        RGB::Yellow,
         RGB(242, 18, 18),    // Deep Red
+        RGB::FairyLightNCC,
     });
 
     ArrayColorMap dimXmasColors(xmasColors);
@@ -118,7 +118,7 @@ int main() {
     uint8_t rwColors[] = {0, 3};
     uint8_t rgwColors[] = {0, 1, 3};
     uint8_t rgbwColors[] = {0, 1, 2, 3};
-    uint8_t rgbwgColors[] = {0, 1, 2, 3, 13};
+    uint8_t rgbwgColors[] = {0, 1, 2, 3, 4};
 
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
@@ -126,17 +126,6 @@ int main() {
     }
     canvas.setup();
     canvas.setColorMap(&midXmasColors);
-
-    //
-    // Let's see if we got the pins set correctly.
-
-    for(int i = 0; i < canvas.getHeight(); i++) {
-        printf("Row %d\n", i);
-        canvas.fillRow(i, rgbwColors[i % 4]);
-        canvas.show();
-        sleep_ms(500);
-    }
-
     canvas.clear();
     canvas.show();
 
@@ -151,12 +140,12 @@ int main() {
     fancyMarq.setName("FMarq");
     animator.addTimed(&fancyMarq, 30000);
 
-    Marquees rwMarq(&canvas, &midXmasColors, 2, rwColors, 20, RIGHT,
+    Marquees rwMarq(&canvas, &midXmasColors, 2, rwColors, 25, RIGHT,
                     canvas.getHeight());
     rwMarq.setName("RWMarq");
     animator.addTimed(&rwMarq, 30000);
 
-    Marquees rgMarq(&canvas, &midXmasColors, 2, rgColors, 20, RIGHT,
+    Marquees rgMarq(&canvas, &midXmasColors, 2, rgColors, 25, RIGHT,
                     canvas.getHeight());
     rgMarq.setName("RGMarq");
     animator.addTimed(&rgMarq, 30000);
@@ -164,12 +153,12 @@ int main() {
     LinesFill lfu(&canvas, &midXmasColors, 5, rgbwgColors, UP, 1);
     lfu.setName("LFU");
     lfu.setGap(6);
-    animator.addTimed(&lfu, 10000);
+    animator.addTimed(&lfu, 15000);
 
     LinesFill lfd(&canvas, &midXmasColors, 5, rgbwgColors, DOWN, 1);
     lfd.setName("LFD");
     lfd.setGap(7);
-    animator.addTimed(&lfd, 10000);
+    animator.addTimed(&lfd, 15000);
 
     Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
     sp1.setName("Spiral1");
@@ -217,7 +206,7 @@ int main() {
     fb4.setName("FB4");
     animator.addTimed(&fb4, 10000);
 
-    RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 20);
+    RotatingColumns rc1(&canvas, &midXmasColors, 2, rgColors, 25);
     rc1.setName("RC1");
     animator.addTimed(&rc1, 10000);
 

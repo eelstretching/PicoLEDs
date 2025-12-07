@@ -14,7 +14,7 @@ class RotatingRows : public Animation {
     bool firstFrame = true;
 public:
     RotatingRows(Canvas *canvas, ColorMap *colorMap, uint8_t nColors, uint8_t *colors, uint8_t rowWidth);
-    int getFPSNeeded() override { return 25; };
+    int getFPSNeeded() override { return 20; };
     virtual void init() override {firstFrame = true; canvas->setColorMap(colorMap);};
     virtual bool step() override;
 };
