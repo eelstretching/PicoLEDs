@@ -12,20 +12,22 @@
 /// @brief A text element that can appear in a text animation.
 class TextElement {
    public:
-    TextElement(const char *text, uint x, uint y, uint8_t color);
+    TextElement(const char *text, int x, int y, uint8_t color);
     const char *text;
-    uint x;
-    uint y;
+    int startx;
+    int starty;
+    int x;
+    int y;
+    bool waiting;
+    uint width;
     uint8_t color;
 };
 
 class TextAnimation : public Animation {
    protected:
-    /// @brief How long to display the canvas, in microseconds.
-    uint duration;
-    uint64_t start;
     Font *font;
     std::vector<TextElement *> elements;
+    RenderAngle angle = RENDER_0;
 
    public:
     /// @brief Creates a text "animation" that just displays the text for a
@@ -33,16 +35,18 @@ class TextAnimation : public Animation {
     /// @param canvas
     /// @param font
     /// @param duration How long to display the text, in milliseconds.
-    TextAnimation(Canvas *canvas, ColorMap *colorMap, Font *font, uint duration);
+    TextAnimation(Canvas *canvas, ColorMap *colorMap, Font *font);
 
     void add(TextElement *element);
 
+    void setAngle(RenderAngle angle) { this->angle = angle; };
+
     /// @brief Initializes this animation, by rendering the text elements.
-    void init();
+    void init() override;
 
-    bool step();
+    bool step() override;
 
-    int getFPSNeeded() {return 2;};
+    int getFPSNeeded() override {return 1;};
 };
 
 #endif

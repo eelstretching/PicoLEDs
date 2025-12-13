@@ -40,7 +40,6 @@ class Ornament : public Animation {
     Ornament(Canvas* canvas, Xpm* orn);
     void setXY(uint8_t x, uint8_t y);
     void setColor(uint8_t color);
-    bool impinges(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
     void init() override;
     int getFPSNeeded() override { return 1; };
     bool step() override;
@@ -73,7 +72,6 @@ class Ribbon : public Animation {
     /// @param x1 X coord of upper right of area.
     /// @param y1 Y coord of upper right of area
     /// @return true if this area impinges on the ribbon.
-    bool impinges(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
     int getFPSNeeded() override { return 30; };
     bool step() override;
 };
@@ -131,8 +129,7 @@ class XmasTree : public Animation {
     uint8_t el;
 
    public:
-    XmasTree(Canvas* canvas, ColorMap* colorMap, uint8_t nOrnaments,
-             uint8_t nLights);
+    XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights);
     void init() override;
     int getFPSNeeded() override { return 30; };
     bool step() override;

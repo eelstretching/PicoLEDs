@@ -73,7 +73,13 @@ class MultiAnimation : public Animation {
         fps = MAX(fps, animation->getFPSNeeded());
     }
 
-    bool step() {
+    void init() override {
+        for (auto a : animations) {
+            a->init();
+        }
+    }
+
+    bool step() override{
         for(auto a : animations) {
             a->step();
         }

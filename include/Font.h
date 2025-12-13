@@ -23,6 +23,14 @@
 #define B24(d1, d2, d3) ((uint8_t)B8__(HEX__(d1))),((uint8_t)B8__(HEX__(d2))),((uint8_t)B8__(HEX__(d3))))
 #endif
 
+
+enum RenderAngle {
+    RENDER_0,
+    RENDER_90,
+    RENDER_180,
+    RENDER_270
+};
+
 class Font {
    public:
     /// @brief Create a class that can render the given font data onto the
@@ -39,7 +47,10 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in
     /// @return The width of the rendered text, in pixels.
-    uint render(const char *text, int bx, int by, uint8_t color);
+    uint render(const char *text, int bx, int by, uint8_t color, RenderAngle angle = RENDER_0);
+
+    uint render0(const char* text, int bx, int by, uint8_t color);
+    uint render90(const char* text, int bx, int by, uint8_t color);
 
     /// @brief Renders a single character onto our canvas at the given pixel
     /// position.
@@ -48,7 +59,8 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in.
     /// @return the width of the rendered character, in pixels.
-    uint render(char c, int bx, int by, uint8_t color);
+    uint render0(char c, int bx, int by, uint8_t color);
+    uint render90(char c, int bx, int by, uint8_t color);
 
     /// @brief Gets the width of the given string rendered in this font.
     /// @param text 

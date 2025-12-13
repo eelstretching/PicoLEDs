@@ -1,5 +1,7 @@
 #include "XmasTree.h"
 
+#include "ArrayColorMap.h"
+
 int sideOfLine(int x, int y, int offset) { return x - y + offset; }
 bool inside(uint8_t x, uint8_t y, uint8_t llx, uint8_t lly, uint8_t urx,
             uint8_t ury) {
@@ -16,13 +18,9 @@ void Ornament::setXY(uint8_t x, uint8_t y) {
 
 void Ornament::setColor(uint8_t color) { cmap[0] = color; }
 
-bool Ornament::impinges(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
-    uint8_t urx = x + orn->getWidth();
-    uint8_t ury = y + orn->getHeight();
-    return inside(x1, y1, x, y, urx, ury) || inside(x2, y2, x, y, urx, ury);
+void Ornament::init() {
+    cmap[0] = canvas->getColorMap()->getRandomColor();
 }
-
-void Ornament::init() {}
 
 bool Ornament::step() {
     orn->render(canvas, cmap, x, y);
@@ -32,32 +30,23 @@ bool Ornament::step() {
 void Ribbon::init() {
     state = RibbonState::DRAWING;
     lineStarts.clear();
+    //
+    // Figure out the ribbon line start positions.
+    uint8_t sx = 0;
+    bool done = false;
+    while(!done) {
+        lineStarts.push_back(sx);
+        lineStarts.push_back(sx + width);
+        sx += (canvas->getHeight() + canvas->getHeight() / 2);
+        if(sx >= canvas->getWidth()) {
+            done = true;
+        }
+    }
     x = 0;
     y = 0;
 }
 
-bool Ribbon::impinges(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
-    for (auto sx : lineStarts) {
-        int lls = sideOfLine(x1, y1, sx);
-        int urs = sideOfLine(x2, y2, sx);
-        //
-        // If the lower left and upper right are on opposite sides of the line,
-        // it impinges.
-        if ((lls <= 0) && (urs >= 0)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool Ribbon::step() {
-    //
-    // Remember where we started when we're at zero. Put the offsets of
-    // both sides of the ribbon.
-    if (y == 0) {
-        lineStarts.push_back(x);
-        lineStarts.push_back(x + width);
-    }
     //
     // The ribbon will wrap itself around the tree as it animates, one row per
     // frame.
@@ -107,15 +96,34 @@ bool Light::step() {
     return true;
 }
 
-XmasTree::XmasTree(Canvas* canvas, ColorMap* colorMap, uint8_t nOrnaments,
-                   uint8_t nLights)
-    : Animation(canvas, colorMap), nOrnaments(nOrnaments), nLights(nLights) {
+XmasTree::XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights)
+    : Animation(canvas, nullptr), nOrnaments(nOrnaments), nLights(nLights) {
+    //
+    // We have a pretty specific color map, so just set it here.
+    colorMap = new ArrayColorMap({RGB::Red, RGB::Green, RGB::Blue, RGB::White,
+                                  RGB(213, 181, 52),  // Gold
+                                  RGB::Purple, RGB::Orange, RGB::Silver});
+    colorMap->setBackground(RGB::ForestGreen);
+    colorMap->setBrightness(16);
+
     ribbon = new Ribbon(canvas, 0, 5);
     ornament = new Xpm(ornaPixMap);
-    ornaments = new Ornament*[nOrnaments];
-    for (int i = 0; i < nOrnaments; i++) {
+    nOrnaments = 9;
+    ornaments = new Ornament*[9];
+    for (int i = 0; i < 9; i++) {
         ornaments[i] = new Ornament(canvas, ornament);
     }
+    ornaments[0]->setXY(17, 7);
+    ornaments[1]->setXY(18, 15);
+    ornaments[2]->setXY(16, 19);
+    ornaments[3]->setXY(46, 6);
+    ornaments[4]->setXY(46, 14);
+    ornaments[5]->setXY(46, 18);
+    ornaments[6]->setXY(77, 7);
+    ornaments[7]->setXY(77, 15);
+    ornaments[8]->setXY(77, 19);
+    
+    nLights = 18;
     lights = new Light*[nLights];
     uint8_t lightColors[3];
     for (int i = 0; i < 3; i++) {
@@ -124,6 +132,24 @@ XmasTree::XmasTree(Canvas* canvas, ColorMap* colorMap, uint8_t nOrnaments,
     for (int i = 0; i < nLights; i++) {
         lights[i] = new Light(canvas, lightColors, 3, 30 + random8(30));
     }
+    lights[0]->setXY(10, 5);
+    lights[1]->setXY(25, 10);
+    lights[2]->setXY(40, 5);
+    lights[3]->setXY(55, 10);
+    lights[4]->setXY(70, 5);
+    lights[5]->setXY(85, 10);
+    lights[6]->setXY(20, 15);
+    lights[7]->setXY(35, 20);
+    lights[8]->setXY(50, 15);
+    lights[9]->setXY(65, 20);
+    lights[10]->setXY(80, 15);
+    lights[11]->setXY(30, 25);
+    lights[12]->setXY(45, 30);
+    lights[13]->setXY(60, 25);
+    lights[14]->setXY(75, 30);
+    lights[15]->setXY(40, 35);
+    lights[16]->setXY(55, 40);
+    lights[17]->setXY(70, 35);
 }
 
 void XmasTree::init() {
@@ -131,65 +157,13 @@ void XmasTree::init() {
     canvas->setColorMap(colorMap);
     canvas->clear();
     ribbon->init();
-    uint8_t randx = 0;
-    uint8_t urandx = 0;
-    uint8_t randy = 0;
-    uint8_t urandy = 0;
 
-    //
-    // Find positions for the ornaments that don't impinge on the ribbon or other ornaments.
-    for (int i = 0; i < nOrnaments; i++) {
-        bool imp = true;
-        //
-        // Find ornament positions that don't impinge on the ribbon.
-        while (imp) {
-            randx = random8(0, canvas->getWidth() - ornament->getWidth());
-            randy = random8(0, canvas->getHeight() - ornament->getHeight());
-            urandx = randx + ornaments[i]->orn->getWidth();
-            urandy = randy + ornaments[i]->orn->getHeight();
-            if (ribbon->impinges(randx, randy, urandx, urandy)) {
-                continue;
-            }
-            bool foundImpingement = false;
-            for(int j = 0; j < i; j++) {
-                if (ornaments[j]->impinges(randx, randy, urandx, urandy)) {
-                    foundImpingement = true;
-                    break;
-                }
-            }
-            if(!foundImpingement) {
-                imp = false;
-            }
-            ornaments[i]->setXY(randx, randy);
-            ornaments[i]->setColor(colorMap->getRandomColor());
-        }
+    for(int i = 0; i < nOrnaments; i++) {
+        ornaments[i]->init();
     }
 
-    //
-    // Lights don't want to impinge on teh ribbon or ornaments.
-    for (int i = 0; i < nLights; i++) {
-        bool imp = true;
-        while (imp) {
-            randx = random8(0, canvas->getWidth() - lights[i]->size);
-            randy = random8(0, canvas->getHeight() - lights[i]->size);
-            if (ribbon->impinges(randx, randy, randx + lights[i]->size,
-                                 randy + lights[i]->size)) {
-                continue;
-            }
-            bool foundImpingement = false;
-            for (int j = 0; j < nOrnaments; j++) {
-                if (ornaments[j]->impinges(randx, randy,
-                                           randx + lights[i]->size,
-                                           randy + lights[i]->size)) {
-                    foundImpingement = true;
-                    break;
-                }
-            }
-            if (!foundImpingement) {
-                imp = false;
-            }
-        }
-        lights[i]->setXY(randx, randy);
+    for(int i = 0; i < nLights; i++) {
+        lights[i]->init();
     }
 }
 

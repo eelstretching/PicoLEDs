@@ -92,7 +92,7 @@ int main() {
         RGB::Green,
         RGB::Blue,
         RGB::White,
-        RGB(213, 181, 52),   // Gold
+        RGB(213, 181, 52),  // Gold
         RGB::Purple,
         RGB::Orange,
         RGB::Silver,
@@ -101,7 +101,7 @@ int main() {
         RGB(0, 33, 111),     // Navy
         RGB(255, 252, 245),  // Warm White
         RGB::Yellow,
-        RGB(242, 18, 18),    // Deep Red
+        RGB(242, 18, 18),  // Deep Red
         RGB::FairyLightNCC,
     });
 
@@ -114,6 +114,12 @@ int main() {
     ArrayColorMap brightXmasColors(xmasColors);
     brightXmasColors.setBrightness(128);
 
+    ArrayColorMap spiralColors(xmasColors);
+    spiralColors.setBackground(RGB::ForestGreen);
+    spiralColors.setBrightness(64);
+
+    uint8_t rColors[] = {0};
+    uint8_t gColors[] = {1};
     uint8_t rgColors[] = {0, 1};
     uint8_t rwColors[] = {0, 3};
     uint8_t rgwColors[] = {0, 1, 3};
@@ -160,17 +166,46 @@ int main() {
     lfd.setGap(7);
     animator.addTimed(&lfd, 15000);
 
-    Spiral sp1(&canvas, &brightXmasColors, 4, rgbwColors, 10, 25);
+    Spiral sp1(&canvas, &brightXmasColors, 0, 0, 4, rgbwColors, 10, 25);
     sp1.setName("Spiral1");
     animator.addTimed(&sp1, 10000);
 
-    Spiral sp2(&canvas, &brightXmasColors, 1, rwColors, 10, 25);
+    Spiral sp2(&canvas, &brightXmasColors, 0, 0, 1, rwColors, 10, 25);
     sp2.setName("Spiral2");
     animator.addTimed(&sp2, 10000);
 
-    Spiral sp3(&canvas, &brightXmasColors, 2, rwColors, 10, 25);
+    Spiral sp3(&canvas, &brightXmasColors, 0, 0, 2, rgColors, 10, 25);
     sp3.setName("Spiral3");
     animator.addTimed(&sp3, 10000);
+
+    Spiral spired(&canvas, &midXmasColors, 20, 0, 1, rColors, 10, 25);
+    spired.setName("SpiralRed");
+    spired.setDirection(Direction::UP);
+
+    Spiral spigreen(&canvas, &midXmasColors, 0, canvas.getHeight() - 1, 1,
+                    gColors, 10, 25);
+    spigreen.setName("SpiralGreen");
+    spigreen.setDirection(Direction::DOWN);
+    MultiAnimation ma1(&canvas, &midXmasColors);
+    ma1.setName("RGSpirals");
+    ma1.add(&spired);
+    ma1.add(&spigreen);
+    animator.addTimed(&ma1, 10000);
+
+    Spiral spired1(&canvas, &spiralColors, 0, 0, 1, rColors, 10, 25);
+    spired1.setName("SpRed1");
+    spired1.setDirection(Direction::UP);
+
+    Spiral spired2(&canvas, &spiralColors, 40, 0, 1, rColors, 10, 30);
+    spired2.setName("SpRed2");
+    spired2.setDirection(Direction::UP);
+    spired2.setClearPrev(false);
+
+    MultiAnimation ma2(&canvas, &spiralColors);
+    ma2.setName("RedSpirals");
+    ma2.add(&spired1);
+    ma2.add(&spired2);
+    animator.addTimed(&ma1, 10000);
 
     ArrayColorMap icicleMap(8);
     Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(128, 128, 128));

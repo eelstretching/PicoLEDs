@@ -30,6 +30,9 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <FontTwoP.h>
+#include <TextAnimation.h>
+#include <ScrollText.h>
 
 #define NUM_STRIPS 5
 #define START_PIN 2
@@ -60,37 +63,43 @@ int main() {
         RGB::Green,
         RGB::Blue,
         RGB::White,
-        RGB::Yellow,
+        RGB(213, 181, 52),  // Gold
         RGB::Purple,
         RGB::Orange,
         RGB::Silver,
-        RGB::FairyLightNCC,
         RGB(255, 20, 20),    // Bright Red
         RGB(28, 191, 38),    // Vibrant Green
         RGB(0, 33, 111),     // Navy
         RGB(255, 252, 245),  // Warm White
-        RGB(213, 181, 52),   // Gold
-        RGB(242, 18, 18),    // Deep Red
+        RGB::Yellow,
+        RGB(242, 18, 18),  // Deep Red
+        RGB::FairyLightNCC,
     });
 
     ArrayColorMap dimXmasColors(xmasColors);
-    dimXmasColors.setBrightness(32);
+    dimXmasColors.setBrightness(16);
 
     ArrayColorMap midXmasColors(xmasColors);
-    midXmasColors.setBrightness(16);
+    midXmasColors.setBrightness(64);
+
+    ArrayColorMap brightXmasColors(xmasColors);
+    brightXmasColors.setBrightness(128);
 
     ArrayColorMap xmasTreeColors(xmasColors);
     xmasTreeColors.setBackground(RGB::ForestGreen);
     xmasTreeColors.setBrightness(16);
 
-    ArrayColorMap brightXmasColors(xmasColors);
-    brightXmasColors.setBrightness(128);
+    ArrayColorMap spiralColors(xmasColors);
+    spiralColors.setBackground(RGB::ForestGreen);
+    spiralColors.setBrightness(16);
 
+    uint8_t rColors[] = {0};
+    uint8_t gColors[] = {1};
     uint8_t rgColors[] = {0, 1};
     uint8_t rwColors[] = {0, 3};
     uint8_t rgwColors[] = {0, 1, 3};
     uint8_t rgbwColors[] = {0, 1, 2, 3};
-    uint8_t rgbwgColors[] = {0, 1, 2, 3, 13};
+    uint8_t rgbwgColors[] = {0, 1, 2, 3, 4};
 
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
@@ -103,31 +112,15 @@ int main() {
 
     Animator animator(&canvas, FPS);
 
-    // Xpm* ornxpm = new Xpm(ornaPixMap);
-    // MultiAnimation ma(&canvas, &midXmasColors);
-    // Ornament o1(&canvas, ornxpm);
-    // o1.setXY(30, 0);
-    // o1.setColor(0);
-    // ma.add(&o1);
-
-    // Ornament o2(&canvas, ornxpm);
-    // o2.setXY(20, 5);
-    // o2.setColor(2);
-    // ma.add(&o2);
-
-    // Ornament o3(&canvas, ornxpm);
-    // o3.setXY(50, 2);
-    // o3.setColor(1);
-    // ma.add(&o3);
-
-    midXmasColors.setBackground(RGB::ForestGreen);
-    XmasTree xmt(&canvas, &xmasTreeColors, 5, 10);
-
-    animator.add(&xmt);
-
+    Font font(&canvas, FontTwoPData);
+    ScrollText ta(&canvas, &dimXmasColors, &font);
+    ta.setAngle(RenderAngle::RENDER_90);
+    ta.add(new TextElement("  MERRY", 30, 0, 0));
+    ta.add(new TextElement("CHRISTMAS", 20, 0, 1));
+    
+    animator.addTimed(&ta, 20000);
+    
     animator.init();
-
-
 
     while (true) {
         animator.step();

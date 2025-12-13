@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "Animation.h"
+#include "Direction.h"
 
 /// @brief An animation that draws a spiral pattern on the tree.
 class Spiral : public Animation {
@@ -14,6 +15,10 @@ class Spiral : public Animation {
     uint8_t barWidth;
     uint8_t nColors;
     uint8_t *colors;
+    uint8_t startx;
+    uint8_t starty;
+    Direction direction = Direction::UP;
+    bool clearPrev = true;
 
     int x = 0;
     int y = 0;
@@ -23,12 +28,16 @@ class Spiral : public Animation {
     /// @param canvas The canvas to draw on.
     /// @param width The width of the spiral in pixels.
     /// @param length The length of the spiral in pixels.
-    Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t nColors, uint8_t *colors, uint8_t width, uint8_t length);
+    Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t startx, uint8_t starty, uint8_t nColors, uint8_t *colors, uint8_t width, uint8_t length);
 
     /// @brief Default destructor.
     ~Spiral();
 
     void init() override;
+
+    void setDirection(Direction dir) { direction = dir; };
+
+    void setClearPrev(bool clear) { clearPrev = clear; };
 
     /// @brief Gets the frames-per-second this animation requires. Default
     /// is 30.

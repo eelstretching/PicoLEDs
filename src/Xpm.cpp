@@ -18,19 +18,19 @@ uint8_t hextoi(char c) {
 }
 uint8_t hextoi(char c1, char c2) { return hextoi(c1) << 4 | hextoi(c2); }
 
-uint8_t remap(uint8_t *remap, uint8_t o) {
-    if(remap == nullptr || o == 255) {
+uint8_t remap(uint8_t* remap, uint8_t o) {
+    if (remap == nullptr || o == 255) {
         return o;
     }
     return remap[o];
 }
 
-Xpm::Xpm(const char *xpm[]) {
+Xpm::Xpm(const char* xpm[]) {
     char holder[3];
 
     //
     // width, height, and number of colors.
-    const char *vals = xpm[0];
+    const char* vals = xpm[0];
     int l = strlen(vals);
     int el = 0;
     int p = 0;
@@ -57,10 +57,10 @@ Xpm::Xpm(const char *xpm[]) {
 
     //
     // Colors.
-    char *cc = new char[nc];
+    char* cc = new char[nc];
     colorIndexes = new uint8_t[nc];
     for (int i = 0; i < nc; i++) {
-        const char *row = xpm[i + 1];
+        const char* row = xpm[i + 1];
         cc[i] = row[0];
         colorIndexes[i] = atoi(&row[3]);
     }
@@ -74,7 +74,7 @@ Xpm::Xpm(const char *xpm[]) {
     //
     // Yeah, this is a triple-barrelled loop, but it only runs once per pixmap!
     for (int i = nc + 1; i < nc + 1 + h; i++) {
-        const char *row = xpm[i];
+        const char* row = xpm[i];
         for (int j = 0; j < w; j++) {
             char pc = row[j];
             for (int k = 0; k < nc; k++) {
@@ -89,10 +89,10 @@ Xpm::Xpm(const char *xpm[]) {
 }
 
 Xpm::Xpm(const Xpm& other) : nc(other.nc), h(other.h), w(other.w) {
-    pixels = new uint8_t[w*h];
-    memcpy(pixels, other.pixels, w*h*sizeof(uint8_t));
+    pixels = new uint8_t[w * h];
+    memcpy(pixels, other.pixels, w * h * sizeof(uint8_t));
     colorIndexes = new uint8_t[nc];
-    memcpy(colorIndexes, other.colorIndexes, nc*sizeof(uint8_t));    
+    memcpy(colorIndexes, other.colorIndexes, nc * sizeof(uint8_t));
 }
 
 void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
@@ -103,11 +103,11 @@ void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
     }
 }
 
-bool Xpm::render(Canvas *canvas, uint x, uint y) {
+bool Xpm::render(Canvas* canvas, uint x, uint y) {
     return render(canvas, nullptr, x, y);
 }
 
-bool Xpm::render(Canvas *canvas, uint8_t *map, uint x, uint y) {
+bool Xpm::render(Canvas* canvas, uint8_t* map, uint x, uint y) {
     bool atLeastOnePixel = false;
     int cy = y + h - 1;
     int p = 0;
@@ -115,8 +115,15 @@ bool Xpm::render(Canvas *canvas, uint8_t *map, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            if (canvas->set(cx++, cy, remap(map, pixels[p]))) {
-                atLeastOnePixel = true;
+            uint8_t col = pixels[p];
+            //
+            // Leave the background as transparent.
+            if (col != 255) {
+                if (canvas->set(cx++, cy, remap(map, col))) {
+                    atLeastOnePixel = true;
+                }
+            } else {
+                cx++;
             }
             p++;
         }
