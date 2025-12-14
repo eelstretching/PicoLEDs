@@ -32,7 +32,7 @@
 #include "pico/types.h"
 #include <FontTwoP.h>
 #include <TextAnimation.h>
-#include <ScrollText.h>
+#include <ScrollTexts.h>
 
 #define NUM_STRIPS 5
 #define START_PIN 2
@@ -57,6 +57,7 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, StripType::WS2812);
         strips[i]->setColorOrder(ColorOrder::OGRB);
     }
+
 
     ArrayColorMap xmasColors({
         RGB::Red,
@@ -113,12 +114,21 @@ int main() {
     Animator animator(&canvas, FPS);
 
     Font font(&canvas, FontTwoPData);
-    ScrollText ta(&canvas, &dimXmasColors, &font);
-    ta.setAngle(RenderAngle::RENDER_90);
-    ta.add(new TextElement("  MERRY", 30, 0, 0));
-    ta.add(new TextElement("CHRISTMAS", 20, 0, 1));
+    ScrollTexts sts(&canvas, &dimXmasColors);
+    ScrollText st1(&canvas, &font, "MERRY CHRISTMAS", 90, -30, 0);
+    ScrollText st2(&canvas, &font, "HAPPY HOLIDAYS", 75, -45, 1);
+    ScrollText st3(&canvas, &font, "JOYEUX NOEL", 55, 0, 4);
+    ScrollText st4(&canvas, &font, "CHAG SAMEACH", 40, -10, 2);
+    ScrollText st5(&canvas, &font, "FELIZ NAVIDAD", 25, -30, 4);
+    ScrollText st6(&canvas, &font, "SEASON'S GREETINGS", 10, -20, 3);
+    sts.add(&st1);
+    sts.add(&st2);
+    sts.add(&st3);
+    sts.add(&st4);
+    sts.add(&st5);
+    sts.add(&st6);
+    animator.addTimed(&sts, 20000);
     
-    animator.addTimed(&ta, 20000);
     
     animator.init();
 
