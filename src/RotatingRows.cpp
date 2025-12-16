@@ -2,7 +2,7 @@
 
 RotatingRows::RotatingRows(Canvas* canvas, ColorMap* colorMap, uint8_t nColors, uint8_t *colors,
                                  uint8_t rowWidth)
-    : Animation(canvas, colorMap), rowWidth(rowWidth), nColors(nColors), colors(colors) {}
+    : Animation(canvas, colorMap, 20), rowWidth(rowWidth), nColors(nColors), colors(colors) {}
 
 bool RotatingRows::step() {
     if (firstFrame) {

@@ -1,7 +1,7 @@
 #include "RotRandRows.h"
 
 RotRandRows::RotRandRows(Canvas* canvas, ColorMap* colorMap, uint8_t nColors)
-    : Animation(canvas, colorMap), nColors(nColors) {}
+    : Animation(canvas, colorMap, 20), nColors(nColors) {}
 
 void RotRandRows::init() {
     firstFrame = true;

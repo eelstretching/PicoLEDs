@@ -21,8 +21,6 @@ class Marquees : public Animation {
 
     bool step() override;
 
-    int getFPSNeeded() override { return 40; };
-
  };
 
 #endif

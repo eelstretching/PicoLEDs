@@ -41,7 +41,6 @@ class Ornament : public Animation {
     void setXY(uint8_t x, uint8_t y);
     void setColor(uint8_t color);
     void init() override;
-    int getFPSNeeded() override { return 1; };
     bool step() override;
 };
 
@@ -65,14 +64,6 @@ class Ribbon : public Animation {
     Ribbon(Canvas* canvas, uint8_t color, uint8_t width)
         : Animation(canvas, nullptr), color(color), width(width) {};
     void init() override;
-    /// @brief Does an area that we want to draw in impinge on the ribbon's
-    /// area?
-    /// @param x1 X coord of lower left of area.
-    /// @param y1 Y coord of lower left of area
-    /// @param x1 X coord of upper right of area.
-    /// @param y1 Y coord of upper right of area
-    /// @return true if this area impinges on the ribbon.
-    int getFPSNeeded() override { return 30; };
     bool step() override;
 };
 
@@ -101,7 +92,6 @@ class Light : public Animation {
     void setXY(uint8_t x, uint8_t y);
 
     void init() override;
-    int getFPSNeeded() override { return 30; };
     bool step() override;
 };
 
@@ -131,7 +121,6 @@ class XmasTree : public Animation {
    public:
     XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights);
     void init() override;
-    int getFPSNeeded() override { return 30; };
     bool step() override;
 };
 

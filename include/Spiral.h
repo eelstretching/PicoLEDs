@@ -39,11 +39,6 @@ class Spiral : public Animation {
 
     void setClearPrev(bool clear) { clearPrev = clear; };
 
-    /// @brief Gets the frames-per-second this animation requires. Default
-    /// is 30.
-    /// @return the FPS this animation needs.
-    int getFPSNeeded() override { return 50; };
-
     /// @brief Takes one step in the animation.
     /// @returns true if the animation will continue after this step, false if
     /// the animation is complete.

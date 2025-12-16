@@ -14,7 +14,6 @@ class RotatingColumns : public Animation {
     bool firstFrame = true;
 public:
     RotatingColumns(Canvas *canvas, ColorMap *colorMap, uint8_t nColors, uint8_t *colors, uint8_t colWidth);
-    int getFPSNeeded() override { return 50; };
     virtual void init() override {firstFrame = true; canvas->setColorMap(colorMap);};
     virtual bool step() override;
 };

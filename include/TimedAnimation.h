@@ -30,7 +30,7 @@ class TimedAnimation : public Animation {
     /// @return true if the animation is not out of time, false if we're out of
     /// time.
     bool step() override;
-    int getFPSNeeded() override { return animation->getFPSNeeded(); };
+    int getFPS() override { return animation->getFPS(); };
     const char* getName() override { snprintf(name, 20, "T %s %.1f", animation->getName(), duration/1000000.0); return name; };
 };
 

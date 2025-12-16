@@ -14,10 +14,9 @@ class RainbowWipe : public Animation {
 
     public:
 
-    RainbowWipe(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {};
+    RainbowWipe(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap, 55) {};
     void init();
     bool step();
-    int getFPSNeeded() {return 55;};
 };
 
 #endif

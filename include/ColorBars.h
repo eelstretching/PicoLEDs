@@ -14,7 +14,6 @@ class ColorBars : public Animation {
    public:
     ColorBars(Canvas* canvas, ColorMap* colorMap, uint8_t barWidth,
               uint8_t nColors);
-    int getFPSNeeded() override { return 1; };
     virtual bool step() override;
 };
 #endif

@@ -1,7 +1,7 @@
 #include "RotRandColumns.h"
 
 RotRandColumns::RotRandColumns(Canvas* canvas, ColorMap* colorMap, uint8_t nColors)
-    : Animation(canvas, colorMap), nColors(nColors) {}
+    : Animation(canvas, colorMap, 50), nColors(nColors) {}
 
 void RotRandColumns::init() {
     firstFrame = true;

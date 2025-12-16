@@ -34,7 +34,7 @@ bool Burst::step() {
 
 Bursts::Bursts(Canvas* canvas, RGB backGround, uint8_t maxBursts,
                RGB burstColor, uint8_t tailLen)
-    : Animation(canvas, nullptr), maxBursts(maxBursts), tailLen(tailLen) {
+    : Animation(canvas, nullptr, 50), maxBursts(maxBursts), tailLen(tailLen) {
     colorMap = new ArrayColorMap(16);
     colorMap->setBackground(backGround);
     //

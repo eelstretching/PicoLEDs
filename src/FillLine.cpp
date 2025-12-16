@@ -4,7 +4,7 @@
 
 FillLine::FillLine(Canvas* canvas, ColorMap *colorMap, uint8_t colorIndex, Direction direction, int16_t startPos,
                    int16_t endPos, uint8_t stepSize)
-    : Animation(canvas, colorMap),
+    : Animation(canvas, colorMap, 80),
       colorIndex(colorIndex),
       direction(direction),
       currPos(startPos),

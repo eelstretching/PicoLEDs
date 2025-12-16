@@ -14,8 +14,7 @@ class Burst : public Animation {
     BurstState state;
 
    public:
-    Burst(Canvas* canvas, uint8_t tailLen) : Animation(canvas, nullptr), tailLen(tailLen) {};
-    int getFPSNeeded() override { return 50; };
+    Burst(Canvas* canvas, uint8_t tailLen) : Animation(canvas, nullptr, 50), tailLen(tailLen) {};
     virtual void init() override;
     virtual bool step() override;
 };
@@ -28,7 +27,6 @@ class Bursts : public Animation {
     public:
     Bursts(Canvas *canvas, RGB backGround, uint8_t maxBursts, RGB burstColor, uint8_t tailLen);
     ~Bursts();
-    int getFPSNeeded() override { return 50; };
     virtual void init() override;
     virtual bool step() override;
 };

@@ -4,7 +4,7 @@
 
 LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nColors, uint8_t *colors, Direction direction,
                    int stepSize)
-    : Animation(canvas, colorMap),
+    : Animation(canvas, colorMap, 60),
       nColors(nColors),
       colors(colors),
       direction(direction),

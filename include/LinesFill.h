@@ -41,8 +41,6 @@ class LinesFill : public Animation {
 
     ~LinesFill() {};
 
-    int getFPSNeeded() override { return 60; };
-
     bool step() override;
 
     void init() override;

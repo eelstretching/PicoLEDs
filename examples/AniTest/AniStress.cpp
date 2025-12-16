@@ -66,7 +66,7 @@ int main() {
                     "%.2f "
                     "us/show %d missed frames\n",
                     animator.getFrameCount(), animator.getUsPerFrame(),
-                    animator.getFPSNeeded(), animator.getAverageFrameTimeUS(),
+                    animator.getFPS(), animator.getAverageFrameTimeUS(),
                     animator.getAverageShowTimeUS(),
                     animator.getMissedFrames());
             }

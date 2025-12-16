@@ -23,7 +23,7 @@ void Animator::init() {
     if(f == nullptr) {
         return;
     }
-    setFPS(f->getFPSNeeded());
+    setFPS(f->getFPS());
     f->init();
 }
 
@@ -32,7 +32,7 @@ void Animator::printStats() {
     printf(
         "%d frames run, running %.1fs %.2f us/frame at %d fps %.2f us/step, %.2f "
         "us/show %.2f us/frame %d missed frames\n",
-        getFrameCount(), runTime / 1000000.0, getUsPerFrame(), getFPSNeeded(),
+        getFrameCount(), runTime / 1000000.0, getUsPerFrame(), getFPS(),
         getAverageStepTimeUS(), getAverageShowTimeUS(), getAverageFrameTimeUS(),
         getMissedFrames());
 }
@@ -55,6 +55,7 @@ bool Animator::step() {
     }
     stepWatch.finish();
     showWatch.start();
+//    canvas->clearColumn(0);
     canvas->show();
     showWatch.finish();
     frameWatch.finish();
@@ -66,7 +67,7 @@ bool Animator::step() {
     if (changed) {
         animationChanged();
         animations[pos]->init();
-        setFPS(animations[pos]->getFPSNeeded());
+        setFPS(animations[pos]->getFPS());
     }
 
     //

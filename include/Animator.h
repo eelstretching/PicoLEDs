@@ -48,7 +48,7 @@ class Animator {
     /// milliseconds.
     void addTimed(Animation* a, int durationMS);
     void setFPS(int fps);
-    int getFPSNeeded() { return fps; };
+    int getFPS() { return fps; };
     /// @brief Steps through whatever animation that we're currently working on.
     /// @return
     virtual bool step();

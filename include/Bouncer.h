@@ -30,7 +30,6 @@ class Bouncer : public Animation {
 
     Bouncer(Canvas* canvas, ColorMap* colorMap, uint8_t color, int x, int y,
             int maxX, int maxY);
-    int getFPSNeeded() { return 10; };
     bool step();
 };
 

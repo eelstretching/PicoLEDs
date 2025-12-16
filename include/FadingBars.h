@@ -24,12 +24,11 @@ class FadingBar : public Animation {
    public:
     FadingBar(Canvas* canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t position,
               uint8_t brightColorIndex, uint8_t dimColorIndex, FadeState state)
-        : Animation(canvas, colorMap),
+        : Animation(canvas, colorMap, 10),
           barWidth(barWidth),
           brightColorIndex(brightColorIndex),
           dimColorIndex(dimColorIndex),
           position(position), initState(state), state(state) {};
-    int getFPSNeeded() override { return 10; };
     virtual void init() override;
     virtual bool step() override;
 
@@ -44,7 +43,6 @@ class FadingBars : public Animation {
 
    public:
     FadingBars(Canvas* canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t nColors);
-    int getFPSNeeded() override { return 10; };
     virtual void init() override;
     virtual bool step() override;
 };

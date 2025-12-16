@@ -2,7 +2,7 @@
 
 RotatingColumns::RotatingColumns(Canvas* canvas, ColorMap* colorMap,
                            uint8_t nColors, uint8_t *colors, uint8_t colWidth)
-    : Animation(canvas, colorMap),
+    : Animation(canvas, colorMap, 50),
       colWidth(colWidth),
       colors(colors),
       nColors(nColors) {

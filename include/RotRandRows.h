@@ -17,7 +17,6 @@ class RotRandRows : public Animation {
 
    public:
     RotRandRows(Canvas* canvas, ColorMap* colorMap, uint8_t nColors);
-    int getFPSNeeded() override { return 20; };
     virtual void init() override;
     virtual bool step() override;
 };

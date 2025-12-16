@@ -34,8 +34,6 @@ class FillLine : public Animation {
 
     ~FillLine() {};
 
-    int getFPSNeeded() override { return 80; };
-
     bool step() override;
 
    protected:

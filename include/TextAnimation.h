@@ -46,7 +46,6 @@ class TextAnimation : public Animation {
 
     bool step() override;
 
-    int getFPSNeeded() override {return 1;};
 };
 
 #endif

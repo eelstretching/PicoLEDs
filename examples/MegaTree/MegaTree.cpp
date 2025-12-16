@@ -28,6 +28,8 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <ScrollTexts.h>
+#include <FontTwoP.h>
 
 #define NUM_STRIPS 7
 #define START_PIN 2
@@ -272,6 +274,22 @@ int main() {
     RotRandRows rrr2(&canvas, &midXmasColors, 2);
     rrr2.setName("RRR2");
     animator.addTimed(&rrr2, 10000);
+
+    Font font(&canvas, FontTwoPData);
+    ScrollTexts sts(&canvas, &midXmasColors);
+    ScrollText st1(&canvas, &font, "MERRY CHRISTMAS", 90, -30, 0);
+    ScrollText st2(&canvas, &font, "HAPPY HOLIDAYS", 75, -45, 1);
+    ScrollText st3(&canvas, &font, "JOYEUX NOEL", 55, 0, 4);
+    ScrollText st4(&canvas, &font, "CHAG SAMEACH", 40, -10, 2);
+    ScrollText st5(&canvas, &font, "FELIZ NAVIDAD", 25, -30, 4);
+    ScrollText st6(&canvas, &font, "SEASON'S GREETINGS", 10, -20, 3);
+    sts.add(&st1);
+    sts.add(&st2);
+    sts.add(&st3);
+    sts.add(&st4);
+    sts.add(&st5);
+    sts.add(&st6);
+    animator.addTimed(&sts, 20000);
 
     animator.init();
 

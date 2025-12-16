@@ -27,11 +27,11 @@ class TimeAnimation : public Animation {
     /// @param canvas the canvas we'll display on
     /// @param font the font we'll use for display
     /// @param duration the duration of the display, in milliseconds
-    TimeAnimation(Canvas *canvas, Font *font, uint duration) : Animation(canvas), font(font), duration(duration*1000) { 
+    TimeAnimation(Canvas *canvas, Font *font, uint duration) : Animation(canvas, nullptr), font(font), duration(duration*1000) { 
+        fps = 10;
     };
     void init();
     bool step();
-    int getFPSNeeded() {return 10;};
 
 };
 #endif

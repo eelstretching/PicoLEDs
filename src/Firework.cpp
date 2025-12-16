@@ -20,7 +20,7 @@ static float constrain(float f, int min, int max) {
     return f;
 }
 
-Firework::Firework(Canvas* canvas, ColorMap *colorMap, uint row) : Animation(canvas, colorMap){
+Firework::Firework(Canvas* canvas, ColorMap *colorMap, uint row) : Animation(canvas, colorMap, 45){
     this->row = row;
     state = RESET;
     flare = new Spark[flareSize];

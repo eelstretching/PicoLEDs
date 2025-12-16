@@ -14,7 +14,6 @@ class RotRandColumns : public Animation {
     bool firstFrame = true;
 public:
     RotRandColumns(Canvas *canvas, ColorMap *colorMap, uint8_t nColors);
-    int getFPSNeeded() override { return 50; };
     virtual void init() override;
     virtual bool step() override;
 };

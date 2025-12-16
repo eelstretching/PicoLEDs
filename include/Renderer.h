@@ -18,7 +18,8 @@
  * RES time, specification says it needs at least 50 us, but some folks say it
  * can be as low as 9us!
  */
-#define RESET_TIME_US (55)
+#define RESET_TIME_US (80)
+#define NUM_PARALLEL_PINS 8
 
 /// @brief A struct to store a semaphore and a delay alarm that will allow us to
 /// delay after sending data to the LEDs to give the strip time to actually
@@ -40,7 +41,7 @@ class StripResetDelay {
 ///
 /// Make sure it's initialized to zeros, as we're counting on being able to test
 /// which DMA channels need management.
-static StripResetDelay *strip_delays[NUM_DMA_CHANNELS] = {};
+static StripResetDelay *strip_delays[NUM_DMA_CHANNELS] = {0};
 
 /// @brief A structure holding the details of a single PIO program for rendering
 /// one or more strips.
@@ -63,8 +64,7 @@ class PIOProgram {
 };
 
 /// @brief A class for a thing that knows how to render a logical Strip to a
-/// physical strip. For now it just does 2812B LED strips, but we can subclass
-/// later as necessary.
+/// physical strip.
 class Renderer {
    protected:
     //

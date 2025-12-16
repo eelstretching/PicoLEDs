@@ -23,6 +23,5 @@ class Fireworks : public Animation {
     int getNumFireworks() {
         return nf;
     };
-    int getFPSNeeded() {return 55;};
 };
 #endif

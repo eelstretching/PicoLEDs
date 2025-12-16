@@ -117,10 +117,6 @@ class Firework : public Animation {
         this->maxExplosionSteps = maxExplosionSteps;
     };
 
-    int getFPSNeeded() {
-        return 45;
-    };
-
     /// @brief Sets the current state of the firework.
     /// @param state The state to use.
     void setState(FillState state) { this->state = state; };

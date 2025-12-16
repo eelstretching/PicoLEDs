@@ -24,17 +24,22 @@ class Animation {
 
     char name[20];
 
+    uint8_t fps = 30;
+
    public:
     /// @brief Default constructor
     Animation();
     /// @brief Construct an animation that will draw on the given canvas.
     /// @param canvas The canvas we'll draw on.
     Animation(Canvas *canvas, ColorMap *colorMap);
+    Animation(Canvas *canvas, ColorMap *colorMap, uint8_t fps);
 
     /// @brief Gets the frames-per-second this animation requires. Default
     /// is 30.
     /// @return the FPS this animation needs.
-    virtual int getFPSNeeded() { return 30; };
+    virtual int getFPS() { return fps; };
+
+    virtual void setFPS(uint8_t fps) { this->fps = fps; };
 
     /// @brief Virtual destructor!
     virtual ~Animation(){};
@@ -70,7 +75,7 @@ class MultiAnimation : public Animation {
     MultiAnimation(Canvas *canvas, ColorMap *colorMap) : Animation(canvas, colorMap){};
     void add(Animation *animation) {
         animations.push_back(animation);
-        fps = MAX(fps, animation->getFPSNeeded());
+        fps = MAX(fps, animation->getFPS());
     }
 
     void init() override {
@@ -85,7 +90,7 @@ class MultiAnimation : public Animation {
         }
         return true;
     }
-    int getFPSNeeded() { return fps; }
+    int getFPS() { return fps; }
 };
 
 #endif

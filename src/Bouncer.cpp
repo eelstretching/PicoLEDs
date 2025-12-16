@@ -5,6 +5,7 @@ Bouncer::Bouncer(Canvas* canvas, ColorMap *colorMap, uint8_t color, int x, int y
     maxY=canvas->getHeight() - 1;
     up = true;
     right = true;
+    fps = 10;
 }
 
 Bouncer::Bouncer(Canvas* canvas,  ColorMap *colorMap,uint8_t color, int x, int y, int maxX, int maxY) : Animation(canvas, colorMap), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {

@@ -22,7 +22,7 @@ bool FadingBar::step() {
             }
             currColorIndex--;
             if (currColorIndex <= brightColorIndex) {
-                pauseCount = getFPSNeeded();
+                pauseCount = getFPS();
                 state = PAUSING;
             }
             break;
@@ -32,7 +32,7 @@ bool FadingBar::step() {
             }
             currColorIndex++;
             if (currColorIndex >= dimColorIndex) {
-                pauseCount = getFPSNeeded();
+                pauseCount = getFPS();
                 state = PAUSING;
             }
             break;
@@ -54,7 +54,7 @@ bool FadingBar::step() {
 
 FadingBars::FadingBars(Canvas* canvas,
                        ColorMap* colorMap, uint8_t barWidth, uint8_t nColors)
-    : Animation(canvas, colorMap), barWidth(barWidth), nColors(nColors) {
+    : Animation(canvas, colorMap, 10), barWidth(barWidth), nColors(nColors) {
     fadeMap = new FadeColorMap(colorMap, nColors, 32, 28);
     canvas->setColorMap(fadeMap);
     nBars = canvas->getWidth() / barWidth;

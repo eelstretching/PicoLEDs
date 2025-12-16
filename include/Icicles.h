@@ -106,8 +106,6 @@ class Icicles : public Animation {
     /// @brief Destructor for the icicles animation.
     ~Icicles();
 
-    int getFPSNeeded() override { return 30; };
-
     void init() override;
 
     bool step() override;

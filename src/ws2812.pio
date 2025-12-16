@@ -51,9 +51,9 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 
 ; 2812 and 2812B require 400ns of high, 400ns of data, and 450ns of low.
 ; This is an 8/8/9 ratio, so 8 cycles of high, 8 cycles of data, and 9 cycles of low.
-.define public T1 3
-.define public T2 3
-.define public T3 4
+.define public T1 8
+.define public T2 8
+.define public T3 9
 .define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
 
 .wrap_target
@@ -78,18 +78,19 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
     pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
     sm_config_set_out_shift(&c, true, true, 8);
     sm_config_set_out_pins(&c, pin_base, pin_count);
-    sm_config_set_in_shift(&c, true, false, 8);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);
     sm_config_set_clkdiv(&c, div);
-//    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_parallel_CYCLES_FOR_1_BIT, div);
-//    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
-//    printf("state machine cycle is: %.1fns\n", cycle_time);
-//    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2812_parallel_T1 * cycle_time, ws2812_parallel_T2 * cycle_time, ws2812_parallel_T3 * cycle_time);
-    
+
+    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_parallel_CYCLES_FOR_1_BIT, div);
+    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
+    printf("state machine cycle is: %.1fns\n", cycle_time);
+    printf("T1: %d %.1f T2: %d %.1f T3: %d %.1f\n", ws2812_parallel_T1, ws2812_parallel_T1 * cycle_time, 
+    ws2812_parallel_T2, ws2812_parallel_T2 * cycle_time, ws2812_parallel_T3, ws2812_parallel_T3 * cycle_time);
 
     pio_sm_init(pio, sm, offset, &c);
+    pio_sm_exec(pio, sm, pio_encode_mov(pio_pins, pio_null));
     pio_sm_set_enabled(pio, sm, true);
 }
 %}

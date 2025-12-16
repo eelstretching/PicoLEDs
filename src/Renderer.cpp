@@ -11,8 +11,6 @@
 #include "ws2811.pio.h"
 #include "ws2812.pio.h"
 
-#define NUM_PARALLEL_PINS 1
-
 /// @brief A comparator that we can use to sort strips by their pin number.
 /// @param s1 The first strip
 /// @param s2 The second strip
@@ -48,7 +46,7 @@ static inline void __isr dma_complete_handler() {
     for (unsigned int i = 0; i < NUM_DMA_CHANNELS; i++) {
         // if dma triggered for this channel and it's been used (has a delay
         // associated with it)
-        if ((dma_hw->ints0 & (1 << i)) && strip_delays[i]) {
+        if (strip_delays[i] && (dma_hw->ints0 & (1 << i))) {
             dma_hw->ints0 = (1 << i);  // clear/ack IRQ
             /* safety check: is there somehow an alarm already running? */
             if (strip_delays[i]->alarm != 0) {
@@ -264,6 +262,9 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     channel_config_set_transfer_data_size(&channel_config, tsize);
     channel_config_set_dreq(&channel_config,
                             pio_get_dreq(pip->pio, pip->sm, true));
+    channel_config_set_read_increment(&channel_config, true);
+    channel_config_set_write_increment(&channel_config, false);
+
     dma_channel_configure(pip->dma_channel, &channel_config,
                           &pip->pio->txf[pip->sm], NULL, 1, false);
 
@@ -271,8 +272,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
         //
         // We only want to install the handler once, which we'll do the
         // first time that we configure a DMA channel.
-        irq_add_shared_handler(DMA_IRQ_0, dma_complete_handler,
-                               PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY);
+        irq_set_exclusive_handler(DMA_IRQ_0, dma_complete_handler);
         irq_set_enabled(DMA_IRQ_0, true);
         isr_installed = true;
     }
@@ -280,7 +280,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
 
     //
     // Set the drive strength on the pins.
-    for(int i = 0; i < pinCount; i++) {
+    for (int i = 0; i < pinCount; i++) {
         pio_gpio_init(pip->pio, startPin + i);
         gpio_set_drive_strength(startPin + i, GPIO_DRIVE_STRENGTH_4MA);
     }

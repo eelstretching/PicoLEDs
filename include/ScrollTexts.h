@@ -23,8 +23,6 @@ class ScrollText : public Animation {
     ScrollText(Canvas* canvas, Font* font, const char* text, int startx, int starty, uint8_t color, RenderAngle angle = RENDER_90);
     void init() override;
     bool step() override;
-    int getFPSNeeded() override { return 20; };
-
 };
 
 class ScrollTexts : public Animation {
@@ -40,7 +38,6 @@ class ScrollTexts : public Animation {
 
     bool step() override;
 
-    int getFPSNeeded() override { return 20; };
 };
 
 #endif

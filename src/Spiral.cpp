@@ -3,7 +3,7 @@
 Spiral::Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t startx,
                uint8_t starty, uint8_t nColors, uint8_t* colors, uint8_t width,
                uint8_t length)
-    : Animation(canvas, colorMap),
+    : Animation(canvas, colorMap, 50),
       startx(startx),
       starty(starty),
       nColors(nColors),
