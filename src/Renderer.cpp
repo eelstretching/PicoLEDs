@@ -24,14 +24,14 @@ bool pinComparator(Strip s1, Strip s2) { return s1.getPin() < s2.getPin(); }
 /// semaphore associated with this channel, which will allow us to send data on
 /// it again.
 /// @return 0, as we do not wish the alarm to repeat.
-static int64_t reset_delay_complete(alarm_id_t id, void* strip_delay) {
-    StripResetDelay* srd = (StripResetDelay*)strip_delay;
+static int64_t reset_delay_complete(alarm_id_t id, void* data) {
+    PIOProgram* pip = (PIOProgram*)data;
 
     //
     // Reset the alarm, and release the semaphore.
-    srd->alarm = 0;
-    sem_release(&srd->sem);
-    srd->dma_time += (time_us_64() - srd->dma_start);
+    pip->alarm = 0;
+    sem_release(&pip->sem);
+    pip->dma_time += (time_us_64() - pip->dma_start);
     return 0;
 }
 
@@ -46,18 +46,25 @@ static inline void __isr dma_complete_handler() {
     for (unsigned int i = 0; i < NUM_DMA_CHANNELS; i++) {
         // if dma triggered for this channel and it's been used (has a delay
         // associated with it)
-        if (strip_delays[i] && (dma_hw->ints0 & (1 << i))) {
+        if (pioPrograms[i] && (dma_hw->ints0 & (1 << i))) {
             dma_hw->ints0 = (1 << i);  // clear/ack IRQ
             /* safety check: is there somehow an alarm already running? */
-            if (strip_delays[i]->alarm != 0) {
-                cancel_alarm(strip_delays[i]->alarm); /* cancel it */
+            if (pioPrograms[i]->alarm != 0) {
+                cancel_alarm(pioPrograms[i]->alarm); /* cancel it */
             }
             //
             // Set up alarm to wait for the required latch-in time for the LEDs
             // at the end of the transfer, which will release the associated
             // semaphore.
-            strip_delays[i]->alarm = add_alarm_in_us(
-                RESET_TIME_US, reset_delay_complete, strip_delays[i], true);
+            pioPrograms[i]->alarm = add_alarm_in_us(
+                RESET_TIME_US, reset_delay_complete, pioPrograms[i], true);
+            //
+            // Drive the pins for the strips low now that the data has been
+            // sent.
+            for (int pin = pioPrograms[i]->startPin;
+                 pin < pioPrograms[i]->startPin + pioPrograms[i]->size; pin++) {
+                gpio_put(pin, 0);
+            }
             return;
         }
     }
@@ -81,16 +88,15 @@ PIOProgram::~PIOProgram() {
 Renderer::Renderer() {}
 
 Renderer::~Renderer() {
-    for (auto pip : programs) {
-        delete pip;
-    }
-    programs.clear();
-    strips.clear();
-    for (int i = 0; i < NUM_DMA_CHANNELS; i++) {
-        if (strip_delays[i]) {
-            strip_delays[i] = nullptr;
+    for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        PIOProgram* pip = pioPrograms[i];
+        if(pip == nullptr || pip->renderer != this) {
+            continue;
         }
-    }
+        delete pip;
+        pioPrograms[i] = nullptr;
+    }   
+    strips.clear();
     if (isr_installed) {
         irq_set_enabled(DMA_IRQ_0, false);
         irq_remove_handler(DMA_IRQ_0, dma_complete_handler);
@@ -144,6 +150,7 @@ void Renderer::setup() {
 
 void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     PIOProgram* pip = new PIOProgram();
+    pip->renderer = this;
     pip->startIndex = startIndex;
     pip->startPin = startPin;
     pip->size = pinCount;
@@ -223,8 +230,8 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // so that we can send data without delay. Also, we'll put the strip
     // delay into the global array so that the interrupt service routine can
     // find it.
-    sem_init(&pip->delay.sem, 1, 1);
-    strip_delays[pip->dma_channel] = &pip->delay;
+    sem_init(&pip->sem, 1, 1);
+    pioPrograms[pip->dma_channel] = pip;
 
     //
     // Now we'll need a buffer where we can put the pixels while they're
@@ -285,22 +292,22 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
         gpio_set_drive_strength(startPin + i, GPIO_DRIVE_STRENGTH_4MA);
     }
 
-    //
-    // Looks like we're all set, so add this program to the list of ones
-    // that we'll run.
-    programs.push_back(pip);
 }
 
 void Renderer::render(ColorMap* colorMap) {
     if (!setupDone) {
         setup();
     }
-    for (auto pip : programs) {
+    for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        PIOProgram* pip = pioPrograms[i];
+        if(pip == nullptr || pip->renderer != this) {
+            continue;
+        }
         pip->stats.start();
-        if (sem_available(&pip->delay.sem) == 0) {
+        if (sem_available(&pip->sem) == 0) {
             pip->nblocked++;
         }
-        sem_acquire_blocking(&pip->delay.sem);
+        sem_acquire_blocking(&pip->sem);
         //
         // We need to fill the buffer that we'll DMA to the PIO program. How
         // we fill it depends on how many strips we're sending.
@@ -438,7 +445,7 @@ void Renderer::render(ColorMap* colorMap) {
 
         //
         // We'll keep track of the time for the DMA ops.
-        pip->delay.dma_start = time_us_64();
+        pip->dma_start = time_us_64();
 
         dma_channel_set_read_addr(pip->dma_channel, pip->buffer, false);
         dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
@@ -450,16 +457,24 @@ void Renderer::render(ColorMap* colorMap) {
 
 uint32_t Renderer::getBlockedCount() {
     uint32_t nb = 0;
-    for (auto pip : programs) {
+    for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        PIOProgram* pip = pioPrograms[i];
+        if(pip == nullptr || pip->renderer != this) {
+            continue;
+        }
         nb += pip->nblocked;
-    }
+    }   
     return nb;
 }
 
 uint64_t Renderer::getDMATime() {
     uint64_t dt = 0;
-    for (auto pip : programs) {
-        dt += pip->delay.dma_time;
+    for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        PIOProgram* pip = pioPrograms[i];
+        if(pip == nullptr || pip->renderer != this) {
+            continue;
+        }
+        dt += pip->dma_time;
     }
     return dt;
 }

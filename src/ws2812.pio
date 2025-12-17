@@ -51,9 +51,9 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
 
 ; 2812 and 2812B require 400ns of high, 400ns of data, and 450ns of low.
 ; This is an 8/8/9 ratio, so 8 cycles of high, 8 cycles of data, and 9 cycles of low.
-.define public T1 8
-.define public T2 8
-.define public T3 9
+.define public T1 3
+.define public T2 3
+.define public T3 4
 .define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
 
 .wrap_target
@@ -71,13 +71,12 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
                                                 uint pin_count, float freq) {
     for(uint i=pin_base; i< pin_base+pin_count; i++) {
         pio_gpio_init(pio, i);
-        gpio_set_drive_strength(i, GPIO_DRIVE_STRENGTH_4MA);
     }
     pio_sm_set_consecutive_pindirs(pio, sm, pin_base, pin_count, true);
 
     pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
-    sm_config_set_out_shift(&c, true, true, 8);
     sm_config_set_out_pins(&c, pin_base, pin_count);
+    sm_config_set_out_shift(&c, true, true, 8);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);

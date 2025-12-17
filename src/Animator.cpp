@@ -55,7 +55,7 @@ bool Animator::step() {
     }
     stepWatch.finish();
     showWatch.start();
-//    canvas->clearColumn(0);
+    canvas->clearColumn(0);
     canvas->show();
     showWatch.finish();
     frameWatch.finish();
