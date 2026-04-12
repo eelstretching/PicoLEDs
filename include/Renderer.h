@@ -64,7 +64,7 @@ class Renderer {
    protected:
     //
     // The strips that we're being asked to render.
-    std::vector<Strip> strips;
+    std::vector<Strip *> strips;
 
     StopWatch dw;
 
@@ -93,7 +93,7 @@ class Renderer {
 
     /// @brief Adds a strip to be rendered by this renderer.
     /// @param strip The strip to render
-    void add(Strip &strip);
+    void add(Strip *strip);
 
     /// @brief Renders the strips.
     void render(ColorMap *colorMap);
@@ -107,6 +107,6 @@ class Renderer {
     /// @return The total time spent on DMA
     uint64_t getDMATime();
 
-    uint64_t getDataSetupTime() { return dw.totalTime; }
+    uint64_t getAverageDataSetupTime() { return dw.getAverageTime(); }
 };
 #endif

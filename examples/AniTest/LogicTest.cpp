@@ -65,16 +65,16 @@ int main() {
     Renderer r1;
     Renderer r2;
 
-    r1.add(*strips[0]);
-    r1.add(*strips[1]);
-    r1.add(*strips[2]);
-    r1.add(*strips[3]);
-    r1.add(*strips[4]);
-    r1.add(*strips[5]);
-    r1.add(*strips[6]);
-    r1.add(*strips[7]);
+    r1.add(strips[0]);
+    r1.add(strips[1]);
+    r1.add(strips[2]);
+    r1.add(strips[3]);
+    r1.add(strips[4]);
+    r1.add(strips[5]);
+    r1.add(strips[6]);
+    r1.add(strips[7]);
     for (int i = 8; i < ns; i++) {
-        r2.add(*strips[i]);
+        r2.add(strips[i]);
     }
     // r2.add(*strips[8]);
     // r2.add(*strips[9]);

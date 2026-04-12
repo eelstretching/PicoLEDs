@@ -28,7 +28,7 @@ int main() {
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
-        renderer.add(*strips[i]);
+        renderer.add(strips[i]);
     }
     renderer.setup();
 

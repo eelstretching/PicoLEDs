@@ -130,7 +130,7 @@ int main() {
 
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
-        canvas.add(*strips[i]);
+        canvas.add(strips[i]);
     }
     canvas.setup();
     canvas.setColorMap(&midXmasColors);

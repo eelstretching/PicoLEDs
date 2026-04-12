@@ -22,9 +22,9 @@ int main() {
     Canvas canvas(NUM_LEDS);
     Strip strips[] = {Strip(2, NUM_LEDS), Strip(3, NUM_LEDS), Strip(4, NUM_LEDS)};
     int ns = 3;
-    canvas.add(strips[0]);
-    canvas.add(strips[1]);
-    canvas.add(strips[2]);
+    canvas.add(&strips[0]);
+    canvas.add(&strips[1]);
+    canvas.add(&strips[2]);
     int delay = 100;
 
     ArrayColorMap colorMap({

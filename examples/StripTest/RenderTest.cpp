@@ -28,7 +28,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
            strips[endStrip]->getPin());
     Renderer r;
     for (int i = startStrip; i < endStrip; i++) {
-        r.add(*strips[i]);
+        r.add(strips[i]);
     }
     r.setup();
     for (int i = startStrip; i < endStrip; i++) {
@@ -64,7 +64,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
 
     for (int i = 0; i < ds; i++) {
         for (int j = s[i]; j < e[i]; j++) {
-            r.add(*strips[j]);
+            r.add(strips[j]);
         }
     }
     r.setup();

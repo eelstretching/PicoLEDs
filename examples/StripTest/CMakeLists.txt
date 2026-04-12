@@ -5,6 +5,7 @@ pico_sdk_init()
 add_executable(StripTest StripTest.cpp)
 add_executable(StripTestSingle StripTestSingle.cpp)
 add_executable(RenderTest RenderTest.cpp)
+add_executable(MultiRender MultiRender.cpp)
 add_executable(DimTest DimTest.cpp)
 
 pico_set_program_name(StripTest "StripTest")
@@ -88,3 +89,22 @@ target_link_libraries(RenderTest
 )
 
 pico_add_extra_outputs(RenderTest)
+
+# Add the standard include files to the build
+target_include_directories(MultiRender PRIVATE
+  ../../src
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+)
+
+# Add any user requested libraries
+target_link_libraries(MultiRender 
+  PicoLEDs
+  hardware_dma
+  hardware_pio
+  hardware_timer
+  hardware_clocks
+  pico_stdlib
+)
+
+pico_add_extra_outputs(MultiRender)

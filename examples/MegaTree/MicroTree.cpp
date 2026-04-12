@@ -1,11 +1,14 @@
 #include <Bursts.h>
 #include <ColorBars.h>
 #include <FadingBars.h>
+#include <FontTwoP.h>
 #include <RandomAnimator.h>
 #include <RotRandColumns.h>
 #include <RotRandRows.h>
 #include <RotatingColumns.h>
 #include <RotatingRows.h>
+#include <ScrollTexts.h>
+#include <TextAnimation.h>
 #include <TimedAnimation.h>
 #include <XmasTree.h>
 #include <stdlib.h>
@@ -30,13 +33,10 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
-#include <FontTwoP.h>
-#include <TextAnimation.h>
-#include <ScrollTexts.h>
 
-#define NUM_STRIPS 5
+#define NUM_STRIPS 10
 #define START_PIN 2
-#define STRIP_LEN 400
+#define STRIP_LEN 200
 #define CANVAS_WIDTH 100
 #define BRIGHTNESS 32
 #define FPS 30
@@ -57,7 +57,6 @@ int main() {
         strips[i] = new Strip(pin++, STRIP_LEN, StripType::WS2812);
         strips[i]->setColorOrder(ColorOrder::OGRB);
     }
-
 
     ArrayColorMap xmasColors({
         RGB::Red,
@@ -104,7 +103,7 @@ int main() {
 
     Canvas canvas(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
-        canvas.add(*strips[i]);
+        canvas.add(strips[i]);
     }
     canvas.setup();
     canvas.setColorMap(&midXmasColors);
@@ -113,18 +112,13 @@ int main() {
 
     Animator animator(&canvas, FPS);
 
-    char buff[40];
-    for(int i = 0; i < 5; i++) {
-        printf("Color %d: %s\n", i, dimXmasColors[i].toString(buff, 40));
-    }
-
     Marquees fancyMarq(&canvas, &dimXmasColors, 5, rgbwgColors, 20, RIGHT,
                        canvas.getHeight());
     fancyMarq.setName("FMarq");
     fancyMarq.setFPS(40);
-    
+
     animator.add(&fancyMarq);
-    
+
     animator.init();
 
     while (true) {

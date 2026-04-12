@@ -44,7 +44,7 @@ int main() {
             for (int i = 0; i < ns - (sc - 1); i++) {
                 Canvas canvas(CANVAS_WIDTH);
                 for (int j = 0; j < sc; j++) {
-                    canvas.add(*strips[i + j]);
+                    canvas.add(strips[i + j]);
                 }
                 canvas.setup();
                 canvas.setColorMap(&colors);

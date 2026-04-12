@@ -22,10 +22,10 @@ int main() {
     Canvas canvas(138);
     Strip strips[] = {Strip(2, 552), Strip(3, 552), Strip(4, 552),
                       Strip(5, 552)};
-    canvas.add(strips[0]);
-    canvas.add(strips[1]);
-    canvas.add(strips[2]);
-    canvas.add(strips[3]);
+    canvas.add(&strips[0]);
+    canvas.add(&strips[1]);
+    canvas.add(&strips[2]);
+    canvas.add(&strips[3]);
     int delay = 30;
 
     Font twoP(&canvas, FontTwoPData);

@@ -1,0 +1,7 @@
+12 Gold  0E0C04
+20 Red   100000
+20 Green 001000
+20 Blue  000010
+20 White 101010
+ 8 Gold  0E0C04
+

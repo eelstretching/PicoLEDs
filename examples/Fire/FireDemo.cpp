@@ -17,7 +17,7 @@ int main() {
     Strip strips[] = {Strip(2, 138), Strip(3, 138), Strip(4, 138)};
     int ns = 3;
     for(int i = 0; i < ns; i++) {
-        canvas.add(strips[i]);
+        canvas.add(&strips[i]);
     }
 
     int delay = 30;

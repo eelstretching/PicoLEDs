@@ -93,7 +93,7 @@ int main() {
 
     Canvas c(CANVAS_WIDTH);
     for (int i = 0; i < ns; i++) {
-        c.add(*strips[i]);
+        c.add(strips[i]);
     }
     c.setup();
     c.setColorMap(&dimXmasColors);

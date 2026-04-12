@@ -37,7 +37,7 @@ int main() {
     // zeros on the colors that we're feeding into the LEDS
     Canvas canvas(STRIP_LEN);
     for (int i = 0; i < ns; i++) {
-        canvas.add(*strips[i]);
+        canvas.add(strips[i]);
     }
     canvas.setup();
     ArrayColorMap colorMap({RGB(0b11111111, 0b11111111, 0b11111111),

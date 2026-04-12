@@ -15,7 +15,7 @@
 /// @param s1 The first strip
 /// @param s2 The second strip
 /// @return true if the first strip's pin number is lower than the second's.
-bool pinComparator(Strip s1, Strip s2) { return s1.getPin() < s2.getPin(); }
+bool pinComparator(Strip *s1, Strip *s2) { return s1->getPin() < s2->getPin(); }
 
 /// @brief An alarm function that gets called when the reset delay required at
 /// the end of sending data to a strip has elapsed.
@@ -104,7 +104,7 @@ Renderer::~Renderer() {
     }
 }
 
-void Renderer::add(Strip& strip) { strips.push_back(strip); }
+void Renderer::add(Strip *strip) { strips.push_back(strip); }
 
 void Renderer::setup() {
     if (setupDone) {
@@ -121,14 +121,14 @@ void Renderer::setup() {
     int startPin = -1;
     int pinCount = -1;
     for (int i = 0; i < strips.size(); i++) {
-        Strip s = strips[i];
+        Strip *s = strips[i];
         if (startPin < 0) {
             //
             // Starting a new run.
             startIndex = i;
-            startPin = s.getPin();
+            startPin = s->getPin();
             pinCount = 1;
-        } else if (s.getPin() == startPin + pinCount &&
+        } else if (s->getPin() == startPin + pinCount &&
                    pinCount < NUM_PARALLEL_PINS) {
             //
             // Continuing a run, but no run longer than 8 pins.
@@ -138,7 +138,7 @@ void Renderer::setup() {
             // End of a run, generate a PIO program for this run of pins.
             addPIOProgram(startIndex, startPin, pinCount);
             startIndex = i;
-            startPin = s.getPin();
+            startPin = s->getPin();
             pinCount = 1;
         }
     }
@@ -158,7 +158,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     //
     // Figure out what PIO program we need for this set of pins.
     if (pip->size == 1) {
-        switch (strips[startIndex].getType()) {
+        switch (strips[startIndex]->getType()) {
             case WS2812:
                 pip->pio_program = (pio_program_t*)&ws2812_program;
                 break;
@@ -167,7 +167,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
                 break;
         }
     } else {
-        switch (strips[startIndex].getType()) {
+        switch (strips[startIndex]->getType()) {
             case WS2812:
                 pip->pio_program = (pio_program_t*)&ws2812_parallel_program;
                 break;
@@ -189,7 +189,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     hard_assert(success);
 
     if (pip->size == 1) {
-        switch (strips[startIndex].getType()) {
+        switch (strips[startIndex]->getType()) {
             case WS2812:
                 ws2812_program_init(pip->pio, pip->sm, pip->offset,
                                     pip->startPin, 800000);
@@ -200,7 +200,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
                 break;
         }
     } else {
-        switch (strips[startIndex].getType()) {
+        switch (strips[startIndex]->getType()) {
             case WS2812:
                 ws2812_parallel_program_init(pip->pio, pip->sm, pip->offset,
                                              pip->startPin, pip->size, 800000);
@@ -243,7 +243,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // length one?
     dma_channel_transfer_size tsize;
     if (pip->size == 1) {
-        pip->buffSize = strips[startIndex].getNumPixels();
+        pip->buffSize = strips[startIndex]->getNumPixels();
         pip->buffer = calloc(pip->buffSize, sizeof(uint32_t));
 
         //
@@ -253,7 +253,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
         //
         // Each pixel on the strip uses 24 bits of color, this array will
         // have ones where the strips have that bit of color.
-        pip->buffSize = strips[startIndex].getNumPixels() * 24;
+        pip->buffSize = strips[startIndex]->getNumPixels() * 24;
         pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
 
         //
@@ -323,15 +323,15 @@ void Renderer::render(ColorMap* colorMap) {
             //
             // One strip, just put the data in the buffer according to the
             // color order after scaling by the strip's brightness.
-            Strip s = strips[pip->startIndex];
-            uint8_t* data = s.getData();
+            Strip *s = strips[pip->startIndex];
+            uint8_t* data = s->getData();
             uint32_t* pb = (uint32_t*)pip->buffer;
-            for (int i = 0; i < s.getNumPixels(); i++, pb++, data++) {
+            for (int i = 0; i < s->getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO
                 // program will be pulling 24 bits and it wants those 24
                 // bits in the most significant place.
-                *pb = colorMap->getColor(*data).getColor(s.getColorOrder())
+                *pb = colorMap->getColor(*data).getColor(s->getColorOrder())
                       << 8u;
             }
         } else {
@@ -341,8 +341,8 @@ void Renderer::render(ColorMap* colorMap) {
             // planes.
             for (int i = pip->startIndex, sn = 0;
                  i < pip->startIndex + pip->size; i++, sn++) {
-                Strip s = strips[i];
-                uint8_t* data = s.getData();
+                Strip *s = strips[i];
+                uint8_t* data = s->getData();
                 uint32_t pp = 0;
 
                 //
@@ -351,7 +351,7 @@ void Renderer::render(ColorMap* colorMap) {
                 // just make it now. But remember that we need to start from
                 // 0 for this program!
                 uint8_t stripBit = 1 << (i - pip->startIndex);
-                for (int j = 0; j < s.getNumPixels(); j++, pp += 24, data++) {
+                for (int j = 0; j < s->getNumPixels(); j++, pp += 24, data++) {
                     uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
                     //
                     // Map the color index, then transform for color order.
@@ -359,7 +359,7 @@ void Renderer::render(ColorMap* colorMap) {
                     // array accesses to try to cut down on the time spent
                     // prepping the data.
                     uint32_t val =
-                        colorMap->getColor(*data).getColor(s.getColorOrder());
+                        colorMap->getColor(*data).getColor(s->getColorOrder());
 
                     //
                     // Unrolling the inner loop to save some ops. There's

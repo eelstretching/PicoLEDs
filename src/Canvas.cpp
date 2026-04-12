@@ -108,18 +108,18 @@ ColorMap* Canvas::makeColorMap(uint8_t size) {
     return colorMap;
 }
 
-void Canvas::add(Strip& strip) {
-    uint np = strip.getNumPixels();
+void Canvas::add(Strip *strip) {
+    uint np = strip->getNumPixels();
 
     if (np == width) {
-        rows.push_back(new Row(&strip, 0, width, StripDirection::FORWARDS, this));
+        rows.push_back(new Row(strip, 0, width, StripDirection::FORWARDS, this));
         renderer.add(strip);
         return;
     }
 
     if (np < width) {
         printf("Strip added with %d pixels, but width is %d", np, width);
-        rows.push_back(new Row(&strip, 0, np, StripDirection::FORWARDS, this));
+        rows.push_back(new Row(strip, 0, np, StripDirection::FORWARDS, this));
         renderer.add(strip);
         return;
     }
@@ -136,7 +136,7 @@ void Canvas::add(Strip& strip) {
     int start = 0;
     StripDirection dir = StripDirection::FORWARDS;
     while (np > 0) {
-        rows.push_back(new Row(&strip, start, width, dir, this));
+        rows.push_back(new Row(strip, start, width, dir, this));
         start += width;
         np -= width;
         if (dir == StripDirection::FORWARDS) {

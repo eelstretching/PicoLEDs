@@ -113,11 +113,13 @@ class Canvas {
 
     ColorMap* getColorMap() { return colorMap; };
 
+    Renderer* getRenderer() { return &renderer; };
+
     ColorMap* makeColorMap(uint8_t size);
 
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
-    void add(Strip& strip);
+    void add(Strip *strip);
 
     /// @brief Set up the canvas for operations.
     void setup() { renderer.setup(); };

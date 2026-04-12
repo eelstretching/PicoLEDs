@@ -65,6 +65,7 @@ class Animator {
     float getAverageStepTimeUS() { return stepWatch.getAverageTime(); }
     float getAverageFrameTimeUS() { return frameWatch.getAverageTime(); }
     float getAverageShowTimeUS() { return showWatch.getAverageTime(); }
+    float getAverageDataPrepTimeUS() {return canvas->getRenderer()->getAverageDataSetupTime();}
 
     uint getFrameCount() { return frameCount; };
 

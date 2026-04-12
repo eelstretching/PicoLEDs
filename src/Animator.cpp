@@ -30,10 +30,13 @@ void Animator::init() {
 void Animator::printStats() {
     uint64_t runTime = time_us_64() - startTime;
     printf(
-        "%d frames run, running %.1fs %.2f us/frame at %d fps %.2f us/step, %.2f "
+        "%d frames run, running %.1fs %.2f us/frame at %d fps %.2f us/step, %.2f us/dst %.2f "
         "us/show %.2f us/frame %d missed frames\n",
-        getFrameCount(), runTime / 1000000.0, getUsPerFrame(), getFPS(),
-        getAverageStepTimeUS(), getAverageShowTimeUS(), getAverageFrameTimeUS(),
+        getFrameCount(), runTime / 1000000.0, 
+        getUsPerFrame(), getFPS(),
+        getAverageStepTimeUS(), 
+        getAverageDataPrepTimeUS(),
+        getAverageShowTimeUS(), getAverageFrameTimeUS(),
         getMissedFrames());
 }
 
@@ -54,8 +57,8 @@ bool Animator::step() {
         changed = true;
     }
     stepWatch.finish();
+    // canvas->clearColumn(0);
     showWatch.start();
-    canvas->clearColumn(0);
     canvas->show();
     showWatch.finish();
     frameWatch.finish();

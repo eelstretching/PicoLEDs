@@ -27,7 +27,7 @@ int main() {
     Strip strip(START_PIN, STRIP_LEN);
     strip.setColorOrder(ColorOrder::ORGB);
     Renderer renderer;
-    renderer.add(strip);
+    renderer.add(&strip);
     renderer.setup();
 
     ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
