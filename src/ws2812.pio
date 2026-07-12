@@ -5,24 +5,17 @@
 ;
 
 .program ws2812
-.side_set 1
 
 .define public T1 3
 .define public T2 3
 .define public T3 4
-
-.lang_opt python sideset_init = pico.PIO.OUT_HIGH
-.lang_opt python out_init     = pico.PIO.OUT_HIGH
-.lang_opt python out_shiftdir = 1
+.define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
 
 .wrap_target
-bitloop:
-    out x, 1       side 0 [T3 - 1] ; Side-set still takes place when instruction stalls
-    jmp !x do_zero side 1 [T1 - 1] ; Branch on the bit we shifted out. Positive pulse
-do_one:
-    jmp  bitloop   side 1 [T2 - 1] ; Continue driving high, for a long pulse
-do_zero:
-    nop            side 0 [T2 - 1] ; Or drive low, for a short pulse
+    out x, 1             ; Read the next bit
+    mov pins, !null [T1 - 1] ; Drive high for T1 cycles
+    mov pins, x     [T2 - 1] ; Drive the bit we shifted out for T2 cycles
+    mov pins, null  [T3 - 2] ; Drive low for T3 cycles, account for the instruction at the top of the loop
 .wrap
 
 % c-sdk {
@@ -34,13 +27,19 @@ static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, 
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
 
     pio_sm_config c = ws2812_program_get_default_config(offset);
-    sm_config_set_sideset_pins(&c, pin);
+    sm_config_set_out_pins(&c, pin, 1);
     sm_config_set_out_shift(&c, false, true, 24);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     int cycles_per_bit = ws2812_T1 + ws2812_T2 + ws2812_T3;
     float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
     sm_config_set_clkdiv(&c, div);
+
+    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_CYCLES_FOR_1_BIT, div);
+    float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
+    printf("state machine cycle is: %.1fns\n", cycle_time);
+    printf("T1: %d %.1f T2: %d %.1f T3: %d %.1f\n", ws2812_T1, ws2812_T1 * cycle_time, 
+    ws2812_T2, ws2812_T2 * cycle_time, ws2812_T3, ws2812_T3 * cycle_time);
 
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
@@ -94,24 +93,26 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
 }
 %}
 
-.program ws2812_ada
+.program ws2812_parallel_fastled
 
-.define public T1 2
-.define public T2 2
-.define public T3 4
-.define public CYCLES_FOR_1_BIT (T1 + T2 + T3 + 1)
+; 2812 and 2812B require 400ns of high, 400ns of data, and 450ns of low.
+; This is an 8/8/9 ratio, so 8 cycles of high, 8 cycles of data, and 9 cycles of low.
+.define public T1 12
+.define public T2 32
+.define public T3 19
+.define public CYCLES_FOR_1_BIT (T1 + T2 + T3)
 
 .wrap_target
-mov  pins, null  [T1-1]  ; Write  parallel '0' bits, delay 1
-pull block               ; Wait on next byte from TX FIFO to OSR
-mov  pins, !null [T2-1]  ; Write 8 parallel '1' bits, delay 1
-mov  pins, osr   [T3-1]  ; Write 8 parallel data bits, delay 3
-.wrap 
+out x, 8               ; Read 8 bits from the OSR into X, autopulling from the TX FIFO, blocking until data is ready.
+mov pins, !null [T1-1] ; Write 1 for 8 cycles 
+mov pins, x     [T2-1] ; Write the data bits to the pins, autopulls data from TX FIFO.
+mov pins, null  [T3-2] ; Write 0 bits to all pins, account for the instruction at the top of the loop
+.wrap
 
 % c-sdk {
 #include "hardware/clocks.h"
 
-static inline void ws2812_ada_program_init(PIO pio, uint sm, uint offset, 
+static inline void ws2812_fastled_program_init(PIO pio, uint sm, uint offset, 
                                                 uint pin_base, 
                                                 uint pin_count, float freq) {
     for(uint i=pin_base; i< pin_base+pin_count; i++) {
@@ -120,22 +121,23 @@ static inline void ws2812_ada_program_init(PIO pio, uint sm, uint offset,
     }
     pio_sm_set_consecutive_pindirs(pio, sm, pin_base, pin_count, true);
 
-    pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
+    pio_sm_config c = ws2812_parallel_fastled_program_get_default_config(offset);
     sm_config_set_out_shift(&c, true, false, 32);
     sm_config_set_out_pins(&c, pin_base, pin_count);
     sm_config_set_in_shift(&c, true, false, 32);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
-    float div = clock_get_hz(clk_sys) / (freq * ws2812_ada_CYCLES_FOR_1_BIT);
+    float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_fastled_CYCLES_FOR_1_BIT);
     sm_config_set_clkdiv(&c, div);
-    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_ada_CYCLES_FOR_1_BIT, div);
+    printf("clock: %d cycles: %d div: %f\n", clock_get_hz(clk_sys), ws2812_parallel_fastled_CYCLES_FOR_1_BIT, div);
     float cycle_time = 1000000000.0 / (clock_get_hz(clk_sys) / div);
     printf("state machine cycle is: %.1fns\n", cycle_time);
-    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2812_ada_T1 * cycle_time, ws2812_ada_T2 * cycle_time, ws2812_parallel_T3 * cycle_time);
+    printf("T1: %.1f T2: %.1f T3: %.1f\n", ws2812_parallel_fastled_T1 * cycle_time, ws2812_parallel_fastled_T2 * cycle_time, ws2812_parallel_fastled_T3 * cycle_time);
     
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
 }
-
 %}
+
+
 
