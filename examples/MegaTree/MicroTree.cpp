@@ -117,7 +117,14 @@ int main() {
     fancyMarq.setName("FMarq");
     fancyMarq.setFPS(40);
 
-    animator.add(&fancyMarq);
+    animator.addTimed(&fancyMarq, 30000);
+
+    ArrayColorMap icicleMap(8);
+    Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(0, 128, 0));
+    icicles.setName("Icicles");
+    animator.addTimed(&icicles, 40000);
+
+
 
     animator.init();
 

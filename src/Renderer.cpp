@@ -20,7 +20,7 @@ bool pinComparator(Strip *s1, Strip *s2) { return s1->getPin() < s2->getPin(); }
 /// @brief An alarm function that gets called when the reset delay required at
 /// the end of sending data to a strip has elapsed.
 /// @param id The alarm that went off
-/// @param user_data A pointer to a StripDelay that we can use to release the
+/// @param data A pointer to a StripDelay that we can use to release the
 /// semaphore associated with this channel, which will allow us to send data on
 /// it again.
 /// @return 0, as we do not wish the alarm to repeat.
