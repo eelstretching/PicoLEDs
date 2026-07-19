@@ -10,8 +10,8 @@
 
 static const char *power[]={
 "8 8 2 1",
+". c B",
 "# c #ffb8ae",
-". c #000000",
 "..####..",
 ".######.",
 "########",
@@ -23,7 +23,7 @@ static const char *power[]={
 
 static const char *pilled1[]={
 "14 14 3 1",
-". c #000000",
+". c B",
 "# c #2121ff",
 "a c #ffb8ae",
 ".....####.....",
@@ -43,7 +43,7 @@ static const char *pilled1[]={
 
 static const char *pilled2[]={
 "14 14 3 1",
-". c #000000",
+". c B",
 "# c #2121ff",
 "a c #ffb8ae",
 ".....####.....",

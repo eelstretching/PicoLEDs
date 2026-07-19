@@ -35,6 +35,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
+#include <PacChase.h>
 
 #define NUM_STRIPS 10
 #define START_PIN 2
@@ -112,8 +113,14 @@ int main() {
     Xpm *ghostFrames[2];
     ghostFrames[0] = new Xpm(ghost1);
     ghostFrames[1] = new Xpm(ghost2);
-    Ghost ghost(&canvas, ghostFrames, inkyColor, pupilColor, 0, 1, Direction::RIGHT);
+    Ghost ghost(&canvas, ghostFrames, inkyColor, pupilColor, -ghostFrames[0]->getWidth()+1, 2, Direction::RIGHT);
     animator.add(&ghost);
+
+    PacMan pacMan(&canvas, -pacMan.getXpms()[0]->getWidth()+1, 2);
+    animator.add(&pacMan);
+
+    PacChase pacChase(&canvas);
+    animator.add(&pacChase);
 
     animator.init();
 

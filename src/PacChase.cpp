@@ -4,7 +4,7 @@
 #include "PacMan.h"
 #include "math8.h"
 
-#define PILL_POSITION 61
+#define PILL_POSITION 40
 
 PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
     //

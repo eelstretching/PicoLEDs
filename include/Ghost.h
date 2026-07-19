@@ -69,7 +69,6 @@ class Ghost : public Sprite {
    public:
     Ghost(Canvas *canvas, Xpm **frames, const RGB& ghostColor, const RGB& pupilColor, int startX, int startY, Direction dir);
     ~Ghost();
-    void init() override;
     bool step();
 };
 

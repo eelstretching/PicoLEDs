@@ -69,7 +69,3 @@ bool Ghost::step() {
     return ret;
 }
 
-void Ghost::init() {
-    x = startX;
-    y = startY;
-}
