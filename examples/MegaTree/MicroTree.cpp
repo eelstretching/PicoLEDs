@@ -76,23 +76,6 @@ int main() {
         RGB::FairyLightNCC,
     });
 
-    ArrayColorMap dimXmasColors(xmasColors);
-    dimXmasColors.setBrightness(16);
-
-    ArrayColorMap midXmasColors(xmasColors);
-    midXmasColors.setBrightness(64);
-
-    ArrayColorMap brightXmasColors(xmasColors);
-    brightXmasColors.setBrightness(128);
-
-    ArrayColorMap xmasTreeColors(xmasColors);
-    xmasTreeColors.setBackground(RGB::ForestGreen);
-    xmasTreeColors.setBrightness(16);
-
-    ArrayColorMap spiralColors(xmasColors);
-    spiralColors.setBackground(RGB::ForestGreen);
-    spiralColors.setBrightness(16);
-
     uint8_t rColors[] = {0};
     uint8_t gColors[] = {1};
     uint8_t rgColors[] = {0, 1};
@@ -102,6 +85,7 @@ int main() {
     uint8_t rgbwgColors[] = {0, 1, 2, 3, 4};
 
     Canvas canvas(CANVAS_WIDTH);
+    canvas.setBrightness(BRIGHTNESS);
     for (int i = 0; i < ns; i++) {
         canvas.add(strips[i]);
     }
@@ -111,19 +95,17 @@ int main() {
 
     Animator animator(&canvas, FPS);
 
-    Marquees fancyMarq(&canvas, &dimXmasColors, 5, rgbwgColors, 20, RIGHT,
+    Marquees fancyMarq(&canvas, &xmasColors, 5, rgbwgColors, 20, RIGHT,
                        canvas.getHeight());
     fancyMarq.setName("FMarq");
     fancyMarq.setFPS(40);
 
-    animator.addTimed(&fancyMarq, 30000);
+    animator.addTimed(&fancyMarq, 10000);
 
     ArrayColorMap icicleMap(8);
-    Icicles icicles(&canvas, &icicleMap, 10, 6, RGB(0, 128, 0));
+    Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
     icicles.setName("Icicles");
-    animator.addTimed(&icicles, 40000);
-
-
+    animator.addTimed(&icicles, 10000);
 
     animator.init();
 

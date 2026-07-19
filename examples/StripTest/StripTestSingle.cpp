@@ -29,15 +29,17 @@ int main() {
     renderer.add(&strip);
     renderer.setup();
 
-    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green, RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White, RGB::Gold});
-    for(int i = 0; i < colorMap.getUsed(); i++) {
+    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
+                            RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White,
+                            RGB::Gold});
+    for (int i = 0; i < colorMap.getUsed(); i++) {
         printf("Filling with color %d\n", i);
         strip.fill(colorMap.getColor(i));
         renderer.render();
         sleep_ms(500);
     }
 
-    strip.fill(colorMap.getBackground()); 
+    strip.fill(colorMap.getBackground());
     renderer.render();
     sleep_ms(100);
 
@@ -46,9 +48,9 @@ int main() {
     printf("Filling with color bands on %d pixels\n", strip.getNumPixels());
     RGB cc = colorMap.getColor(0);
     int colorIndex = 0;
-    for(int i = 0; i < strip.getNumPixels(); i++) {
+    for (int i = 0; i < strip.getNumPixels(); i++) {
         strip.putPixel(cc, i);
-        if((i+1) % WIDTH == 0) {
+        if ((i + 1) % WIDTH == 0) {
             colorIndex = (colorIndex + 1) % colorMap.getUsed();
             cc = colorMap.getColor(colorIndex);
         }
@@ -77,9 +79,12 @@ int main() {
         }
 
         if (frameWatch.count % 200 == 0) {
-            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps lus: %llu",
+            printf(
+                "%d frames, %.2f us/frame, %.2f us frame time  %.1f fps lus: "
+                "%llu",
 
-                   frameWatch.count, usPerFrame, frameWatch.getAverageTime(), fps, (unsigned long long)lus);
+                frameWatch.count, usPerFrame, frameWatch.getAverageTime(), fps,
+                (unsigned long long)lus);
 
             printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",

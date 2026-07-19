@@ -9,7 +9,7 @@
 class Marquee : Animation {
    private:
     int nColors;
-    uint8_t *colors;
+    RGB *colors;
     Direction direction;
     int width;
     int pos;
@@ -21,10 +21,15 @@ class Marquee : Animation {
             int width, Direction direction, int pos, int coord)
         : Animation(canvas, colorMap),
           nColors(nColors),
-          colors(colors), width(width),
+          width(width),
           direction(direction),
           pos(pos),
-          coord(coord) {}
+          coord(coord) {
+            this->colors = new RGB[nColors];
+            for (int i = 0; i < nColors; i++) {
+                this->colors[i] = colorMap->getColor(colors[i]);
+            }
+          }
 
     bool step() override;
 };

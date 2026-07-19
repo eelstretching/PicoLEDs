@@ -131,6 +131,10 @@ class Canvas {
 
     Row* getRow(int y) { return rows[y]; }
 
+    void setBrightness(uint8_t brightness) { renderer.setBrightness(brightness); };
+    
+    uint8_t getBrightness() { return renderer.getBrightness(); };
+
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel
     /// @param y the y co-ordinate of the pixel

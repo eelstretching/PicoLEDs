@@ -13,7 +13,7 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 200
-#define NUM_STRIPS 4
+#define NUM_STRIPS 10
 #define START_PIN 2
 #define WIDTH 10
 
@@ -23,7 +23,7 @@ int main() {
     //
     // Simple test for a few strips of pixels.
     Strip* strips[NUM_STRIPS];
-    Renderer renderer;
+    Renderer renderer(16);
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
@@ -33,18 +33,18 @@ int main() {
     renderer.setup();
 
     ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
-                       RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White});
-    colorMap.setBrightness(64);
+                            RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White,
+                            RGB::Gold});
 
     for (int c = 0; c < colorMap.getUsed(); c++) {
         for (int i = 0; i < ns; i++) {
-            strips[i]->fill(c);
+            strips[i]->fill(colorMap.getColor(c));
         }
         renderer.render();
         sleep_ms(250);
     }
     for (int i = 0; i < ns; i++) {
-        strips[i]->fill(colorMap.getBackgroundIndex());
+        strips[i]->fill(colorMap.getBackground());
     }
     renderer.render();
     sleep_ms(100);
@@ -55,9 +55,8 @@ int main() {
         Strip& strip = *strips[s];
         uint8_t cc = 0;
         for (int i = 0; i < strip.getNumPixels(); i++) {
-            strip.putPixel(cc, i);
+            strip.putPixel(colorMap.getColor(cc), i);
             if ((i + 1) % WIDTH == 0) {
-                printf("Color change at pixel %d\n", i);
                 cc = (cc + 1) % colorMap.getUsed();
             }
         }
@@ -65,7 +64,7 @@ int main() {
     renderer.render();
     sleep_ms(1000);
 
-    float fps = 40;
+    float fps = 30;
     float usPerFrame = 1e6 / fps;
     StopWatch frameWatch;
     uint32_t missedFrames = 0;

@@ -63,16 +63,16 @@ bool Drip::step() {
             // Draw the drip with the brightest color.
             switch (direction) {
                 case LEFT:
-                    canvas->set(dp, pos, 0);
+                    canvas->set(dp, pos, colorMap->getColor(0));
                     break;
                 case RIGHT:
-                    canvas->set(dp, pos, 0);
+                    canvas->set(dp, pos, colorMap->getColor(0));
                     break;
                 case UP:
-                    canvas->set(pos, dp, 0);
+                    canvas->set(pos, dp, colorMap->getColor(0));
                     break;
                 case DOWN:
-                    canvas->set(pos, dp, 0);
+                    canvas->set(pos, dp, colorMap->getColor(0));
                     break;
             }
             break;
@@ -90,9 +90,9 @@ bool Drip::step() {
                         init();
                         return true;
                     }
-                    canvas->set(dp, pos, 0);
+                    canvas->set(dp, pos, colorMap->getColor(0));
                     for (int i = 0; i < tailLen; i++) {
-                        canvas->set(dp + i + 1, pos, i + 1);
+                        canvas->set(dp + i + 1, pos, colorMap->getColor(i + 1));
                     }
                     break;
                 case RIGHT:
@@ -101,9 +101,9 @@ bool Drip::step() {
                         init();
                         return true;
                     }
-                    canvas->set(dp, pos, 0);
+                    canvas->set(dp, pos, colorMap->getColor(0));
                     for (int i = 0; i < tailLen; i++) {
-                        canvas->set(dp - i + 1, pos, i + 1);
+                        canvas->set(dp - i + 1, pos, colorMap->getColor(i + 1));
                     }
                     break;
                 case UP:
@@ -112,9 +112,9 @@ bool Drip::step() {
                         init();
                         return true;
                     }
-                    canvas->set(pos, dp, 0);
+                    canvas->set(pos, dp, colorMap->getColor(0));
                     for (int i = 0; i < tailLen; i++) {
-                        canvas->set(pos, dp - i + 1, i + 1);
+                        canvas->set(pos, dp - i + 1, colorMap->getColor(i + 1));
                     }
                     break;
                 case DOWN:
@@ -123,9 +123,9 @@ bool Drip::step() {
                         init();
                         return true;
                     }
-                    canvas->set(pos, dp, 0);
+                    canvas->set(pos, dp, colorMap->getColor(0));
                     for (int i = 0; i < tailLen; i++) {
-                        canvas->set(pos, dp + i + 1, i + 1);
+                        canvas->set(pos, dp + i + 1, colorMap->getColor(i + 1)) ;
                     }
                     break;
             }
@@ -160,14 +160,6 @@ Icicle::Icicle(Canvas* canvas, ColorMap* colorMap, uint pos, uint length,
       length(length),
       direction(direction) {
     drip = new Drip(canvas, colorMap, pos, length, 5, direction);
-    //
-    // Create a color map that goes from the brightest color to the dimmest.
-    colorMap->addColor(color);
-    //
-    // Ripping off fadeToBlack from FastLED, but for colors.
-    for (int i = 0; i < colorMap->getSize(); i++) {
-        colorMap->addColor(color.nscale8(128));
-    }
 }
 
 void Icicle::setPos(uint pos) {
@@ -187,16 +179,16 @@ bool Icicle::step() {
     for (uint i = 0; i < length; i++) {
         switch (direction) {
             case LEFT:
-                canvas->set(canvas->getWidth() - i, pos, 2);
+                canvas->set(canvas->getWidth() - i, pos, colorMap->getColor(2));
                 break;
             case RIGHT:
-                canvas->set(0 + i, pos, 2);
+                canvas->set(0 + i, pos, colorMap->getColor(2));
                 break;
             case UP:
-                canvas->set(pos + i, 0, 2);
+                canvas->set(pos + i, 0, colorMap->getColor(2));
                 break;
             case DOWN:
-                canvas->set(pos, canvas->getHeight() - i, 2);
+                canvas->set(pos, canvas->getHeight() - i, colorMap->getColor(2));
                 break;
         }
     }
@@ -208,13 +200,26 @@ Icicles::Icicles(Canvas* canvas, ColorMap* colorMap, uint numIcicles,
     : Animation(canvas, colorMap), numIcicles(numIcicles) {
     icicles = new Icicle*[numIcicles];
 
+    //
+    // Create a color map that goes from the brightest color to the dimmest.
+    this->colorMap->addColor(color);
+
+    //
+    // Ripping off fadeToBlack from FastLED, but for colors.
+    char colorStr[100];
+    for (int i = 0; i < this->colorMap->getSize(); i++) {
+        this->colorMap->addColor(color.nscale8(128));
+    }
+
     for (uint i = 0; i < numIcicles; i++) {
-        icicles[i] = new Icicle(canvas, colorMap, 0, length + random16(0, 6),
+        icicles[i] = new Icicle(canvas, this->colorMap, 0, length + random16(0, 6),
                                 LEFT, color);
     }
 }
 
 void Icicles::init() {
+    //
+    // We're going to handle the brightness around here.
     for (int i = 0; i < numIcicles; i++) {
         icicles[i]->setPos(canvas->getHeight() + 1);
     }
