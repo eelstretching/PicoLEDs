@@ -127,8 +127,6 @@ class Canvas {
 
     const RGB& getBackground() { return background; };
 
-    inline uint8_t getBackgroundIndex() { return 255; };
-
     Row* getRow(int y) { return rows[y]; }
 
     void setBrightness(uint8_t brightness) { renderer.setBrightness(brightness); };

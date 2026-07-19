@@ -5,20 +5,21 @@
 
 #include "Sprite.h"
 
-/// @brief Comment
+/// @brief Ghost colors
 static RGB inkyColor = RGB(0, 255, 255);
 static RGB blinkyColor = RGB(255, 0, 0);
 static RGB pinkyColor = RGB(255, 184, 255);
 static RGB clydeColor = RGB(255, 184, 81);
 static RGB pupilColor = RGB(33, 33, 255);
 
+
 //
 // These ghosts have no blue part in their eyes because we'll render that according to their direction
 static const char *ghost1[]={
 "14 14 3 1",
-". c 255",
-"a c 0",
-"# c 1",
+". c B",
+"a c #dedeff",
+"# c #ff0000",
 ".....####.....",
 "...########...",
 "..##########..",
@@ -36,9 +37,9 @@ static const char *ghost1[]={
 
 static const char *ghost2[]={
 "14 14 3 1",
-". c 255",
-"a c 0",
-"# c 1",
+". c B",
+"a c #dedeff",
+"# c #ff0000",
 ".....####.....",
 "...########...",
 "..##########..",
@@ -60,13 +61,15 @@ class Ghost : public Sprite {
 
     //
     // Map for our ghost's colors.
-    uint8_t cmap[3];
+    RGB ghostColor;
+    RGB pupilColor;
     Xpm **frames;
     void drawPupils();
 
    public:
-    Ghost(Canvas *canvas, Xpm **frames, uint8_t ghostColorIndex, uint8_t pupilColorIndex, int startX, int startY);
+    Ghost(Canvas *canvas, Xpm **frames, const RGB& ghostColor, const RGB& pupilColor, int startX, int startY, Direction dir);
     ~Ghost();
+    void init() override;
     bool step();
 };
 

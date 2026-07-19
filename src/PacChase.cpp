@@ -11,20 +11,18 @@ PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
     // Make a color map for this animation.
     ghostFrames[0] = new Xpm(ghost1);
     ghostFrames[1] = new Xpm(ghost2);
-    uint8_t pupilColorIndex = colorMap->addColor(pupilColor);
-    uint8_t pacColorIndex = colorMap->addColor(pacColor);
-    pacMan = new PacMan(canvas, pacColorIndex, 0, 1);
+    pacMan = new PacMan(canvas, 0, 1);
     ghosts = new Sprite *[4];
-    ghosts[0] = new Ghost(canvas, ghostFrames, colorMap->addColor(inkyColor), pupilColorIndex, 0, 1);
-    ghosts[1] = new Ghost(canvas, ghostFrames, colorMap->addColor(blinkyColor), pupilColorIndex, 0, 1);
-    ghosts[2] = new Ghost(canvas, ghostFrames, colorMap->addColor(pinkyColor), pupilColorIndex, 0, 1);
-    ghosts[3] = new Ghost(canvas, ghostFrames, colorMap->addColor(clydeColor), pupilColorIndex, 0, 1);
+    ghosts[0] = new Ghost(canvas, ghostFrames, inkyColor, pupilColor, 0, 1, Direction::RIGHT);
+    ghosts[1] = new Ghost(canvas, ghostFrames, blinkyColor, pupilColor, 0, 1, Direction::RIGHT);
+    ghosts[2] = new Ghost(canvas, ghostFrames, pinkyColor, pupilColor, 0, 1, Direction::RIGHT);
+    ghosts[3] = new Ghost(canvas, ghostFrames, clydeColor, pupilColor, 0, 1, Direction::RIGHT);
     setup();
 }
 
 /// @brief A constructor that lets us borrow the bitmaps from a pac-man wipe.
 /// @param wipe The wipe we'll borrow from.
-PacChase::PacChase(PacWipe *wipe, ColorMap *colorMap) : Animation(wipe->canvas, colorMap) {
+PacChase::PacChase(PacWipe *wipe) : Animation(wipe->canvas, nullptr) {
     canvas = wipe->canvas;
     pacMan = wipe->sprites[0];
     ghosts = &(wipe->sprites[1]);
@@ -35,7 +33,7 @@ void PacChase::setup() {
     pmw = pacMan->getWidth();
     ghw = ghosts[0]->getWidth();
     pilled = new Sprite *[2];
-    pilled[0] = new Sprite(canvas, colorMap, 0, 0);
+    pilled[0] = new Sprite(canvas, 0, 0, 0, 0);
     Xpm *pil1 = new Xpm(pilled1);
     pilled[0]->add(pil1);
     pilled[0]->add(pil1);
@@ -53,10 +51,10 @@ void PacChase::setup() {
 }
 
 void PacChase::drawDot(int i) {
-    canvas->set(i, 7, dotColorIndex);
-    canvas->set(i + 1, 7, dotColorIndex);
-    canvas->set(i, 8, dotColorIndex);
-    canvas->set(i + 1, 8, dotColorIndex);
+    canvas->set(i, 7, dotColor);
+    canvas->set(i + 1, 7, dotColor);
+    canvas->set(i, 8, dotColor);
+    canvas->set(i + 1, 8, dotColor);
 }
 
 void PacChase::init() {
@@ -81,13 +79,13 @@ void PacChase::init() {
     // Set up for initial animation.
     state = PLAIN;
     pacMan->setStartPosition(-pmw, 1);
-    pacMan->setDirection(RIGHT);
+    pacMan->setDirection(Direction::RIGHT);
     pacMan->init();
     g1->setStartPosition(canvas->getWidth(), 1);
-    g1->setDirection(LEFT);
+    g1->setDirection(Direction::LEFT);
     g1->init();
     g2->setStartPosition(canvas->getWidth() + 6 + ghw, 1);
-    g2->setDirection(LEFT);
+    g2->setDirection(Direction::LEFT);
     g2->init();
 
     for (int i = 0; i < canvas->getWidth(); i += 8) {
@@ -105,9 +103,9 @@ bool PacChase::step() {
         if (pacMan->getX() + pmw >= PILL_POSITION) {
             state = POWER_PILL;
             pilled[0]->setStartPosition(g1->getX(), g1->getY());
-            pilled[0]->setDirection(RIGHT);
+            pilled[0]->setDirection(Direction::RIGHT);
             pilled[1]->setStartPosition(g2->getX(), g2->getY());
-            pilled[1]->setDirection(RIGHT);
+            pilled[1]->setDirection(Direction::RIGHT);
             g1 = pilled[0];
             g2 = pilled[1];
             g1->init();

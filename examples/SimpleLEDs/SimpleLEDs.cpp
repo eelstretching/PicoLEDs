@@ -40,7 +40,7 @@ int main() {
 
     while (1) {
         // printf("Prev %d,%d\n", x, y);
-        canvas.set(x, y, canvas.getBackgroundIndex());
+        canvas.set(x, y, canvas.getBackground());
         if(up) {
             y++;
             if(y == canvas.getHeight()-1) {
@@ -66,7 +66,7 @@ int main() {
         }
 
         printf("Curr %d,%d\n", x, y);
-        canvas.set(x, y, 4);
+        canvas.set(x, y, colorMap.getColor(4));
         canvas.show();
 
         sleep_ms(200);

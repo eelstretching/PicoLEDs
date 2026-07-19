@@ -39,7 +39,7 @@ class FillLine : public Animation {
    protected:
     /// @brief Draws the line as a row or columnat the given position.
     /// @param pos the position to draw at.
-    void draw(uint16_t pos, uint8_t colorIndex);
+    void draw(uint16_t pos, const RGB& color);
 };
 
 #endif

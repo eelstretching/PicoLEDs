@@ -19,16 +19,16 @@ class Bouncer : public Animation {
 
     bool right;
 
-    uint8_t color;
+    RGB color;
 
    public:
     /// @brief Creates a bouncer at the given coordinates
     /// @param canvas The canvas we'll draw on.
     /// @param x the initial x position of the bouncer
     /// @param y the initial y position of the bouncer
-    Bouncer(Canvas* canvas, ColorMap* colorMap, uint8_t color, int x, int y);
+    Bouncer(Canvas* canvas, ColorMap* colorMap, RGB color, int x, int y);
 
-    Bouncer(Canvas* canvas, ColorMap* colorMap, uint8_t color, int x, int y,
+    Bouncer(Canvas* canvas, ColorMap* colorMap, RGB color, int x, int y,
             int maxX, int maxY);
     bool step();
 };

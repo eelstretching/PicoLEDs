@@ -22,7 +22,7 @@ void Ornament::init() {
 }
 
 bool Ornament::step() {
-    orn->render(canvas, cmap, x, y);
+    orn->render(canvas, nullptr, x, y);
     return true;
 }
 

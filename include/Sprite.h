@@ -19,23 +19,70 @@ class Sprite : public Animation {
 
     int x;
     int y;
-    Direction direction;
+
+    int deltaX;
+    int deltaY;
+
+    //
+    // A local color map we might want for rendering variants of the same pixmap.
+    RGB *myColors = nullptr;
 
    public:
-    Sprite(Canvas *canvas, ColorMap *colorMap, int startX, int startY)
-        : Animation(canvas, colorMap), startX(startX), startY(startY){};
+    Sprite(Canvas *canvas, int startX, int startY, Direction dir) : Animation(canvas, nullptr), startX(startX), startY(startY), deltaX(0), deltaY(0) {
+        switch(dir) {
+            case Direction::UP:
+                deltaY = 1;
+                break;
+            case Direction::DOWN:
+                deltaY = -1;
+                break;
+            case Direction::LEFT:
+                deltaX = -1;
+                break;
+            case Direction::RIGHT:
+                deltaX = 1;
+                break;
+        }
+    };
+
+    Sprite(Canvas *canvas, int startX, int startY, int deltaX, int deltaY)
+        : Animation(canvas, nullptr), startX(startX), startY(startY), deltaX(deltaX), deltaY(deltaY) {};
     void add(Xpm *frame);
     Sprite(Sprite &o);
     std::vector<Xpm *> &getFrames() { return frames; };
-    void setDirection(Direction direction) {
-        this->direction = direction;
-    };
-    Direction getDirection() {return direction;};
     
     void setStartPosition(int startX, int startY) {
         this->startX = startX;
         this->startY = startY;
     }
+
+    void setDirection(int deltaX, int deltaY) {
+        this->deltaX = deltaX;
+        this->deltaY = deltaY;
+    }
+
+    int getDeltaX() { return deltaX; };
+    int getDeltaY() { return deltaY; };
+
+    void setDirection(Direction dir) {
+        deltaX = 0;
+        deltaY = 0;
+        switch(dir) {
+            case Direction::UP:
+                deltaY = 1;
+                break;
+            case Direction::DOWN:
+                deltaY = -1;
+                break;
+            case Direction::LEFT:
+                deltaX = -1;
+                break;
+            case Direction::RIGHT:
+                deltaX = 1;
+                break;
+        }
+    }
+
     uint getWidth();
     uint getHeight();
 

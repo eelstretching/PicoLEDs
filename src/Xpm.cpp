@@ -18,13 +18,6 @@ uint8_t hextoi(char c) {
 }
 uint8_t hextoi(char c1, char c2) { return hextoi(c1) << 4 | hextoi(c2); }
 
-uint8_t remap(uint8_t* remap, uint8_t o) {
-    if (remap == nullptr || o == 255) {
-        return o;
-    }
-    return remap[o];
-}
-
 Xpm::Xpm(const char* xpm[]) {
     char holder[3];
 
@@ -58,11 +51,21 @@ Xpm::Xpm(const char* xpm[]) {
     //
     // Colors.
     char* cc = new char[nc];
-    colorIndexes = new uint8_t[nc];
+    colors = new RGB[nc];
     for (int i = 0; i < nc; i++) {
         const char* row = xpm[i + 1];
         cc[i] = row[0];
-        colorIndexes[i] = atoi(&row[3]);
+        if (row[4] == 'B') {
+            //
+            // A color that's just a capital B means this character is used for the background.
+            // We'll render with the background color when rendering.
+            backgroundColorIndex = i;
+            colors[i] = RGB(0, 0, 0);  // We need something here, but we'll
+                                       // replace it when we render.
+        } else {
+            colors[i] = RGB(hextoi(row[5], row[6]), hextoi(row[7], row[8]),
+                            hextoi(row[9], row[10]));
+        }
     }
 
     //
@@ -79,7 +82,7 @@ Xpm::Xpm(const char* xpm[]) {
             char pc = row[j];
             for (int k = 0; k < nc; k++) {
                 if (cc[k] == pc) {
-                    pixels[p++] = colorIndexes[k];
+                    pixels[p++] = k;
                     break;
                 }
             }
@@ -89,25 +92,23 @@ Xpm::Xpm(const char* xpm[]) {
 }
 
 Xpm::Xpm(const Xpm& other) : nc(other.nc), h(other.h), w(other.w) {
-    pixels = new uint8_t[w * h];
-    memcpy(pixels, other.pixels, w * h * sizeof(uint8_t));
-    colorIndexes = new uint8_t[nc];
-    memcpy(colorIndexes, other.colorIndexes, nc * sizeof(uint8_t));
+    pixels = new uint8_t[w*h];
+    memcpy(pixels, other.pixels, w*h*sizeof(uint8_t));
+    colors = new RGB[nc];
+    memcpy(colors, other.colors, nc*sizeof(RGB));
 }
 
-void Xpm::replaceColor(uint8_t oldColor, uint8_t newColor) {
-    for (int i = 0; i < w * h; i++) {
-        if (pixels[i] == oldColor) {
-            pixels[i] = newColor;
-        }
+bool Xpm::render(Canvas *canvas, uint x, uint y) {
+    return render(canvas, colors, x, y);
+}
+
+bool Xpm::render(Canvas *canvas, RGB *altColors, uint x, uint y) {
+    //
+    // Maybe we didn't get a color map, in which case, use the colors defined in
+    // the pixmap.
+    if (altColors == NULL) {
+        altColors = colors;
     }
-}
-
-bool Xpm::render(Canvas* canvas, uint x, uint y) {
-    return render(canvas, nullptr, x, y);
-}
-
-bool Xpm::render(Canvas* canvas, uint8_t* map, uint x, uint y) {
     bool atLeastOnePixel = false;
     int cy = y + h - 1;
     int p = 0;
@@ -115,17 +116,12 @@ bool Xpm::render(Canvas* canvas, uint8_t* map, uint x, uint y) {
     for (int i = 0; i < h; i++) {
         int cx = x;
         for (int j = 0; j < w; j++) {
-            uint8_t col = pixels[p];
+            uint8_t colorIndex = pixels[p++];
             //
-            // Leave the background as transparent.
-            if (col != 255) {
-                if (canvas->set(cx++, cy, remap(map, col))) {
+            // If this is the background color, use the canvas's background color.
+            if (canvas->set(cx++, cy, colorIndex == backgroundColorIndex ? canvas->getBackground() : altColors[colorIndex])) {
                     atLeastOnePixel = true;
                 }
-            } else {
-                cx++;
-            }
-            p++;
         }
         cy--;
     }

@@ -45,49 +45,26 @@ bool Sprite::step() {
     int prevY = y;
     int h = frames[pos]->getHeight();
     int w = frames[pos]->getWidth();
-    switch (direction) {
-        case UP:
-            y++;
-            break;
-        case DOWN:
-            y--;
-            break;
-        case LEFT:
-            x--;
-            break;
-        case RIGHT:
-            x++;
-            break;
 
-        default:
-            break;
-    }
-    bool someRendered = frames[pos]->render(canvas, nullptr, x, y);
+    //
+    // Take a step.
+    x += deltaX;
+    y += deltaY;
+
+    bool someRendered = frames[pos]->render(canvas, myColors, x, y);
     pos = (pos + 1) % frames.size();
 
     //
     // clear out the pixels left behind
-    switch (direction) {
-        case UP:
-            for(int a = x; a < x + w; a++) {
-                canvas->set(a, prevY, canvas->getBackgroundIndex());
-            }
-            break;
-        case DOWN:
-            for(int a = x; a < x + w; a++) {
-                canvas->set(a, prevY+h-1, canvas->getBackgroundIndex());
-            }
-            break;
-        case LEFT:
-            for(int a = y; a < y+h-1; a++) {
-                canvas->set(prevX+w-1, a, canvas->getBackgroundIndex());
-            }
-            break;
-        case RIGHT:
-            for(int a = y; a < y+h-1; a++) {
-                canvas->set(prevX, a, canvas->getBackgroundIndex());
-            }
-            break;
+    for(int i = 0; i < deltaX; i++) {
+        for(int j = 0; j < h; j++) {
+            canvas->set(prevX + i, prevY + j, canvas->getBackground());
+        }
+    }
+    for(int i = 0; i < deltaY; i++) {
+        for(int j = 0; j < w; j++) {
+            canvas->set(prevX + j, prevY + i, canvas->getBackground());
+        }
     }
     return someRendered;
 }

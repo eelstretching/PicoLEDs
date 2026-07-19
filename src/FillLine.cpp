@@ -14,11 +14,11 @@ FillLine::FillLine(Canvas* canvas, ColorMap *colorMap, uint8_t colorIndex, Direc
 bool FillLine::step() {
     // Clear the previous line, if it's on the canvas.
     if (prevPos >= 0) {
-        draw(prevPos, canvas->getBackgroundIndex());
+        draw(prevPos, canvas->getBackground());
     }
     //
     // Draw the current line.
-    draw(currPos, colorIndex);
+    draw(currPos, colorMap->getColor(colorIndex));
 
     //
     // If the current position is the end position, then we're done.
@@ -51,15 +51,15 @@ bool FillLine::step() {
     return true;
 }
 
-void FillLine::draw(uint16_t pos, uint8_t colorIndex) {
+void FillLine::draw(uint16_t pos, const RGB& color) {
     switch (direction) {
         case UP:
         case DOWN:
-            canvas->fillColumn(pos, colorIndex);
+            canvas->fillColumn(pos, color);
             break;
         case LEFT:
         case RIGHT:
-            canvas->fillRow(pos, colorIndex);
+            canvas->fillRow(pos, color);
             break;
     }
 }

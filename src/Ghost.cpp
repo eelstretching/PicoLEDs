@@ -1,8 +1,17 @@
 #include "Ghost.h"
+#include "Ghost.h"
 
-Ghost::Ghost(Canvas* canvas, Xpm **frames, uint8_t ghostColorIndex, uint8_t pupilColorIndex, int startX, int startY)
-    : Sprite(canvas, colorMap, startX, startY), frames(frames) {
+Ghost::Ghost(Canvas* canvas, Xpm** frames, const RGB& ghostColor,
+             const RGB& pupilColor, int startX, int startY, Direction dir)
+    : Sprite(canvas, startX, startY, dir),
+      frames(frames),
+      ghostColor(ghostColor),
+      pupilColor(pupilColor) {
 
+    myColors = new RGB[frames[0]->getNumberOfColors()];
+    memcpy(myColors, frames[0]->getColors(),
+           frames[0]->getNumberOfColors() * sizeof(RGB));
+    myColors[1] = ghostColor;
     //
     // The animation loop. Each state lasts for four frames
     add(frames[0]);
@@ -13,14 +22,9 @@ Ghost::Ghost(Canvas* canvas, Xpm **frames, uint8_t ghostColorIndex, uint8_t pupi
     add(frames[1]);
     add(frames[1]);
     add(frames[1]);
-
-    cmap[0] = 0;
-    cmap[1] = ghostColorIndex;
-    cmap[2] = pupilColorIndex;
 }
 
-Ghost::~Ghost() {
-}
+Ghost::~Ghost() {}
 
 //
 // We're going to assume that we're called after the animation step, at which
@@ -32,39 +36,40 @@ void Ghost::drawPupils() {
     uint cx, cy;
     uint h = frames[0]->getHeight();
 
-    switch (direction) {
-        case UP:
-            cx = x + 2;
-            cy = y + (h - 4) - 1;
-            break;
-        case DOWN:
-            cx = x + 2;
-            cy = y + (h - 7) - 1;
-            break;
-        case LEFT:
-            cx = x + 1;
-            cy = y + (h - 7) - 1;
-            break;
-        case RIGHT:
-            cx = x + 4;
-            cy = y + (h - 7) - 1;
-            break;
+    if (deltaY > 0) {
+        cx = x + 2;
+        cy = y + 9;
+    } else if (deltaY < 0) {
+        cx = x + 2;
+        cy = y + 6;
+    } else if (deltaX < 0) {
+        cx = x + 1;
+        cy = y + 8;
+    } else if (deltaX > 0) {
+        cx = x + 4;
+        cy = y + 8;
     }
 
     //
     // Put the four pupil-colored pixels into each eye.
-    canvas->set(cx, cy, cmap[2]);
-    canvas->set(cx + 6, cy, cmap[2]);
-    canvas->set(cx + 1, cy, cmap[2]);
-    canvas->set(cx + 7, cy, cmap[2]);
-    canvas->set(cx, cy + 1, cmap[2]);
-    canvas->set(cx + 6, cy + 1, cmap[2]);
-    canvas->set(cx + 1, cy + 1, cmap[2]);
-    canvas->set(cx + 7, cy + 1, cmap[2]);
+    canvas->set(cx, cy, pupilColor);
+    canvas->set(cx + 6, cy, pupilColor);
+    canvas->set(cx + 1, cy, pupilColor);
+    canvas->set(cx + 7, cy, pupilColor);
+
+    canvas->set(cx, cy + 1, pupilColor);
+    canvas->set(cx + 6, cy + 1, pupilColor);
+    canvas->set(cx + 1, cy + 1, pupilColor);
+    canvas->set(cx + 7, cy + 1, pupilColor);
 }
 
 bool Ghost::step() {
     bool ret = Sprite::step();
     drawPupils();
     return ret;
+}
+
+void Ghost::init() {
+    x = startX;
+    y = startY;
 }

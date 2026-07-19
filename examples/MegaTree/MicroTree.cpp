@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include "Ghost.h"
+#include "PacMan.h"
 #include "Animator.h"
 #include "ArrayColorMap.h"
 #include "BarberPole.h"
@@ -95,17 +97,23 @@ int main() {
 
     Animator animator(&canvas, FPS);
 
-    Marquees fancyMarq(&canvas, &xmasColors, 5, rgbwgColors, 20, RIGHT,
-                       canvas.getHeight());
-    fancyMarq.setName("FMarq");
-    fancyMarq.setFPS(40);
+    // Marquees fancyMarq(&canvas, &xmasColors, 5, rgbwgColors, 20, RIGHT,
+    //                    canvas.getHeight());
+    // fancyMarq.setName("FMarq");
+    // fancyMarq.setFPS(40);
 
-    animator.addTimed(&fancyMarq, 10000);
+    // animator.addTimed(&fancyMarq, 2000);
 
-    ArrayColorMap icicleMap(8);
-    Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
-    icicles.setName("Icicles");
-    animator.addTimed(&icicles, 10000);
+    // ArrayColorMap icicleMap(8);
+    // Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
+    // icicles.setName("Icicles");
+    // animator.addTimed(&icicles, 2000);
+
+    Xpm *ghostFrames[2];
+    ghostFrames[0] = new Xpm(ghost1);
+    ghostFrames[1] = new Xpm(ghost2);
+    Ghost ghost(&canvas, ghostFrames, inkyColor, pupilColor, 0, 1, Direction::RIGHT);
+    animator.add(&ghost);
 
     animator.init();
 

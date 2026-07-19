@@ -1,6 +1,6 @@
 #include "Bouncer.h"
 
-Bouncer::Bouncer(Canvas* canvas, ColorMap *colorMap, uint8_t color, int x, int y) : Animation(canvas, colorMap), color(color), x(x), y(y) {
+Bouncer::Bouncer(Canvas* canvas, ColorMap *colorMap, RGB color, int x, int y) : Animation(canvas, colorMap), color(color), x(x), y(y) {
     maxX=canvas->getWidth() - 1;
     maxY=canvas->getHeight() - 1;
     up = true;
@@ -8,13 +8,13 @@ Bouncer::Bouncer(Canvas* canvas, ColorMap *colorMap, uint8_t color, int x, int y
     fps = 10;
 }
 
-Bouncer::Bouncer(Canvas* canvas,  ColorMap *colorMap,uint8_t color, int x, int y, int maxX, int maxY) : Animation(canvas, colorMap), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {
+Bouncer::Bouncer(Canvas* canvas,  ColorMap *colorMap,RGB color, int x, int y, int maxX, int maxY) : Animation(canvas, colorMap), color(color), x(x), y(y), maxX(maxX), maxY(maxY) {
     up = true;
     right = true;
 }
 
 bool Bouncer::step() {
-    canvas->set(x, y, canvas->getBackgroundIndex());
+    canvas->set(x, y, canvas->getBackground());
     if (up) {
         y++;
         if (y == maxY) {
