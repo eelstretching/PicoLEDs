@@ -45,8 +45,6 @@ int main() {
     }
     
     c.setup();
-    c.setColorMap(&fadeMap);
-
 
     while (1) {
         for(int i = 0; i < fadeMap.getSize(); i++) {

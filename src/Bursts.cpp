@@ -56,7 +56,6 @@ Bursts::~Bursts() {
 }
 
 void Bursts::init() {
-    canvas->setColorMap(colorMap);
     int nBursts = MAX(random8(maxBursts) + 2, maxBursts);
     for (int i = 0; i < nBursts; i++) {
         bursts[i]->init();

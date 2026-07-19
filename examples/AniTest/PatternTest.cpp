@@ -64,7 +64,6 @@ int main() {
                        RGB(0b00000000, 0b00000000, 0b00000011),
                        RGB(0b00000000, 0b00000000, 0b00000001),
                        RGB(0b00000000, 0b00000000, 0b00000000)});
-    canvas.setColorMap(&colorMap);
     canvas.clear();
     canvas.show();
     int nColors = colorMap.getUsed();

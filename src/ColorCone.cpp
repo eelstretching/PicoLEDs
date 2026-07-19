@@ -8,7 +8,6 @@ void ColorCone::init() {
     buildDone = false;
     currCol = 0;
     currColor = 0;
-    canvas->setColorMap(colorMap);
     canvas->clear();
 }
 

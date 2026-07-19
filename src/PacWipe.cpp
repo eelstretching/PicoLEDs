@@ -23,7 +23,6 @@ PacWipe::PacWipe(Canvas* canvas, ColorMap* colorMap)
 }
 
 void PacWipe::init() {
-    canvas->setColorMap(colorMap);
     curr = sprites[random8(0, 4)];
     if (curr == sprites[0]) {
         //

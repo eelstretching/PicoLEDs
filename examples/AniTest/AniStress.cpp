@@ -47,7 +47,6 @@ int main() {
                     canvas.add(strips[i + j]);
                 }
                 canvas.setup();
-                canvas.setColorMap(&colors);
                 
                 BarberPole bp(&canvas, &colors, nColors, 5);
 

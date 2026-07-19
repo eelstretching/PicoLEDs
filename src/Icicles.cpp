@@ -215,7 +215,6 @@ Icicles::Icicles(Canvas* canvas, ColorMap* colorMap, uint numIcicles,
 }
 
 void Icicles::init() {
-    canvas->setColorMap(colorMap);
     for (int i = 0; i < numIcicles; i++) {
         icicles[i]->setPos(canvas->getHeight() + 1);
     }

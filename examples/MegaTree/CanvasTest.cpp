@@ -96,7 +96,6 @@ int main() {
         c.add(strips[i]);
     }
     c.setup();
-    c.setColorMap(&dimXmasColors);
 
     for (int i = 0; i < c.getHeight(); i++) {
         c.fillRow(i, i % dimXmasColors.getUsed());

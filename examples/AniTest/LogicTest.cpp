@@ -104,8 +104,8 @@ int main() {
             }
             starts[i] = (starts[i] + 1) % STRIP_LEN;
         }
-        r1.render(&colorMap);
-        r2.render(&colorMap);
+        r1.render();
+        r2.render();
 
         //
         // Wait until we need to render the next frame.

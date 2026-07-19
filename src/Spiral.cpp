@@ -16,7 +16,6 @@ Spiral::Spiral(Canvas* canvas, ColorMap* colorMap, uint8_t startx,
 Spiral::~Spiral() {}
 
 void Spiral::init() {
-    canvas->setColorMap(colorMap);
     x = startx;
     y = starty;
 }

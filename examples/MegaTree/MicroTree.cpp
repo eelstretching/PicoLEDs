@@ -106,7 +106,6 @@ int main() {
         canvas.add(strips[i]);
     }
     canvas.setup();
-    canvas.setColorMap(&midXmasColors);
     canvas.clear();
     canvas.show();
 

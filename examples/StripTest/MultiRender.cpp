@@ -125,7 +125,7 @@ int main() {
             }
         }
         count++;
-        renderer.render(&dimXmasColors);
+        renderer.render();
         sleep_ms(1000);
     }
 }

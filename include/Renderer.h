@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <functional>
 #include <vector>
 
 #include "StopWatch.h"
@@ -21,7 +22,7 @@
 #define RESET_TIME_US (80)
 #define NUM_PARALLEL_PINS 8
 
-class Renderer; 
+class Renderer;
 
 /// @brief A structure holding the details of a single PIO program for rendering
 /// one or more strips.
@@ -34,7 +35,7 @@ class PIOProgram {
     uint sm;
     uint offset;
     int dma_channel;
-    void *buffer;
+    void* buffer;
     uint32_t buffSize;
     StopWatch stats;
     uint32_t nblocked = 0;
@@ -56,7 +57,7 @@ class PIOProgram {
 ///
 /// Make sure it's initialized to zeros, as we're counting on being able to test
 /// which DMA channels need management.
-static PIOProgram *pioPrograms[NUM_DMA_CHANNELS] = {0};
+static PIOProgram* pioPrograms[NUM_DMA_CHANNELS] = {0};
 
 /// @brief A class for a thing that knows how to render a logical Strip to a
 /// physical strip.
@@ -64,7 +65,7 @@ class Renderer {
    protected:
     //
     // The strips that we're being asked to render.
-    std::vector<Strip *> strips;
+    std::vector<Strip*> strips;
 
     StopWatch dw;
 
@@ -72,13 +73,26 @@ class Renderer {
 
     int renderCount = 0;
 
+    // @brief Global brightness level for all strips we're rendering.
+    uint8_t brightness;
+
    public:
-    /// @brief Construct a renderer for a single strip.
-    /// @param pin The pin that the strip is connected to.
-    /// @param strip The strip itself.
-    Renderer();
+    /// @brief Construct a renderer. We'll use a small default brightness
+    /// because power and stuff.
+    Renderer(uint8_t brightness = 32) : brightness(brightness) {}
 
     ~Renderer();
+
+    void setBrightness(uint8_t brightness) { this->brightness = brightness; };
+
+    uint8_t getBrightness() { return this->brightness; };
+
+    // @brief Processes a pixel color based on the current brightness, returing
+    // the uint32 that we need to output to the strip. This is the default
+    // function that we'll use if we don't call render with something else.
+    virtual uint32_t processPixel(const RGB& color, Strip* strip) {
+        return (uint32_t)color.scale8(brightness).getColor(strip->getColorOrder());
+    };
 
     /// @brief After all strips have been added, set up for
     /// rendering by setting up PIO programs, DMA, etc.
@@ -93,10 +107,10 @@ class Renderer {
 
     /// @brief Adds a strip to be rendered by this renderer.
     /// @param strip The strip to render
-    void add(Strip *strip);
+    void add(Strip* strip);
 
     /// @brief Renders the strips.
-    void render(ColorMap *colorMap);
+    void render();
 
     /// @brief Gets the number of times that calls to render blocked on the
     /// semaphore.

@@ -50,7 +50,6 @@ int main() {
         c.add(strips[i]);
     }
     c.setup();
-    c.setColorMap(&colorMap);
     c.clear();
     c.show();
 

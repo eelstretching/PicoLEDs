@@ -12,8 +12,8 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 300
-#define NUM_STRIPS 7
+#define STRIP_LEN 200
+#define NUM_STRIPS 4
 #define START_PIN 2
 #define WIDTH 10
 
@@ -40,13 +40,13 @@ int main() {
         for (int i = 0; i < ns; i++) {
             strips[i]->fill(c);
         }
-        renderer.render(&colorMap);
+        renderer.render();
         sleep_ms(250);
     }
     for (int i = 0; i < ns; i++) {
         strips[i]->fill(colorMap.getBackgroundIndex());
     }
-    renderer.render(&colorMap);
+    renderer.render();
     sleep_ms(100);
 
     //
@@ -62,7 +62,7 @@ int main() {
             }
         }
     }
-    renderer.render(&colorMap);
+    renderer.render();
     sleep_ms(1000);
 
     float fps = 40;
@@ -79,10 +79,10 @@ int main() {
                 strips[s]->rotate(LEFT);
             } else {
                 strips[s]->rotate(RIGHT);
-            }
+            }   
         }
 
-        renderer.render(&colorMap);
+        renderer.render();
         frameWatch.finish();
         uint64_t lus = frameWatch.getLastTime();
         if (lus < usPerFrame) {

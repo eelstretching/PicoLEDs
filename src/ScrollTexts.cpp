@@ -44,7 +44,6 @@ bool ScrollText::step() {
 }
 
 void ScrollTexts::init() {
-    canvas->setColorMap(colorMap);
     for(auto t : texts) {
         t->init();
     }

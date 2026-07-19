@@ -5,7 +5,6 @@ RotRandColumns::RotRandColumns(Canvas* canvas, ColorMap* colorMap, uint8_t nColo
 
 void RotRandColumns::init() {
     firstFrame = true;
-    canvas->setColorMap(colorMap);
     for (int i = 0; i < nColors; i++) {
         bool unique = false;
         uint8_t v;

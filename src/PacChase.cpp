@@ -11,7 +11,6 @@ PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
     // Make a color map for this animation.
     ghostFrames[0] = new Xpm(ghost1);
     ghostFrames[1] = new Xpm(ghost2);
-    colorMap = canvas->makeColorMap(32);
     uint8_t pupilColorIndex = colorMap->addColor(pupilColor);
     uint8_t pacColorIndex = colorMap->addColor(pacColor);
     pacMan = new PacMan(canvas, pacColorIndex, 0, 1);
@@ -20,7 +19,6 @@ PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
     ghosts[1] = new Ghost(canvas, ghostFrames, colorMap->addColor(blinkyColor), pupilColorIndex, 0, 1);
     ghosts[2] = new Ghost(canvas, ghostFrames, colorMap->addColor(pinkyColor), pupilColorIndex, 0, 1);
     ghosts[3] = new Ghost(canvas, ghostFrames, colorMap->addColor(clydeColor), pupilColorIndex, 0, 1);
-    dotColorIndex = canvas->getColorMap()->addColor(dotColor);
     setup();
 }
 
@@ -65,7 +63,6 @@ void PacChase::init() {
 
     //
     // Install our color map and clear the canvas.
-    canvas->setColorMap(colorMap);
     canvas->clear();
 
     //

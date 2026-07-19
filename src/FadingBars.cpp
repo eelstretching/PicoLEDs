@@ -56,7 +56,6 @@ FadingBars::FadingBars(Canvas* canvas,
                        ColorMap* colorMap, uint8_t barWidth, uint8_t nColors)
     : Animation(canvas, colorMap, 10), barWidth(barWidth), nColors(nColors) {
     fadeMap = new FadeColorMap(colorMap, nColors, 32, 28);
-    canvas->setColorMap(fadeMap);
     nBars = canvas->getWidth() / barWidth;
     if (canvas->getWidth() % barWidth != 0) {
         nBars++;
@@ -71,7 +70,6 @@ FadingBars::FadingBars(Canvas* canvas,
 }
 
 void FadingBars::init() {
-    canvas->setColorMap(fadeMap);
     for (int i = 0; i < nBars; i++) {
         bars[i]->init();
     }

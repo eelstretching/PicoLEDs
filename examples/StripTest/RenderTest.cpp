@@ -34,7 +34,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     for (int i = startStrip; i < endStrip; i++) {
         strips[i]->fill(((startPin + i) % 3));
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 
     for (int i = startStrip; i < endStrip; i++) {
@@ -42,7 +42,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
             strips[i]->putPixel((j % 3), j);
         }
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 
     //
@@ -50,7 +50,7 @@ void run_contig_test(Strip **strips, int startStrip, int endStrip, int ns,
     for (int i = startStrip; i < endStrip; i++) {
         strips[i]->fill(255);
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 }
 
@@ -74,7 +74,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
             strips[j]->fill((j % 3));
         }
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 
     for (int i = 0; i < ds; i++) {
@@ -84,7 +84,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
             }
         }
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 
     //
@@ -94,7 +94,7 @@ void run_discontig_test(Strip **strips, int ns, int *s, int *e, int ds) {
             strips[j]->fill(255);
         }
     }
-    r.render(&colorMap);
+    r.render();
     sleep_ms(100);
 }
 

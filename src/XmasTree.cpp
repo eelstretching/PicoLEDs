@@ -19,7 +19,6 @@ void Ornament::setXY(uint8_t x, uint8_t y) {
 void Ornament::setColor(uint8_t color) { cmap[0] = color; }
 
 void Ornament::init() {
-    cmap[0] = canvas->getColorMap()->getRandomColor();
 }
 
 bool Ornament::step() {
@@ -154,7 +153,6 @@ XmasTree::XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights)
 
 void XmasTree::init() {
     state = TreeState::RIBBON;
-    canvas->setColorMap(colorMap);
     canvas->clear();
     ribbon->init();
 

@@ -5,7 +5,6 @@ RotRandRows::RotRandRows(Canvas* canvas, ColorMap* colorMap, uint8_t nColors)
 
 void RotRandRows::init() {
     firstFrame = true;
-    canvas->setColorMap(colorMap);
     for (int i = 0; i < nColors; i++) {
         bool unique = false;
         uint8_t v;

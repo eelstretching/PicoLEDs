@@ -25,7 +25,7 @@ class ColorMap {
     virtual uint8_t getUsed() { return 0; };
 
     void setBackground(const RGB& color) { background = color; };
-    RGB getBackground() { return background; };
+    const RGB& getBackground() { return background; };
     uint8_t getBackgroundIndex() {return 255;};
     uint8_t getRandomColor() {return random8(getUsed());};
     virtual RGB operator[](uint8_t index) { return background; };

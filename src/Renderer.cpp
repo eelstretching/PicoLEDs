@@ -85,8 +85,6 @@ PIOProgram::~PIOProgram() {
     }
 }
 
-Renderer::Renderer() {}
-
 Renderer::~Renderer() {
     for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
         PIOProgram* pip = pioPrograms[i];
@@ -294,7 +292,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
 
 }
 
-void Renderer::render(ColorMap* colorMap) {
+void Renderer::render() {
     if (!setupDone) {
         setup();
     }
@@ -324,15 +322,14 @@ void Renderer::render(ColorMap* colorMap) {
             // One strip, just put the data in the buffer according to the
             // color order after scaling by the strip's brightness.
             Strip *s = strips[pip->startIndex];
-            uint8_t* data = s->getData();
+            RGB* data = s->getData();
             uint32_t* pb = (uint32_t*)pip->buffer;
             for (int i = 0; i < s->getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO
                 // program will be pulling 24 bits and it wants those 24
                 // bits in the most significant place.
-                *pb = colorMap->getColor(*data).getColor(s->getColorOrder())
-                      << 8u;
+                *pb = processPixel(*data, s) << 8u;
             }
         } else {
             memset(pip->buffer, 0, pip->buffSize * sizeof(uint8_t));
@@ -342,7 +339,7 @@ void Renderer::render(ColorMap* colorMap) {
             for (int i = pip->startIndex, sn = 0;
                  i < pip->startIndex + pip->size; i++, sn++) {
                 Strip *s = strips[i];
-                uint8_t* data = s->getData();
+                RGB* data = s->getData();
                 uint32_t pp = 0;
 
                 //
@@ -353,13 +350,7 @@ void Renderer::render(ColorMap* colorMap) {
                 uint8_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s->getNumPixels(); j++, pp += 24, data++) {
                     uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
-                    //
-                    // Map the color index, then transform for color order.
-                    // Doing that old school pointer bumping rather than
-                    // array accesses to try to cut down on the time spent
-                    // prepping the data.
-                    uint32_t val =
-                        colorMap->getColor(*data).getColor(s->getColorOrder());
+                    uint32_t val = processPixel(*data, s);
 
                     //
                     // Unrolling the inner loop to save some ops. There's

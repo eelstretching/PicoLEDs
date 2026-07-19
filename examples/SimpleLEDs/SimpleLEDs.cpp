@@ -31,7 +31,6 @@ int main() {
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
         RGB::Blue,  RGB::Indigo, RGB::Violet
     });
-    canvas.setColorMap(&colorMap);
     canvas.setup();
 
     int x = -1;

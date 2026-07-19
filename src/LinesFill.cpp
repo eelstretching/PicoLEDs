@@ -32,7 +32,6 @@ LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nColors, uint8_t *c
 }
 
 void LinesFill::init() {
-    canvas->setColorMap(colorMap);
     canvas->clear();
     uint16_t startPos;
     uint16_t endPos;

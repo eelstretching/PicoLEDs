@@ -12,7 +12,7 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 300
+#define STRIP_LEN 200
 #define NUM_STRIPS 1
 #define START_PIN 2
 #define WIDTH 10
@@ -25,41 +25,40 @@ int main() {
     //
     // Simple test for a single strip of pixels.
     Strip strip(START_PIN, STRIP_LEN);
-    strip.setColorOrder(ColorOrder::ORGB);
-    Renderer renderer;
+    Renderer renderer(32);
     renderer.add(&strip);
     renderer.setup();
 
-    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
-                       RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White});
-    colorMap.setBrightness(64);
-
+    ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green, RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White, RGB::Gold});
     for(int i = 0; i < colorMap.getUsed(); i++) {
-        strip.fill(i);
-        renderer.render(&colorMap);
-        sleep_ms(250);
+        printf("Filling with color %d\n", i);
+        strip.fill(colorMap.getColor(i));
+        renderer.render();
+        sleep_ms(500);
     }
 
-    strip.fill(colorMap.getBackgroundIndex()); 
-    renderer.render(&colorMap);
+    strip.fill(colorMap.getBackground()); 
+    renderer.render();
     sleep_ms(100);
 
     //
     // Fill with color bands.
     printf("Filling with color bands on %d pixels\n", strip.getNumPixels());
-    uint8_t cc = 0;
+    RGB cc = colorMap.getColor(0);
+    int colorIndex = 0;
     for(int i = 0; i < strip.getNumPixels(); i++) {
         strip.putPixel(cc, i);
         if((i+1) % WIDTH == 0) {
-            printf("Color change at pixel %d\n", i);
-            cc = (cc + 1) % colorMap.getUsed();
+            colorIndex = (colorIndex + 1) % colorMap.getUsed();
+            cc = colorMap.getColor(colorIndex);
         }
     }
-    renderer.render(&colorMap);
+    renderer.render();
     sleep_ms(1000);
 
-    float fps = 80;
+    float fps = 30;
     float usPerFrame = 1e6 / fps;
+    printf("usPerFrame: %f\n", usPerFrame);
     StopWatch frameWatch;
     uint32_t missedFrames = 0;
     int startPos = 0;
@@ -68,7 +67,7 @@ int main() {
     while (1) {
         frameWatch.start();
         strip.rotate(RIGHT);
-        renderer.render(&colorMap);
+        renderer.render();
         frameWatch.finish();
         uint64_t lus = frameWatch.getLastTime();
         if (lus < usPerFrame) {
@@ -78,9 +77,9 @@ int main() {
         }
 
         if (frameWatch.count % 200 == 0) {
-            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ",
+            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps lus: %llu",
 
-                   frameWatch.count, usPerFrame, frameWatch.getAverageTime());
+                   frameWatch.count, usPerFrame, frameWatch.getAverageTime(), fps, (unsigned long long)lus);
 
             printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",

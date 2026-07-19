@@ -37,7 +37,7 @@ int main() {
     ColorMap* fadeMap = new FadeColorMap(&baseMap, 2, 32, 28);
     RGB curr = RGB::Red;
     strip.fill(fadeMap->getBackgroundIndex());
-    renderer.render(fadeMap);
+    renderer.render();
 
     float fps = 10;
     float usPerFrame = 1e6 / fps;
@@ -50,7 +50,7 @@ int main() {
             frameWatch.start();
             strip.fill(i, 0, 100);
             strip.putPixel(0, 100 + (i-32));
-            renderer.render(fadeMap);
+            renderer.render();
             frameWatch.finish();
             uint64_t lus = frameWatch.getLastTime();
             if (lus < usPerFrame) {
