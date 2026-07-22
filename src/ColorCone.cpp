@@ -15,7 +15,7 @@ bool ColorCone::step() {
     if (!buildDone) {
         //
         // Build up the cone column by column.
-        canvas->fillColumn(currCol, currColor);
+        canvas->fillColumn(currCol, colorMap->getColor(currColor));
         currCol++;
         if (currCol >= canvas->getWidth()) {
             buildDone = true;

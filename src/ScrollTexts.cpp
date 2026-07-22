@@ -1,7 +1,7 @@
 #include "ScrollTexts.h"
 
 ScrollText::ScrollText(Canvas* canvas, Font* font, const char* text, int startx,
-                       int starty, uint8_t color, RenderAngle angle)
+                       int starty, const RGB& color, RenderAngle angle)
     : Animation(canvas, nullptr, 20),
       startx(startx),
       starty(starty),

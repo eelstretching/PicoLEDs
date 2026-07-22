@@ -49,7 +49,7 @@ bool RotRandColumns::step() {
     if (firstFrame) {
         for (int i = 0; i < canvas->getWidth(); i++) {
             uint8_t colorIndex = currColors[(i / colWidth) % nColors];
-            canvas->fillColumn(i, colorIndex);
+            canvas->fillColumn(i, colorMap->getColor(colorIndex));
         }
         firstFrame = false;
     } else {

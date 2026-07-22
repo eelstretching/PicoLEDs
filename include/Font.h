@@ -47,10 +47,10 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in
     /// @return The width of the rendered text, in pixels.
-    uint render(const char *text, int bx, int by, uint8_t color, RenderAngle angle = RENDER_0);
+    uint render(const char *text, int bx, int by, const RGB& color, RenderAngle angle = RENDER_0);
 
-    uint render0(const char* text, int bx, int by, uint8_t color);
-    uint render90(const char* text, int bx, int by, uint8_t color);
+    uint render0(const char* text, int bx, int by, const RGB& color);
+    uint render90(const char* text, int bx, int by, const RGB& color);
 
     /// @brief Renders a single character onto our canvas at the given pixel
     /// position.
@@ -59,8 +59,8 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in.
     /// @return the width of the rendered character, in pixels.
-    uint render0(char c, int bx, int by, uint8_t color);
-    uint render90(char c, int bx, int by, uint8_t color);
+    uint render0(char c, int bx, int by, const RGB& color);
+    uint render90(char c, int bx, int by, const RGB& color);
 
     /// @brief Gets the width of the given string rendered in this font.
     /// @param text 

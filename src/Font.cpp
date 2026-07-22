@@ -25,7 +25,7 @@ Font::Font(Canvas* canvas, const uint8_t* fontData) {
     }
 }
 
-uint Font::render(const char* text, int bx, int by, uint8_t color,
+uint Font::render(const char* text, int bx, int by, const RGB& color,
                   RenderAngle angle) {
     switch (angle) {
         case RENDER_0:
@@ -36,7 +36,7 @@ uint Font::render(const char* text, int bx, int by, uint8_t color,
     return 0;
 }
 
-uint Font::render0(const char* text, int bx, int by, uint8_t color) {
+uint Font::render0(const char* text, int bx, int by, const RGB& color) {
     uint x = bx;
     uint p = 0;
     uint tw = 0;
@@ -72,7 +72,7 @@ uint Font::render0(const char* text, int bx, int by, uint8_t color) {
     return lw == 0 ? tw : lw;
 }
 
-uint Font::render0(char c, int bx, int by, uint8_t color) {
+uint Font::render0(char c, int bx, int by, const RGB& color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;
@@ -127,7 +127,7 @@ uint Font::render0(char c, int bx, int by, uint8_t color) {
     return charWidth;
 }
 
-uint Font::render90(const char* text, int bx, int by, uint8_t color) {
+uint Font::render90(const char* text, int bx, int by, const RGB& color) {
     uint y = by;
     uint p = 0;
     uint tw = 0;
@@ -163,7 +163,7 @@ uint Font::render90(const char* text, int bx, int by, uint8_t color) {
     return lw == 0 ? tw : lw;
 }
 
-uint Font::render90(char c, int by, int bx, uint8_t color) {
+uint Font::render90(char c, int by, int bx, const RGB& color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;

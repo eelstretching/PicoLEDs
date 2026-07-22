@@ -47,7 +47,7 @@ bool RotRandRows::step() {
     if (firstFrame) {
         for (int i = 0; i < canvas->getHeight(); i++) {
             uint8_t colorIndex = (i / rowWidth) % nColors;
-            canvas->fillRow(i, colorIndex);
+            canvas->fillRow(i, colorMap->getColor(colorIndex));
         }
         firstFrame = false;
     } else {

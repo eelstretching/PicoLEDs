@@ -206,7 +206,6 @@ Icicles::Icicles(Canvas* canvas, ColorMap* colorMap, uint numIcicles,
 
     //
     // Ripping off fadeToBlack from FastLED, but for colors.
-    char colorStr[100];
     for (int i = 0; i < this->colorMap->getSize(); i++) {
         this->colorMap->addColor(color.nscale8(128));
     }

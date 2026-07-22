@@ -2,6 +2,7 @@
 #include <ColorBars.h>
 #include <FadingBars.h>
 #include <FontTwoP.h>
+#include <PacChase.h>
 #include <RandomAnimator.h>
 #include <RotRandColumns.h>
 #include <RotRandRows.h>
@@ -15,17 +16,17 @@
 
 #include <string>
 
-#include "Ghost.h"
-#include "PacMan.h"
 #include "Animator.h"
 #include "ArrayColorMap.h"
 #include "BarberPole.h"
 #include "Bouncer.h"
 #include "Canvas.h"
 #include "ColorCone.h"
+#include "Ghost.h"
 #include "Icicles.h"
 #include "LinesFill.h"
 #include "Marquees.h"
+#include "PacMan.h"
 #include "Spiral.h"
 #include "Strip.h"
 #include "colorutils.h"
@@ -35,7 +36,6 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
-#include <PacChase.h>
 
 #define NUM_STRIPS 10
 #define START_PIN 2
@@ -109,18 +109,9 @@ int main() {
     // Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
     // icicles.setName("Icicles");
     // animator.addTimed(&icicles, 2000);
-
-    Xpm *ghostFrames[2];
-    ghostFrames[0] = new Xpm(ghost1);
-    ghostFrames[1] = new Xpm(ghost2);
-    Ghost ghost(&canvas, ghostFrames, inkyColor, pupilColor, -ghostFrames[0]->getWidth()+1, 2, Direction::RIGHT);
-    animator.add(&ghost);
-
-    PacMan pacMan(&canvas, -pacMan.getXpms()[0]->getWidth()+1, 2);
-    animator.add(&pacMan);
-
-    PacChase pacChase(&canvas);
-    animator.add(&pacChase);
+    ColorBars cb2(&canvas, &xmasColors, 15, 3);
+    cb2.setName("CB2");
+    animator.addTimed(&cb2, 10000);
 
     animator.init();
 

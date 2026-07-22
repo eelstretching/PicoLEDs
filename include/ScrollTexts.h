@@ -16,11 +16,11 @@ class ScrollText : public Animation {
     uint8_t frameWait;
     const char *text;
     Font *font;
-    uint8_t color;
+    const RGB& color;
     RenderAngle angle;
 
     public:
-    ScrollText(Canvas* canvas, Font* font, const char* text, int startx, int starty, uint8_t color, RenderAngle angle = RENDER_90);
+    ScrollText(Canvas* canvas, Font* font, const char* text, int startx, int starty, const RGB& color, RenderAngle angle = RENDER_90);
     void init() override;
     bool step() override;
 };
@@ -30,7 +30,7 @@ class ScrollTexts : public Animation {
     std::vector<ScrollText*> texts;
 
    public:
-    ScrollTexts(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap) {};
+    ScrollTexts(Canvas* canvas) : Animation(canvas, nullptr) {};
 
     void add(ScrollText* text) { texts.push_back(text); };
 

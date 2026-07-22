@@ -34,7 +34,7 @@ bool Spiral::step() {
                 uint8_t colorIndex = colors[(i / barWidth) % nColors];
                 for (int j = 0; j < width; j++) {
                     canvas->set((sx + j) % canvas->getWidth(),
-                                dy % canvas->getHeight(), colorIndex);
+                                dy % canvas->getHeight(), colorMap->getColor(colorIndex));
                 }
                 sx++;
             }
@@ -50,7 +50,7 @@ bool Spiral::step() {
                 }
                 uint8_t colorIndex = colors[(i / barWidth) % nColors];
                 for (int j = 0; j < width; j++) {
-                    canvas->set((sx + j) % canvas->getWidth(), dy, colorIndex);
+                    canvas->set((sx + j) % canvas->getWidth(), dy, colorMap->getColor(colorIndex));
                 }
                 sx++;
             }

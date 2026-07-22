@@ -18,7 +18,7 @@ bool FadingBar::step() {
             for (int i = 0; i < barWidth; i++) {
                 canvas->fillColumn(
                     position + i,
-                    currColorIndex);  // Ensure bright color is set
+                    colorMap->getColor(currColorIndex));  // Ensure bright color is set
             }
             currColorIndex--;
             if (currColorIndex <= brightColorIndex) {
@@ -28,7 +28,7 @@ bool FadingBar::step() {
             break;
         case FADING_OUT:
             for (int i = 0; i < barWidth; i++) {
-                canvas->fillColumn(position + i, currColorIndex);
+                canvas->fillColumn(position + i, colorMap->getColor(currColorIndex));
             }
             currColorIndex++;
             if (currColorIndex >= dimColorIndex) {
