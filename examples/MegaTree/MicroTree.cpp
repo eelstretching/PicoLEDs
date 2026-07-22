@@ -109,9 +109,10 @@ int main() {
     // Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
     // icicles.setName("Icicles");
     // animator.addTimed(&icicles, 2000);
-    ColorBars cb2(&canvas, &xmasColors, 15, 3);
-    cb2.setName("CB2");
-    animator.addTimed(&cb2, 10000);
+    FadingBars fb1(&canvas, &xmasColors, 20, 2);
+    fb1.setName("FB1");
+    animator.addTimed(&fb1, 10000);
+
 
     animator.init();
 

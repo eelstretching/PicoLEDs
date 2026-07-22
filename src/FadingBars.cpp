@@ -64,7 +64,7 @@ FadingBars::FadingBars(Canvas* canvas,
     for (int i = 0; i < nBars; i++) {
         uint8_t dimIndex = (i % nColors) * 32 + 31;
         uint8_t brightIndex = (i % nColors) * 32;
-        bars[i] = new FadingBar(canvas, colorMap, barWidth, i * barWidth, brightIndex,
+        bars[i] = new FadingBar(canvas, fadeMap, barWidth, i * barWidth, brightIndex,
                                 dimIndex, i % 2 == 0 ? FADING_IN : FADING_OUT);
     }
 }
