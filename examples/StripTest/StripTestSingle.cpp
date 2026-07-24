@@ -12,10 +12,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 200
+#define STRIP_LEN 256
 #define NUM_STRIPS 1
 #define START_PIN 2
-#define WIDTH 10
+#define WIDTH 8
 
 int main() {
     stdio_init_all();
@@ -25,7 +25,7 @@ int main() {
     //
     // Simple test for a single strip of pixels.
     Strip strip(START_PIN, STRIP_LEN);
-    Renderer renderer(32);
+    Renderer renderer(16);
     renderer.add(&strip);
     renderer.setup();
 
@@ -36,12 +36,25 @@ int main() {
         printf("Filling with color %d\n", i);
         strip.fill(colorMap.getColor(i));
         renderer.render();
-        sleep_ms(500);
+        sleep_ms(250);
     }
 
     strip.fill(colorMap.getBackground());
     renderer.render();
     sleep_ms(100);
+
+    for (int i = 0; i < strip.getNumPixels(); i++) {
+        strip.fill(colorMap.getBackground());
+        strip.putPixel(RGB::Red, i);
+        if (i >= 1) {
+            strip.putPixel(RGB::Green, i - 1);
+        }
+        if (i >= 2) {
+            strip.putPixel(RGB::Blue, i - 2);
+        }
+        renderer.render();
+        sleep_ms(100);
+    }
 
     //
     // Fill with color bands.
