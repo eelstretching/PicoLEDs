@@ -82,6 +82,7 @@ class Row {
 // A 2-D canvas that we can draw on. If you think of the canvas as a 2-D
 // object, the origin would be in the bottom-left.
 class Canvas {
+   protected:
     //
     // The width of the canvas, in pixels, and a couple of associated values.
     uint width;
@@ -112,12 +113,12 @@ class Canvas {
 
     /// @brief Adds a strip of pixels to this view.
     /// @param strip
-    void add(Strip *strip);
+    void add(Strip* strip);
 
     /// @brief Set up the canvas for operations.
     void setup() { renderer.setup(); };
 
-    uint getHeight() { return rows.size(); };
+    virtual uint getHeight() { return rows.size(); };
 
     uint getWidth() { return width; };
 
@@ -129,8 +130,10 @@ class Canvas {
 
     Row* getRow(int y) { return rows[y]; }
 
-    void setBrightness(uint8_t brightness) { renderer.setBrightness(brightness); };
-    
+    void setBrightness(uint8_t brightness) {
+        renderer.setBrightness(brightness);
+    };
+
     uint8_t getBrightness() { return renderer.getBrightness(); };
 
     /// @brief Sets a pixel on this canvas to the given color
@@ -139,31 +142,31 @@ class Canvas {
     /// @param p the color the pixel should be set to.
     /// @return true, if it was possible to set this pixel, false if the pixel
     /// was not on the canvas as it was out-of-bounds.
-    bool set(int x, int y, const RGB& color);
+    virtual bool set(int x, int y, const RGB& color);
 
     /// @brief Gets the value of the pixel at the given coordinates.
-    const RGB& get(uint x, uint y);
+    virtual const RGB& get(uint x, uint y);
 
     /// @brief Copy the given data into the canvas, starting at position x,y.
     /// @param d the array of data to copy from
     /// @param n the number of pixels to copy in
     /// @param x the x coordinate where we want to do the copying.
     /// @param y the y coordinate where we want to do the copying.
-    void copy(RGB* d, int n, int x, int y);
+    virtual void copy(RGB* d, int n, int x, int y);
 
     /// @brief Fills a row with the given color.
     /// @param row the row to fill
     /// @param p the color
-    void fillRow(uint row, const RGB& color);
+    virtual void fillRow(uint row, const RGB& color);
 
     /// @brief Fills a column with the given color.
     /// @param col the column to fill
     /// @param p the color to fill with.
-    void fillColumn(uint col, const RGB& color);
+    virtual void fillColumn(uint col, const RGB& color);
 
     /// @brief Fill the canvas with a given color
     /// @param c the color to fill with.
-    void fill(const RGB& color);
+    virtual void fill(const RGB& color);
 
     /// @brief Fills a rectangle with the given color.
     /// @param x0 The x coordinate of the bottom-left corner of the rectangle.
@@ -180,7 +183,7 @@ class Canvas {
     /// @param x1 The x coordinate of the second point.
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
-    void drawLine(uint x0, uint y0, uint x1, uint y1,const RGB& color);
+    void drawLine(uint x0, uint y0, uint x1, uint y1, const RGB& color);
 
     /// @brief Draws a line from (x0,y0) to (x1,y1), using Bresenham's
     /// algorithm, with optional wrap-around.
@@ -190,7 +193,8 @@ class Canvas {
     /// @param y1 The y coordinate of the second point.
     /// @param c The color the line should be.
     /// @param wrapAround if true, the line will wrap around the canvas edges.
-    void drawLine(uint x0, uint y0, uint x1, uint y1, const RGB& color, bool wrapAround);
+    void drawLine(uint x0, uint y0, uint x1, uint y1, const RGB& color,
+                  bool wrapAround);
 
     /// @brief Draws a rectangle with diagonal corners (x0,y0) and (x1, y1)
     /// @param x0 The x coordinate of one corner
@@ -208,8 +212,8 @@ class Canvas {
     /// @param y1 The y coordinate of the other corner
     /// @param l The color of the line to draw with.
     /// @param f The color to fill the rectangle with.
-    void drawFilledRect(uint x0, uint y0, uint x1, uint y1, const RGB& lineColor,
-                        const RGB& fillColor);
+    void drawFilledRect(uint x0, uint y0, uint x1, uint y1,
+                        const RGB& lineColor, const RGB& fillColor);
 
     /// @brief Scrolls the canvas up by one row, filling the empty row with
     /// the background color.
@@ -242,21 +246,21 @@ class Canvas {
     /// @brief Copies data from row src into row dst
     /// @param src The source of data
     /// @param dst The destination of data
-    void copyRow(int src, int dst);
+    virtual void copyRow(int src, int dst);
 
-    void copyColumn(int src, int dst);
+    virtual void copyColumn(int src, int dst);
 
-    void rotateRight();
+    virtual void rotateRight();
 
-    void rotateLeft();
+    virtual void rotateLeft();
 
     /// @brief Rotate the canvas up by one row, which will make the top row the
     /// bottom row.
-    void rotateUp();
+    virtual void rotateUp();
 
     /// @brief Rotate the canvas down by one row, which will make the bottom row
     /// the top row.
-    void rotateDown();
+    virtual void rotateDown();
 
     /// @brief Mirrors the left side of the canvas onto the right through the
     /// middle column.
@@ -298,16 +302,16 @@ class Canvas {
     void mirrorBottomToTop(int r);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftLeft(int x, int y, uint w, uint h, int n);
+    virtual void shiftLeft(int x, int y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the right by n pixels.
-    void shiftRight(int x, int y, uint w, uint h, int n);
+    virtual void shiftRight(int x, int y, uint w, uint h, int n);
 
     /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftUp(int x, int y, uint w, uint h, int n);
+    virtual void shiftUp(int x, int y, uint w, uint h, int n);
 
-    /// @brief Shifts a rectangle of pixels to the left by n pixels.
-    void shiftDown(int x, int y, uint w, uint h, int n);
+    /// @brief Shifts a rectangle of pixels to the down by n pixels.
+    virtual void shiftDown(int x, int y, uint w, uint h, int n);
 
     /// @brief Gets the position in our data array for a given x and y. Just
     /// here so friends can figure it out

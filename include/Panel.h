@@ -22,8 +22,8 @@ class Panel : public Strip {
           height(height),
           origin(origin) {}
 
-    void set(uint x, uint y, const RGB& color) {
-        if (x >= width || y >= height) return;
+    bool set(uint x, uint y, const RGB& color) {
+        if (x >= width || y >= height) return false;
         uint index;
         switch (origin) {
             case TopLeft:
@@ -39,11 +39,43 @@ class Panel : public Strip {
                 index = x * height + ((x % 2 == 0) ? (height - 1 - y) : y);
                 break;
             default:
-                return;
+                return false;
         }
 
         Strip::putPixel(color, index);
+        return true;
+    };
+
+    const RGB& get(uint x, uint y) {
+        uint index;
+        switch (origin) {
+            case TopLeft:
+                index = x * height + ((x % 2 == 0) ? (height - 1 - y) : y);
+                break;
+            case BottomRight:
+                index = (width - 1 - x) * height + ((x % 2 == 0) ? y : (height - 1 - y));
+                break;
+            case TopRight:
+                index = (width - 1 - x) * height + ((x % 2 == 0) ? (height - 1 - y) : y);
+                break;
+            case BottomLeft:
+                index = x * height + ((x % 2 == 0) ? (height - 1 - y) : y);
+                break;
+            default:
+                return stripBlack;
+        }
+        return data[index];
     }
+
+    void fill(const RGB& color) {
+        RGB *d = data;
+        for(int i = 0; i < numPixels; i++) {
+            *d++ = color;
+        }
+    }
+
+    void rotateRight();
+    void rotateLeft();
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
