@@ -15,7 +15,7 @@
 #define STRIP_LEN 256
 #define NUM_STRIPS 1
 #define START_PIN 2
-#define WIDTH 8
+#define PANEL_WIDTH 8
 
 int main() {
     stdio_init_all();
@@ -63,7 +63,7 @@ int main() {
     int colorIndex = 0;
     for (int i = 0; i < strip.getNumPixels(); i++) {
         strip.putPixel(cc, i);
-        if ((i + 1) % WIDTH == 0) {
+        if ((i + 1) % PANEL_WIDTH == 0) {
             colorIndex = (colorIndex + 1) % colorMap.getUsed();
             cc = colorMap.getColor(colorIndex);
         }
@@ -77,7 +77,7 @@ int main() {
     StopWatch frameWatch;
     uint32_t missedFrames = 0;
     int startPos = 0;
-    int width = WIDTH;
+    int width = PANEL_WIDTH;
     int currColorIndex = 0;
     while (1) {
         frameWatch.start();

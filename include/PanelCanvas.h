@@ -13,12 +13,8 @@ class PanelCanvas : public Canvas {
     // @param panelHeight The height of each panel.
     // @param nx The number of panels in the x direction.
     // @param ny The number of panels in the y direction.
-    PanelCanvas(uint panelWidth, uint panelHeight, uint nx, uint ny)
-        : Canvas(panelWidth*nx), panelWidth(panelWidth), panelHeight(panelHeight), nx(nx), ny(ny) {
-            height = ny * panelHeight;
-            width = nx * panelWidth;
-        }
-
+    PanelCanvas(uint panelWidth, uint panelHeight, uint nx, uint ny);
+    ~PanelCanvas();
     void addPanel(Panel* panel, uint x, uint y);
 
     uint getHeight() override { return height; };
@@ -43,7 +39,7 @@ class PanelCanvas : public Canvas {
     void shiftDown(int x, int y, uint w, uint h, int n);
 
    private:
-    std::vector<std::vector<Panel*>> panels;
+    Panel ***panels;
     uint panelWidth;
     uint panelHeight;
     uint nx;

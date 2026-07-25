@@ -15,8 +15,8 @@
 #define STRIP_LEN 256
 #define NUM_STRIPS 1
 #define START_PIN 2
-#define WIDTH 32
-#define HEIGHT 8
+#define PANEL_WIDTH 32
+#define PANEL_HEIGHT 8
 
 int main() {
     stdio_init_all();
@@ -25,7 +25,7 @@ int main() {
 
     //
     // Simple test for a single strip of pixels.
-    Panel panel(START_PIN, WIDTH, HEIGHT);
+    Panel panel(START_PIN, PANEL_WIDTH, PANEL_HEIGHT);
     Renderer renderer(16);
     renderer.add(&panel);
     renderer.setup();

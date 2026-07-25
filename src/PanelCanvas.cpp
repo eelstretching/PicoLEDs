@@ -1,4 +1,30 @@
 #include "PanelCanvas.h"
+
+PanelCanvas::PanelCanvas(uint panelWidth, uint panelHeight, uint nx, uint ny)
+    : Canvas(panelWidth * nx),
+      panelWidth(panelWidth),
+      panelHeight(panelHeight),
+      nx(nx),
+      ny(ny) {
+    height = ny * panelHeight;
+    width = nx * panelWidth;
+
+    panels = new Panel**[nx];
+    for (uint i = 0; i < nx; i++) {
+        panels[i] = new Panel*[ny];
+        for (uint j = 0; j < ny; j++) {
+            panels[i][j] = nullptr;
+        }
+    }
+}
+
+PanelCanvas::~PanelCanvas() {
+    for (uint i = 0; i < nx; i++) {
+        delete[] panels[i];
+    }
+    delete[] panels;
+}
+
 void PanelCanvas::addPanel(Panel* panel, uint x, uint y) {
     if (x < nx && y < ny) {
         panels[x][y] = panel;
@@ -56,9 +82,9 @@ void PanelCanvas::fillColumn(uint col, const RGB& color) {
 }
 
 void PanelCanvas::fill(const RGB& color) {
-    for (auto row : panels) {
-        for (auto panel : row) {
-            panel->fill(color);
+    for(int i = 0; i < nx; i++) {
+        for(int j = 0; j < ny; j++) {
+            panels[i][j]->fill(color);
         }
     }
 }

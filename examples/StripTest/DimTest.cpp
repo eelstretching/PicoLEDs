@@ -16,7 +16,7 @@
 #define STRIP_LEN 300
 #define NUM_STRIPS 1
 #define START_PIN 2
-#define WIDTH 10
+#define PANEL_WIDTH 10
 
 int main() {
     stdio_init_all();
