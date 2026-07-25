@@ -380,6 +380,28 @@ void Canvas::rotateDown() {
     rows[rows.size() - 1]->copyInData(tmp);
 }
 
+void Canvas::flipHorizontal() {
+    uint h = getHeight();
+    for (int i = 0; i < width / 2; i++) {
+        for (int j = 0; j < h; j++) {
+            RGB temp = get(i, j);
+            set(i, j, get(width - 1 - i, j));
+            set(width - 1 - i, j, temp);
+        }
+    }
+}
+
+void Canvas::flipVertical() {
+    uint h = getHeight();
+    for (int i = 0; i < h / 2; i++) {
+        for (int j = 0; j < width; j++) {
+            RGB temp = get(j, i);
+            set(j, i, get(j, h - 1 - i));
+            set(j, h - 1 - i, temp);
+        }
+    }
+}
+
 void Canvas::mirrorLeftToRight() {
     mirrorLeftToRight((width / 2) - (width % 2));
 }
@@ -533,7 +555,8 @@ void Canvas::shiftDown(int x, int y, uint w, uint h, int n) {
     }
 }
 
-void Canvas::show() {
+void Canvas::show(uint8_t brightness) {
+    renderer.setBrightness(brightness);
     stats.start();
     renderer.render();
     stats.finish();

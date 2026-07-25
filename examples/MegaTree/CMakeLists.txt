@@ -41,6 +41,7 @@ target_link_libraries(CanvasTest
   pico_rand
   pico_runtime
   pico_stdlib
+  pico_status_led
 )
 
 pico_add_extra_outputs(CanvasTest)
@@ -56,6 +57,7 @@ target_link_libraries(MegaTree
   pico_rand
   pico_runtime
   pico_stdlib
+  pico_status_led
 )
 
 pico_add_extra_outputs(MegaTree)
@@ -69,6 +71,7 @@ target_link_libraries(MicroTree
   pico_rand
   pico_runtime
   pico_stdlib
+  pico_status_led
 )
 
 pico_add_extra_outputs(MicroTree)

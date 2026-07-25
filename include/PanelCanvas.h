@@ -14,16 +14,12 @@ class PanelCanvas : public Canvas {
     // @param nx The number of panels in the x direction.
     // @param ny The number of panels in the y direction.
     PanelCanvas(uint panelWidth, uint panelHeight, uint nx, uint ny)
-        : panelWidth(panelWidth), panelHeight(panelHeight), nx(nx), ny(ny) {
+        : Canvas(panelWidth*nx), panelWidth(panelWidth), panelHeight(panelHeight), nx(nx), ny(ny) {
             height = ny * panelHeight;
             width = nx * panelWidth;
         }
 
-    void addPanel(Panel* panel, uint x, uint y) {
-        if (x < nx && y < ny) {
-            panels[x][y] = panel;
-        }
-    }
+    void addPanel(Panel* panel, uint x, uint y);
 
     uint getHeight() override { return height; };
 
@@ -31,20 +27,20 @@ class PanelCanvas : public Canvas {
     int getPanelX(int x) { return x / panelWidth; }
     int getPanelY(int y) { return y / panelHeight; }
     const RGB& get(uint x, uint y) override;
-    void copy(RGB* d, int n, int x, int y) override = 0;
+    void copy(RGB* d, int n, int x, int y) override;
     void fillRow(uint row, const RGB& color) override;
     void fillColumn(uint col, const RGB& color) override;
     void fill(const RGB& color) override;
     void copyRow(int src, int dst) override;
-    void copyColumn(int src, int dst) override = 0;
-    void rotateRight() override = 0;
-    void rotateLeft() override = 0;
-    void rotateUp() override = 0;
-    void rotateDown() override = 0;
-    void shiftLeft(int x, int y, uint w, uint h, int n) override = 0;
-    void shiftRight(int x, int y, uint w, uint h, int n) override = 0;
-    void shiftUp(int x, int y, uint w, uint h, int n) override = 0;
-    void shiftDown(int x, int y, uint w, uint h, int n) override = 0;
+    void copyColumn(int src, int dst) override;
+    void rotateRight() override;
+    void rotateLeft() override;
+    void rotateUp() override;
+    void rotateDown() override;
+    void shiftLeft(int x, int y, uint w, uint h, int n);
+    void shiftRight(int x, int y, uint w, uint h, int n);
+    void shiftUp(int x, int y, uint w, uint h, int n);
+    void shiftDown(int x, int y, uint w, uint h, int n);
 
    private:
     std::vector<std::vector<Panel*>> panels;

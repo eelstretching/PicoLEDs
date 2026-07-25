@@ -262,6 +262,9 @@ class Canvas {
     /// the top row.
     virtual void rotateDown();
 
+    virtual void flipHorizontal();
+    virtual void flipVertical();
+
     /// @brief Mirrors the left side of the canvas onto the right through the
     /// middle column.
     /// @details If there are an even number of columns, the left half is simply
@@ -346,7 +349,11 @@ class Canvas {
     void clearColumn(int column);
 
     /// @brief Shows the data on the canvas in the view provided by the strips.
-    void show();
+    void show() {
+        show(renderer.getBrightness());
+    };
+
+    void show(uint8_t brightness);
 
     void debugPrint();
 

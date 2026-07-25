@@ -1,3 +1,4 @@
+add_subdirectory(PanelTest)
 add_subdirectory(MegaTree)
 add_subdirectory(StripTest)
 add_subdirectory(Stuff)
