@@ -3,7 +3,7 @@
 #include "pico/printf.h"
 #include "pico/stdlib.h"
 
-DataAnimation::DataAnimation(Canvas* canvas, Font* font, uint duration,
+DataAnimation::DataAnimation(Canvas* canvas, SimpleFont* font, uint duration,
                              data_t* data)
     : TextAnimation(canvas, font, duration), data(data) {
     //

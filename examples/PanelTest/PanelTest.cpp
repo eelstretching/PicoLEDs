@@ -4,6 +4,8 @@
 #include "Animator.h"
 #include "ArrayColorMap.h"
 #include "FontTwoP.h"
+#include "9x15B_font.h"
+#include "BDFFont.h"
 #include "Icicles.h"
 #include "Marquees.h"
 #include "Panel.h"
@@ -89,10 +91,18 @@ int main() {
 
     Animator animator(&canvas, FPS);
 
-    Font font(FontTwoPData);
-    const char* text = "Hello, World!";
-    uint sx = font.getWidth(text);
-    ScrollText t1(&canvas, &font, text, -sx, 4, xmasColors[0],
+    BDFFont bdf(font_9x15b);
+    const char* testText = "TShqgijPJ";
+    const char* helloText = "Hello, World!";
+    uint stt = bdf.getWidth(testText);
+    uint sx = bdf.getWidth(helloText);
+
+    TextElement element(testText, (canvas.getWidth() - stt)/2, 4, xmasColors[0]);
+    TextAnimation anim(&canvas, &bdf);
+    anim.add(&element);
+    animator.addTimed(&anim, 30000);
+
+    ScrollText t1(&canvas, &bdf, helloText, -sx, 4, xmasColors[0],
                   RenderAngle::RENDER_0);
     t1.setClear(true);
     t1.setFrameDelay(false);

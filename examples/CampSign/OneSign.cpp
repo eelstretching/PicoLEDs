@@ -55,7 +55,7 @@ int main() {
     sleep_ms(delay);
     canvas.clear();
 
-    Font twoP(&canvas, FontTwoPData);
+    SimpleFont twoP(&canvas, FontTwoPData);
 
     TextAnimation text(&canvas, &twoP, 1000);
     text.add(new TextElement("THIS IS TEXT", 20, 8, RGB::BlueViolet));

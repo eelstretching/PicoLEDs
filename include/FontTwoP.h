@@ -1,7 +1,7 @@
 #ifndef TWOPFONT_H
 #define TWOPFONT_H
 
-#include "Font.h"
+#include "SimpleFont.h"
 
 const uint8_t FontTwoPData[] = {
 	1,  // This font is proportional, so the first byte of each font character is the width in pixels.

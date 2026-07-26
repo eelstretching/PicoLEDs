@@ -12,7 +12,7 @@
 /// @brief A text element that can appear in a text animation.
 class TextElement {
    public:
-    TextElement(const char *text, int x, int y, uint8_t color);
+    TextElement(const char *text, int x, int y, const RGB& color);
     const char *text;
     int startx;
     int starty;
@@ -20,7 +20,7 @@ class TextElement {
     int y;
     bool waiting;
     uint width;
-    uint8_t color;
+    const RGB& color;
 };
 
 class TextAnimation : public Animation {
@@ -35,7 +35,7 @@ class TextAnimation : public Animation {
     /// @param canvas
     /// @param font
     /// @param duration How long to display the text, in milliseconds.
-    TextAnimation(Canvas *canvas, ColorMap *colorMap, Font *font);
+    TextAnimation(Canvas *canvas, Font *font);
 
     void add(TextElement *element);
 

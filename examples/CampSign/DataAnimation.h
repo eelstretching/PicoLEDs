@@ -22,7 +22,7 @@ class DataAnimation : public TextAnimation {
     /// @param font the font we'll use for display
     /// @param duration how long to show the data for
     /// @param data the data to show
-    DataAnimation(Canvas *canvas, Font *font, uint duration, data_t *data);
+    DataAnimation(Canvas *canvas, SimpleFont *font, uint duration, data_t *data);
 
     ~DataAnimation();
 

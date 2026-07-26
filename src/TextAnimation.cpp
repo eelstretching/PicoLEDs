@@ -4,11 +4,11 @@
 #include "pico/stdlib.h"
 #include <inttypes.h>
 
-TextElement::TextElement(const char* text, int x, int y, uint8_t color)
+TextElement::TextElement(const char* text, int x, int y, const RGB& color)
     : text(text), x(x), startx(x), y(y), starty(y), color(color) {}
 
-TextAnimation::TextAnimation(Canvas* canvas, ColorMap *colorMap, Font* font)
-    : Animation(canvas, colorMap), font(font) {
+TextAnimation::TextAnimation(Canvas* canvas, Font* font)
+    : Animation(canvas, nullptr), font(font) {
 }
 
 void TextAnimation::add(TextElement* element) { elements.push_back(element); }

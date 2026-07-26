@@ -6,7 +6,7 @@
 #define SCROLLING 1
 #define WAITING 2
 
-ScoutLaw::ScoutLaw(Canvas* canvas, Font* font, int wait)
+ScoutLaw::ScoutLaw(Canvas* canvas, SimpleFont* font, int wait)
     : Animation(canvas), font(font), wait(wait*1000) {}
 
 void ScoutLaw::init() {

@@ -12,7 +12,7 @@ class TimeAnimation : public Animation {
 
     protected:
 
-    Font *font;
+    SimpleFont *font;
     datetime_t dt;
     char tb[25];
     uint64_t start;
@@ -27,7 +27,7 @@ class TimeAnimation : public Animation {
     /// @param canvas the canvas we'll display on
     /// @param font the font we'll use for display
     /// @param duration the duration of the display, in milliseconds
-    TimeAnimation(Canvas *canvas, Font *font, uint duration) : Animation(canvas, nullptr), font(font), duration(duration*1000) { 
+    TimeAnimation(Canvas *canvas, SimpleFont *font, uint duration) : Animation(canvas, nullptr), font(font), duration(duration*1000) { 
         fps = 10;
     };
     void init();

@@ -28,7 +28,7 @@ int main() {
     canvas.add(&strips[3]);
     int delay = 30;
 
-    Font twoP(FontTwoPData);
+    SimpleFont twoP(FontTwoPData);
 
     ArrayColorMap colorMap({
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,

@@ -56,7 +56,7 @@ int main() {
     canvas.clear();
     canvas.show();
 
-    Font twoP(&canvas, FontTwoPData);
+    SimpleFont twoP(&canvas, FontTwoPData);
 
     //
     // Setup for networking.

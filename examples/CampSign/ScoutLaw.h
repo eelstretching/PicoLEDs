@@ -21,7 +21,7 @@ class ScoutLaw : public Animation {
     /// @brief Where we'll render the current element.
     int scrollX = 0;
 
-    Font *font;
+    SimpleFont *font;
     uint n = 12;
     const char *sis = "A SCOUT IS ";
     const char *law[12] = {"TRUSTWORTY", "LOYAL", "HELPFUL",  "FRIENDLY",
@@ -29,7 +29,7 @@ class ScoutLaw : public Animation {
                            "THRIFTY",    "BRAVE", "CLEAN",    "REVERENT"};
 
    public:
-    ScoutLaw(Canvas *canvas, Font *font, int wait);
+    ScoutLaw(Canvas *canvas, SimpleFont *font, int wait);
     void init();
     bool step();
 };

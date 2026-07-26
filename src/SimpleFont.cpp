@@ -1,8 +1,6 @@
-#include "Font.h"
+#include "SimpleFont.h"
 
-#include "pico/types.h"
-
-Font::Font(const uint8_t* fontData) {
+SimpleFont::SimpleFont(const uint8_t* fontData) {
     this->proportional = fontData[0] == 1;
     fontWidth = fontData[1];
     fontHeight = fontData[2];
@@ -24,8 +22,8 @@ Font::Font(const uint8_t* fontData) {
     }
 }
 
-uint Font::render(Canvas* canvas, const char* text, int bx, int by, const RGB& color,
-                  RenderAngle angle) {
+uint SimpleFont::render(Canvas* canvas, const char* text, int bx, int by,
+                        const RGB& color, bool renderMissing, RenderAngle angle) {
     switch (angle) {
         case RENDER_0:
             return render0(canvas, text, bx, by, color);
@@ -35,7 +33,8 @@ uint Font::render(Canvas* canvas, const char* text, int bx, int by, const RGB& c
     return 0;
 }
 
-uint Font::render0(Canvas* canvas, const char* text, int bx, int by, const RGB& color) {
+uint SimpleFont::render0(Canvas* canvas, const char* text, int bx, int by,
+                         const RGB& color) {
     uint x = bx;
     uint p = 0;
     uint tw = 0;
@@ -71,7 +70,8 @@ uint Font::render0(Canvas* canvas, const char* text, int bx, int by, const RGB& 
     return lw == 0 ? tw : lw;
 }
 
-uint Font::render0(Canvas* canvas, char c, int bx, int by, const RGB& color) {
+uint SimpleFont::render0(Canvas* canvas, char c, int bx, int by,
+                         const RGB& color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;
@@ -126,7 +126,8 @@ uint Font::render0(Canvas* canvas, char c, int bx, int by, const RGB& color) {
     return charWidth;
 }
 
-uint Font::render90(Canvas* canvas, const char* text, int bx, int by, const RGB& color) {
+uint SimpleFont::render90(Canvas* canvas, const char* text, int bx, int by,
+                          const RGB& color) {
     uint y = by;
     uint p = 0;
     uint tw = 0;
@@ -162,7 +163,8 @@ uint Font::render90(Canvas* canvas, const char* text, int bx, int by, const RGB&
     return lw == 0 ? tw : lw;
 }
 
-uint Font::render90(Canvas* canvas, char c, int by, int bx, const RGB& color) {
+uint SimpleFont::render90(Canvas* canvas, char c, int by, int bx,
+                          const RGB& color) {
     //
     // Figure out where the data for this caracter starts in our font.
     uint fdp = (c - fontBase) * fCBytes;
@@ -217,7 +219,7 @@ uint Font::render90(Canvas* canvas, char c, int by, int bx, const RGB& color) {
     return charWidth;
 }
 
-uint Font::getWidth(const char* text) {
+uint SimpleFont::getWidth(const char* text, bool draw_missing) const {
     uint p = 0;
     uint tw = 0;
 
@@ -231,17 +233,17 @@ uint Font::getWidth(const char* text) {
             tw += fontSpaceWidth;
             continue;
         }
-        uint charWidth = getWidth(c);
+        uint charWidth = getWidth(c, draw_missing);
         tw = tw + charWidth + spacing;
     }
     return tw;
 }
 
-uint Font::getWidth(char c) {
+uint SimpleFont::getWidth(char c, bool draw_missing) const {
     if (!proportional) {
         return fontWidth;
     }
     return fontData[(c - fontBase) * fCBytes];
 }
 
-void Font::setSpacing(uint spacing) { this->spacing = spacing; }
+void SimpleFont::setSpacing(uint spacing) { this->spacing = spacing; }
