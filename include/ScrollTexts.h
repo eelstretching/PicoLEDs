@@ -18,9 +18,13 @@ class ScrollText : public Animation {
     Font *font;
     const RGB& color;
     RenderAngle angle;
+    bool clear;
+    bool frameDelay;
 
     public:
     ScrollText(Canvas* canvas, Font* font, const char* text, int startx, int starty, const RGB& color, RenderAngle angle = RENDER_90);
+    void setClear(bool clear) { this->clear = clear; }
+    void setFrameDelay(bool frameDelay) { this->frameDelay = frameDelay; }
     void init() override;
     bool step() override;
 };

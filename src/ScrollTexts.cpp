@@ -19,11 +19,16 @@ void ScrollText::init() {
 }
 
 bool ScrollText::step() {
-    if(frameWait > 0) {
-        frameWait--;
-        return true;
+    if (clear) {
+        canvas->clear();
     }
-    font->render(text, x, y, color, angle);
+    if (!frameDelay) {
+        if (frameWait > 0) {
+            frameWait--;
+            return true;
+        }
+    }
+    font->render(canvas, text, x, y, color, angle);
     switch (angle) {
         case RENDER_0:
             x++;

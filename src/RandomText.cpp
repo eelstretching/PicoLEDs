@@ -5,5 +5,5 @@
 void RandomText::init() {
     canvas->clear();
     TextElement *el = elements[random8(0, elements.size())];
-    font->render(el->text, el->x, el->y, el->color);
+    font->render(canvas, el->text, el->x, el->y, el->color);
 }

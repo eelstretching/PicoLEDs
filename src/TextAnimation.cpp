@@ -16,7 +16,7 @@ void TextAnimation::add(TextElement* element) { elements.push_back(element); }
 void TextAnimation::init() {
     canvas->clear();
     for (auto el : elements) {
-        font->render(el->text, el->x, el->y, el->color, angle);
+        font->render(canvas, el->text, el->x, el->y, el->color, angle);
     }
 }
 

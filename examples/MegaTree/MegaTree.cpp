@@ -241,7 +241,7 @@ int main() {
     rrr2.setName("RRR2");
     animator.addTimed(&rrr2, 10000);
 
-    Font font(&canvas, FontTwoPData);
+    Font font(FontTwoPData);
     ScrollTexts sts(&canvas);
     ScrollText st1(&canvas, &font, "MERRY CHRISTMAS", 90, -30, xmasColors[0]);
     ScrollText st2(&canvas, &font, "HAPPY HOLIDAYS", 75, -45, xmasColors[1]);

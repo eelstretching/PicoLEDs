@@ -8,7 +8,7 @@
 
 /* Binary constant generator macro By Tom Torfs - donated to the public domain
  */
-/* All macro's evaluate to compile-time constants */
+/* All macros evaluate to compile-time constants */
 #ifndef HEX__
 #define HEX__(n) 0x##n##LU
 #endif
@@ -23,22 +23,15 @@
 #define B24(d1, d2, d3) ((uint8_t)B8__(HEX__(d1))),((uint8_t)B8__(HEX__(d2))),((uint8_t)B8__(HEX__(d3))))
 #endif
 
-
-enum RenderAngle {
-    RENDER_0,
-    RENDER_90,
-    RENDER_180,
-    RENDER_270
-};
+enum RenderAngle { RENDER_0, RENDER_90, RENDER_180, RENDER_270 };
 
 class Font {
    public:
     /// @brief Create a class that can render the given font data onto the
     /// provided canvas.
-    /// @param canvas The canvas onto which we'll render text
     /// @param fontData The data for the font we'll render.
-    Font(Canvas *canvas, const uint8_t *fontData);
-    
+    Font(const uint8_t* fontData);
+
     /// @brief Renders the provided text onto the underlying matrix, at the
     /// given pixel position. We're assuming that the canvas has 0,0 in the
     /// bottom-left corner (i.e., Cartesian coordinates)!
@@ -47,10 +40,13 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in
     /// @return The width of the rendered text, in pixels.
-    uint render(const char *text, int bx, int by, const RGB& color, RenderAngle angle = RENDER_0);
+    uint render(Canvas* canvas, const char* text, int bx, int by,
+                const RGB& color, RenderAngle angle = RENDER_0);
 
-    uint render0(const char* text, int bx, int by, const RGB& color);
-    uint render90(const char* text, int bx, int by, const RGB& color);
+    uint render0(Canvas* canvas, const char* text, int bx, int by,
+                 const RGB& color);
+    uint render90(Canvas* canvas, const char* text, int bx, int by,
+                  const RGB& color);
 
     /// @brief Renders a single character onto our canvas at the given pixel
     /// position.
@@ -59,19 +55,19 @@ class Font {
     /// @param by The base y coordinate for rendering
     /// @param color The color to render the text in.
     /// @return the width of the rendered character, in pixels.
-    uint render0(char c, int bx, int by, const RGB& color);
-    uint render90(char c, int bx, int by, const RGB& color);
+    uint render0(Canvas *canvas, char c, int bx, int by, const RGB& color);
+    uint render90(Canvas *canvas, char c, int bx, int by, const RGB& color);
 
     /// @brief Gets the width of the given string rendered in this font.
-    /// @param text 
-    uint getWidth(const char *text);
+    /// @param text
+    uint getWidth(const char* text);
 
     /// @brief Gets the width of the given character when rendered in this font.
     /// @param c the character
     /// @return the width of the character
     uint getWidth(char c);
 
-    uint getSpacing() {return spacing;};
+    uint getSpacing() { return spacing; };
 
     /// @brief Sets the spacing between characters, if we wish to override the
     /// definition in the font.
@@ -85,12 +81,11 @@ class Font {
     uint8_t getFontHeight() { return (fontHeight); };
 
    private:
-    Canvas *canvas;
     bool proportional;
     uint8_t fontWidth, fontHeight, fontSpaceWidth, fontBase, fontUpper, fWBytes,
         fCBytes;
     uint8_t spacing = 1;
-    const uint8_t *fontData;
+    const uint8_t* fontData;
     uint8_t dbp;
 };
 

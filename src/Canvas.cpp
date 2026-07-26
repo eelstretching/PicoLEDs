@@ -461,9 +461,7 @@ void Canvas::mirrorBottomToTop(int r) {
 }
 
 void Canvas::clear() {
-    for (auto row : rows) {
-        row->fill(background);
-    }
+    fill(background);
 }
 
 void Canvas::clear(uint x, uint y, uint w, uint h) {

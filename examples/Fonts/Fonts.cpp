@@ -28,7 +28,7 @@ int main() {
     canvas.add(&strips[3]);
     int delay = 30;
 
-    Font twoP(&canvas, FontTwoPData);
+    Font twoP(FontTwoPData);
 
     ArrayColorMap colorMap({
         RGB::Black, RGB::Red,  RGB::Orange, RGB::Yellow, RGB::Green,
@@ -40,7 +40,7 @@ int main() {
     //
     // A couple of animations.
     while (1) {
-        int w = twoP.render("prepared", 10, 8, 4);
+        int w = twoP.render(&canvas, "prepared", 10, 8, colorMap[4]);
         canvas.show();
 
         printf("Render was %d pixels wide\n", w);
