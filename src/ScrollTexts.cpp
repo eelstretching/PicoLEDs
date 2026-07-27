@@ -31,17 +31,33 @@ bool ScrollText::step() {
     font->render(canvas, text, x, y, color, angle);
     switch (angle) {
         case RENDER_0:
-            x++;
-            if(x >= (int) canvas->getWidth()) {
-                x = startx;
-                frameWait = random8(0, 30);
+            if (direction == LEFT) {
+                x--;
+                if (x < -width) {
+                    x = startx;
+                    frameWait = random8(0, 30);
+                }
+            } else if (direction == RIGHT) {
+                x++;
+                if (x >= (int)canvas->getWidth()) {
+                    x = startx;
+                    frameWait = random8(0, 30);
+                }
             }
             break;
         case RENDER_90:
-            y = y + 1;
-            if (y >= (int) (canvas->getHeight() + width)) {
-                y = starty;
-                frameWait = random8(0, 30);
+            if (direction == UP) {
+                y = y + 1;
+                if (y >= (int)(canvas->getHeight() + width)) {
+                    y = starty;
+                    frameWait = random8(0, 30);
+                }
+            } else if (direction == DOWN) {
+                y = y - 1;
+                if (y < -width) {
+                    y = starty;
+                    frameWait = random8(0, 30);
+                }
             }
             break;
     }
@@ -49,14 +65,14 @@ bool ScrollText::step() {
 }
 
 void ScrollTexts::init() {
-    for(auto t : texts) {
+    for (auto t : texts) {
         t->init();
     }
 }
 
-bool ScrollTexts::step() { 
+bool ScrollTexts::step() {
     canvas->clear();
-    for(auto t : texts) {
+    for (auto t : texts) {
         t->step();
     }
     return true;

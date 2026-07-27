@@ -1,11 +1,12 @@
 #include <Renderer.h>
 #include <stdlib.h>
 
+#include "9x15B_font.h"
+#include "6x10_font.h"
 #include "Animator.h"
 #include "ArrayColorMap.h"
-#include "FontTwoP.h"
-#include "9x15B_font.h"
 #include "BDFFont.h"
+#include "FontTwoP.h"
 #include "Icicles.h"
 #include "Marquees.h"
 #include "Panel.h"
@@ -92,21 +93,26 @@ int main() {
     Animator animator(&canvas, FPS);
 
     BDFFont bdf(font_9x15b);
-    const char* testText = "TShqgijPJ";
     const char* helloText = "Hello, World!";
-    uint stt = bdf.getWidth(testText);
-    uint sx = bdf.getWidth(helloText);
+    int sx = bdf.getWidth(helloText);
 
-    TextElement element(testText, (canvas.getWidth() - stt)/2, 4, xmasColors[0]);
-    TextAnimation anim(&canvas, &bdf);
-    anim.add(&element);
-    animator.addTimed(&anim, 30000);
+    BDFFont bdf2(font_6x10);
+    const char* testText = "TEST hqgijPJ Testing the font rendering!";
+    int stt = bdf2.getWidth(testText);
 
-    ScrollText t1(&canvas, &bdf, helloText, -sx, 4, xmasColors[0],
+    ScrollText t1(&canvas, &bdf, helloText, canvas.getWidth(), 4, xmasColors[0],
                   RenderAngle::RENDER_0);
+    t1.setDirection(Direction::LEFT);
     t1.setClear(true);
     t1.setFrameDelay(false);
     animator.addTimed(&t1, 10000);
+
+    ScrollText t2(&canvas, &bdf2, testText, canvas.getWidth(), 4, xmasColors[0],
+                  RenderAngle::RENDER_0);
+    t2.setDirection(Direction::LEFT);
+    t2.setClear(true);
+    t2.setFrameDelay(false);
+    animator.addTimed(&t2, 20000);
 
     Marquees fancyMarq(&canvas, &xmasColors, 5, rgbwgColors, 20, RIGHT,
                        canvas.getHeight());

@@ -2,6 +2,7 @@
 #define SCROLLTEXTS_H
 #pragma once
 #include <stdint.h>
+#include "Direction.h"
 #include "TextAnimation.h"
 #include "Font.h"
 
@@ -20,9 +21,11 @@ class ScrollText : public Animation {
     RenderAngle angle;
     bool clear;
     bool frameDelay;
+    Direction direction;
 
     public:
     ScrollText(Canvas* canvas, Font* font, const char* text, int startx, int starty, const RGB& color, RenderAngle angle = RENDER_90);
+    void setDirection(Direction direction) { this->direction = direction; }
     void setClear(bool clear) { this->clear = clear; }
     void setFrameDelay(bool frameDelay) { this->frameDelay = frameDelay; }
     void init() override;
