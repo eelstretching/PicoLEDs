@@ -62,20 +62,26 @@ int main() {
     uint8_t rgbwColors[] = {0, 1, 2, 3};
     uint8_t rgbwgColors[] = {0, 1, 2, 3, 4};
 
-    Panel panels[6] = {Panel(START_PIN, PANEL_WIDTH, PANEL_HEIGHT),
+    Panel panels[9] = {Panel(START_PIN, PANEL_WIDTH, PANEL_HEIGHT),
                        Panel(START_PIN + 1, PANEL_WIDTH, PANEL_HEIGHT),
                        Panel(START_PIN + 2, PANEL_WIDTH, PANEL_HEIGHT),
                        Panel(START_PIN + 3, PANEL_WIDTH, PANEL_HEIGHT),
                        Panel(START_PIN + 4, PANEL_WIDTH, PANEL_HEIGHT),
-                       Panel(START_PIN + 5, PANEL_WIDTH, PANEL_HEIGHT)};
+                       Panel(START_PIN + 5, PANEL_WIDTH, PANEL_HEIGHT),
+                       Panel(START_PIN + 6, PANEL_WIDTH, PANEL_HEIGHT),
+                       Panel(START_PIN + 7, PANEL_WIDTH, PANEL_HEIGHT),
+                       Panel(START_PIN + 8, PANEL_WIDTH, PANEL_HEIGHT)};
 
-    PanelCanvas canvas(PANEL_WIDTH, PANEL_HEIGHT, 3, 2);
+    PanelCanvas canvas(PANEL_WIDTH, PANEL_HEIGHT, 3, 3);
     canvas.addPanel(&panels[0], 0, 0);
     canvas.addPanel(&panels[1], 1, 0);
     canvas.addPanel(&panels[2], 2, 0);
     canvas.addPanel(&panels[3], 0, 1);
     canvas.addPanel(&panels[4], 1, 1);
     canvas.addPanel(&panels[5], 2, 1);
+    canvas.addPanel(&panels[6], 0, 2);
+    canvas.addPanel(&panels[7], 1, 2);
+    canvas.addPanel(&panels[8], 2, 2);
     canvas.setup();
     canvas.setBrightness(8);
 
@@ -89,6 +95,13 @@ int main() {
     canvas.fill(colorMap.getBackground());
     canvas.show();
     sleep_ms(100);
+
+    for(int i = 0; i < canvas.getWidth(); i++) {
+        canvas.clear();
+        canvas.fillColumn(i, RGB::Red);
+        canvas.show();
+        sleep_ms(50);
+    }
 
     Animator animator(&canvas, FPS);
 
