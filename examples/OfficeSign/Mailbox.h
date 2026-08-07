@@ -11,9 +11,22 @@
 /// @brief Inter-core "latest message wins" mailbox. Core 1 (BluetoothServer)
 /// is the producer, core 0 (the animation loop) is the consumer.
 ///
-/// The shared SignMessage is protected by a mutex; the multicore FIFO is used
-/// purely as a doorbell to tell core 0 a new message is waiting -- the
-/// message payload itself never travels over the FIFO.
+/// The shared SignMessage is protected by a mutex; a dedicated hardware
+/// doorbell is used purely to tell core 0 a new message is waiting -- the
+/// message payload itself never travels over the doorbell/FIFO.
+///
+/// This deliberately does NOT use the SIO inter-core FIFO for that signal
+/// (an earlier version did). BTStack persists its link keys/device DB to
+/// flash, which requires both cores to call flash_safe_execute_core_init()
+/// -> multicore_lockout_victim_init() -- and that installs a FIFO-interrupt
+/// handler on *each* core that unconditionally drains and discards anything
+/// pushed to the FIFO that isn't its own internal lockout handshake value.
+/// With that handler active, any value this class pushed to the FIFO was
+/// getting silently eaten before take()'s polling loop ever saw it: publish()
+/// still worked (the mutex-protected fields were fine), but take() could
+/// never observe that a doorbell had rung, so messages piled up unread
+/// forever. A dedicated doorbell (same mechanism BtReadySignal already uses
+/// for the startup handshake) isn't touched by the lockout machinery at all.
 ///
 /// Concurrency contract: this is latest-wins, not a queue. If two messages
 /// are published before core 0 next calls take(), only the second is ever
@@ -31,12 +44,12 @@ class Mailbox {
     Mailbox();
 
     /// @brief Producer side (core 1). Publishes msg as the latest message,
-    /// overwriting any not-yet-consumed one, then rings the FIFO doorbell.
+    /// overwriting any not-yet-consumed one, then rings the doorbell.
     void publish(const SignMessage& msg);
 
     /// @brief Consumer side (core 0). Call once per frame. Non-blocking:
-    /// drains the FIFO doorbell if any pushes are pending and, if there's an
-    /// unread message, copies it into out and returns true.
+    /// checks (and clears) the doorbell and, if there's an unread message,
+    /// copies it into out and returns true.
     bool take(SignMessage& out);
 
     /// @brief Producer side (core 1). Records whether the sign currently has
@@ -59,7 +72,9 @@ class Mailbox {
     std::atomic<bool> connected{false};
     std::atomic<uint64_t> disconnectedAtUs{0};
 
-    static constexpr uint32_t kDoorbellValue = 0xA5;
+    // Claimed in the constructor -- gMailbox is a global, so this runs
+    // during static init on core 0, well before core 1 is ever launched.
+    int doorbellNum = -1;
 };
 
 #endif

@@ -16,9 +16,16 @@ ModeController::ModeController(Canvas* canvas, Font* font, RandomAnimator* vibeA
     clockAnimator.add(&clockAnimation);
     meetingAnimator.add(&meetingAnimation);
     darkAnimator.add(&darkAnimation);
+
+    // mode already starts as SignMode::Dark (see the header), so the usual
+    // setMode() path -- which no-ops when newMode == mode -- would never
+    // actually clear the canvas for this initial mode. Do it here instead.
+    darkAnimator.init();
 }
 
 void ModeController::handleMessage(const SignMessage& msg) {
+
+    printf("Received message of type %d\n", msg.type);
     switch (msg.type) {
         case MessageType::SetTime: {
             struct timespec ts;

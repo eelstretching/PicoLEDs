@@ -14,7 +14,7 @@
 #include "RandomAnimator.h"
 #include "ScrollWipe.h"
 #include "BDFFont.h"
-#include "9x15B_font.h"
+#include "6x10_font.h"
 #include "pico/aon_timer.h"
 #include "pico/flash.h"
 #include "pico/multicore.h"
@@ -27,7 +27,7 @@
 #define PANEL_WIDTH 32
 #define PANEL_HEIGHT 8
 #define PANELS_X 3
-#define PANELS_Y 2
+#define PANELS_Y 3
 #define NUM_PANELS (PANELS_X * PANELS_Y)
 #define START_PIN 2
 
@@ -78,11 +78,11 @@ int main() {
         }
     }
     canvas.setup();
-    canvas.setBrightness(32);
+    canvas.setBrightness(8);
     canvas.clear();
     canvas.show();
 
-    BDFFont font(font_9x15b);
+    BDFFont font(font_6x10);
 
     font.render(&canvas, "Start up!", 0, 3, RGB::Green);
     canvas.show();
@@ -116,8 +116,10 @@ int main() {
     vibeAnimator.add(&pacWipe);
     vibeAnimator.add(&rainbowWipe);
 
+    // ModeController boots into SignMode::Dark itself (see ModeController.h)
+    // and clears the canvas as part of construction, so the sign starts dark
+    // until the laptop app sends a mode-switching message.
     ModeController controller(&canvas, &font, &vibeAnimator, &gMailbox);
-    controller.setMode(SignMode::Dark);  // boot dark until the laptop app sends Clock Mode
 
     while (true) {
         SignMessage msg;

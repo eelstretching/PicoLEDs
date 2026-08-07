@@ -17,6 +17,7 @@ void ClockWeatherAnimation::init() {
 bool ClockWeatherAnimation::step() {
     uint64_t now = time_us_64();
     if (now - lastRenderUs >= S_IN_US) {
+        printf("ClockWeatherAnimation: second elapsed\n");
         lastRenderUs = now;
         render();
     }
@@ -56,11 +57,11 @@ void ClockWeatherAnimation::render() {
              tm.tm_hour, tm.tm_min, tm.tm_sec);
 
     canvas->clear();
-    font->render(canvas, timeBuf, 2, 10, RGB::White);
+    font->render(canvas, timeBuf, 0, 8, RGB::White);
 
     if (showWeather && weather.valid) {
         snprintf(weatherBuf, sizeof(weatherBuf), "%s %dF (H%d L%d)", conditionText(weather.condition),
                  weather.currentTempF, weather.highTempF, weather.lowTempF);
-        font->render(canvas, weatherBuf, 2, 0, RGB::Cyan);
+        font->render(canvas, weatherBuf, 0, 0, RGB::Cyan);
     }
 }

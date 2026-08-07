@@ -11,22 +11,39 @@
 
 BluetoothServer* BluetoothServer::instance = nullptr;
 
-// Advertising payload: flags + complete local name + our 128-bit service
-// UUID, so the laptop app can find the sign by scanning for that service
-// rather than matching on name/MAC address.
+// Advertising payload: flags + our 128-bit service UUID, so the laptop app
+// can find the sign by scanning for that service rather than matching on
+// name/MAC address.
 //
 // 20B1C720-1391-4410-9F7F-7ECE217F621C, transmitted least-significant octet
 // first as required for AD structures (i.e. reversed from how the UUID is
 // normally written).
+//
+// The complete local name is deliberately NOT in this packet: legacy BLE
+// advertising data is capped at 31 octets total (see gap_advertisements_set_data's
+// own doc comment), and flags(3) + name(12) + 128-bit service UUID(18) = 33
+// bytes -- 2 over. Since the service UUID is what the laptop app actually
+// filters on, that's the one that has to fit here; the name goes in the
+// scan response packet instead (a second, separate 31-byte packet BLE
+// already provides for exactly this, which bleak's active scan fetches
+// automatically).
 static const uint8_t kAdvData[] = {
     // Flags: LE General Discoverable, BR/EDR not supported.
     0x02, BLUETOOTH_DATA_TYPE_FLAGS, 0x06,
-    // Complete local name.
-    0x0b, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'O', 'f', 'f', 'i', 'c', 'e', 'S', 'i', 'g', 'n',
     // Complete list of 128-bit service class UUIDs.
     0x11, BLUETOOTH_DATA_TYPE_COMPLETE_LIST_OF_128_BIT_SERVICE_CLASS_UUIDS,
     0x1C, 0x62, 0x7F, 0x21, 0xCE, 0x7E, 0x7F, 0x9F, 0x10, 0x44, 0x91, 0x13, 0x20, 0xC7, 0xB1, 0x20,
 };
+
+static const uint8_t kScanRespData[] = {
+    // Complete local name.
+    0x0b, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'O', 'f', 'f', 'i', 'c', 'e', 'S', 'i', 'g', 'n',
+};
+
+// Catch a regression at compile time rather than relearn the 31-byte legacy
+// advertising limit the hard way again.
+static_assert(sizeof(kAdvData) <= 31, "legacy BLE advertising data is capped at 31 octets");
+static_assert(sizeof(kScanRespData) <= 31, "legacy BLE scan response data is capped at 31 octets");
 
 BluetoothServer::BluetoothServer(Mailbox* mailbox) : mailbox(mailbox) {}
 
@@ -81,6 +98,7 @@ void BluetoothServer::setupBluetoothStack() {
     memset(nullAddr, 0, 6);
     gap_advertisements_set_params(advIntMin, advIntMax, advType, 0, nullAddr, 0x07, 0x00);
     gap_advertisements_set_data(sizeof(kAdvData), (uint8_t*)kAdvData);
+    gap_scan_response_set_data(sizeof(kScanRespData), (uint8_t*)kScanRespData);
     gap_advertisements_enable(1);
 
     hciEventReg.callback = &packetHandlerTrampoline;

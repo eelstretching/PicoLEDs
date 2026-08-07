@@ -40,6 +40,7 @@ class SignClient:
         self.disconnected_event.set()
 
     async def connect(self, timeout: float = 15.0) -> None:
+        print("Scanning for OfficeSign. Looking for UUID:", SERVICE_UUID)
         device: BLEDevice | None = await BleakScanner.find_device_by_filter(
             lambda d, adv: SERVICE_UUID in (adv.service_uuids or []),
             timeout=timeout,

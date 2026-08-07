@@ -3,7 +3,11 @@
 #include "pico/multicore.h"
 #include "pico/time.h"
 
-Mailbox::Mailbox() { mutex_init(&mutex); }
+Mailbox::Mailbox() {
+    mutex_init(&mutex);
+    // core_mask 0b11: both cores may claim/reference this doorbell number.
+    doorbellNum = multicore_doorbell_claim_unused(0b11, /*required=*/true);
+}
 
 void Mailbox::publish(const SignMessage& msg) {
     mutex_enter_blocking(&mutex);
@@ -11,19 +15,14 @@ void Mailbox::publish(const SignMessage& msg) {
     hasUnread = true;
     mutex_exit(&mutex);
 
-    multicore_fifo_push_blocking(kDoorbellValue);
+    multicore_doorbell_set_other_core(doorbellNum);
 }
 
 bool Mailbox::take(SignMessage& out) {
-    if (!multicore_fifo_rvalid()) {
+    if (!multicore_doorbell_is_set_current_core(doorbellNum)) {
         return false;
     }
-
-    // Drain any doorbells that have piled up -- we only care that *something*
-    // arrived, not how many times the FIFO was rung.
-    while (multicore_fifo_rvalid()) {
-        (void)multicore_fifo_pop_blocking();
-    }
+    multicore_doorbell_clear_current_core(doorbellNum);
 
     bool got = false;
     mutex_enter_blocking(&mutex);

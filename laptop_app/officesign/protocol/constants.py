@@ -34,5 +34,9 @@ class MeetingStyle(IntEnum):
 PARTICIPANT_NAME_MAX_LEN = 14
 
 # The sign's BLE GATT service/characteristic UUIDs (see OfficeSign.gatt).
+#
+# Lowercase deliberately: bleak's CoreBluetooth backend always normalizes
+# advertised service UUIDs to lowercase (see cb_uuid_to_str), so an uppercase
+# constant here would silently never match during scanning.
 SERVICE_UUID = "20b1c720-1391-4410-9f7f-7ece217f621c"
 CONTROL_CHARACTERISTIC_UUID = "d353ee31-9eab-4fa5-bff2-258667f6d295"
