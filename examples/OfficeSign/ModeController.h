@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Animator.h"
+#include "MapAnimator.h"
 #include "ClockWeatherAnimation.h"
 #include "DarkAnimation.h"
 #include "Mailbox.h"
@@ -11,7 +12,7 @@
 #include "RandomAnimator.h"
 #include "SignMessage.h"
 
-enum class SignMode : uint8_t { Clock, Meeting, Vibe, Dark };
+enum class SignMode : uint8_t { Clock = 0, Meeting = 1, Vibe = 2, Dark = 3 };
 
 /// @brief Owns one Animator per sign mode (Clock/Meeting/Dark) plus a
 /// reference to the Vibe mode's RandomAnimator (built by main() from
@@ -39,9 +40,8 @@ class ModeController {
     MeetingModeAnimation meetingAnimation;
     DarkAnimation darkAnimation;
 
-    Animator clockAnimator;
-    Animator meetingAnimator;
-    Animator darkAnimator;
+    MapAnimator animator;
+
     RandomAnimator* vibeAnimator;
 
     Mailbox* mailbox;

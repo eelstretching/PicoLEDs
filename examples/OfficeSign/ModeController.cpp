@@ -3,28 +3,21 @@
 #include "pico/aon_timer.h"
 #include "pico/time.h"
 
-ModeController::ModeController(Canvas* canvas, Font* font, RandomAnimator* vibeAnimator,
-                                Mailbox* mailbox)
+ModeController::ModeController(Canvas* canvas, Font* font,
+                               RandomAnimator* vibeAnimator, Mailbox* mailbox)
     : clockAnimation(canvas, font),
       meetingAnimation(canvas, font),
       darkAnimation(canvas),
-      clockAnimator(canvas),
-      meetingAnimator(canvas),
-      darkAnimator(canvas),
+      animator(canvas),
       vibeAnimator(vibeAnimator),
       mailbox(mailbox) {
-    clockAnimator.add(&clockAnimation);
-    meetingAnimator.add(&meetingAnimation);
-    darkAnimator.add(&darkAnimation);
-
-    // mode already starts as SignMode::Dark (see the header), so the usual
-    // setMode() path -- which no-ops when newMode == mode -- would never
-    // actually clear the canvas for this initial mode. Do it here instead.
-    darkAnimator.init();
+    animator.add((int)SignMode::Clock, &clockAnimation);
+    animator.add((int)SignMode::Meeting, &meetingAnimation);
+    animator.add((int)SignMode::Dark, &darkAnimation);
+    setMode(SignMode::Dark);
 }
 
 void ModeController::handleMessage(const SignMessage& msg) {
-
     printf("Received message of type %d\n", msg.type);
     switch (msg.type) {
         case MessageType::SetTime: {
@@ -52,10 +45,12 @@ void ModeController::handleMessage(const SignMessage& msg) {
             break;
 
         case MessageType::MeetingMode:
-            meetingAnimation.configure(msg.meetingDurationMinutes, msg.meetingParticipantName,
-                                        msg.meetingTzOffsetMinutes, msg.meetingStyle);
+            meetingAnimation.configure(
+                msg.meetingDurationMinutes, msg.meetingParticipantName,
+                msg.meetingTzOffsetMinutes, msg.meetingStyle);
             meetingEndTimeUs =
-                time_us_64() + (uint64_t)msg.meetingDurationMinutes * 60ull * 1000000ull;
+                time_us_64() +
+                (uint64_t)msg.meetingDurationMinutes * 60ull * 1000000ull;
             setMode(SignMode::Meeting);
             break;
 
@@ -84,21 +79,19 @@ void ModeController::step() {
         // no laptop attached. Deliberately doesn't touch Dark Mode -- "Go
         // Dark" is an explicit instruction, and a BLE hiccup (or the laptop
         // just being asleep) shouldn't quietly turn the lights back on.
+        printf(
+            "Vibe Mode has been running unattended for %llu seconds; falling "
+            "back to Clock Mode\n",
+            mailbox->microsSinceDisconnected() / 1000000ull);
         setMode(SignMode::Clock);
     }
 
     switch (mode) {
-        case SignMode::Clock:
-            clockAnimator.step();
-            break;
-        case SignMode::Meeting:
-            meetingAnimator.step();
-            break;
         case SignMode::Vibe:
             vibeAnimator->step();
             break;
-        case SignMode::Dark:
-            darkAnimator.step();
+        default:
+            animator.step();
             break;
     }
 }
@@ -108,18 +101,8 @@ void ModeController::setMode(SignMode newMode) {
         return;
     }
     mode = newMode;
-    switch (mode) {
-        case SignMode::Clock:
-            clockAnimator.init();
-            break;
-        case SignMode::Meeting:
-            meetingAnimator.init();
-            break;
-        case SignMode::Vibe:
-            vibeAnimator->init();
-            break;
-        case SignMode::Dark:
-            darkAnimator.init();
-            break;
+    animator.set((int)mode);
+    if (mode == SignMode::Vibe) {
+        vibeAnimator->init();
     }
 }

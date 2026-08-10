@@ -22,6 +22,7 @@ pico_enable_stdio_usb(OfficeSign 0)
 target_include_directories(OfficeSign PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
 )
+target_compile_definitions(OfficeSign PRIVATE PICO_CORE1_STACK_SIZE=0x1000)
 
 target_link_libraries(OfficeSign
   PicoLEDs

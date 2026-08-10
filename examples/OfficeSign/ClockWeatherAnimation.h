@@ -6,6 +6,7 @@
 #include "Animation.h"
 #include "SignMessage.h"
 #include "Font.h"
+#include "Xpm.h"
 
 /// @brief Info cached from the most recent WEATHER message.
 struct WeatherInfo {
@@ -41,8 +42,16 @@ class ClockWeatherAnimation : public Animation {
     char timeBuf[24];
     char weatherBuf[24];
 
+    // One Xpm per WeatherCondition, parsed once up front (see
+    // WeatherIcons.h) rather than re-parsed every render() call.
+    Xpm sunIcon;
+    Xpm cloudyIcon;
+    Xpm partlyCloudyIcon;
+    Xpm rainIcon;
+    Xpm snowIcon;
+
     void render();
-    static const char* conditionText(WeatherCondition condition);
+    Xpm* iconFor(WeatherCondition condition);
 };
 
 #endif

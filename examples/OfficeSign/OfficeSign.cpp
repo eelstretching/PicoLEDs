@@ -1,6 +1,8 @@
 #include <stdlib.h>
 
+#include "6x10_font.h"
 #include "ArrayColorMap.h"
+#include "BDFFont.h"
 #include "BluetoothServer.h"
 #include "BtReadySignal.h"
 #include "Direction.h"
@@ -13,12 +15,12 @@
 #include "RainbowWipe.h"
 #include "RandomAnimator.h"
 #include "ScrollWipe.h"
-#include "BDFFont.h"
-#include "6x10_font.h"
 #include "pico/aon_timer.h"
 #include "pico/flash.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include <Marquees.h>
+#include <Icicles.h>
 
 // TODO: placeholder hardware configuration, copied from PanelTest's pattern.
 // Update these once the physical OfficeSign's panel wiring/grid layout is
@@ -26,8 +28,8 @@
 // one per pin, arranged in a PANELS_X x PANELS_Y grid.
 #define PANEL_WIDTH 32
 #define PANEL_HEIGHT 8
-#define PANELS_X 3
-#define PANELS_Y 3
+#define PANELS_X 4
+#define PANELS_Y 4
 #define NUM_PANELS (PANELS_X * PANELS_Y)
 #define START_PIN 2
 
@@ -78,43 +80,41 @@ int main() {
         }
     }
     canvas.setup();
-    canvas.setBrightness(8);
+    canvas.setBrightness(16);
     canvas.clear();
     canvas.show();
 
     BDFFont font(font_6x10);
 
-    font.render(&canvas, "Start up!", 0, 3, RGB::Green);
+    font.render(&canvas, "Secret Collect!", 0, 3, RGB::Green);
     canvas.show();
     sleep_ms(2000);
 
     // Vibe Mode: a reasonable starting playlist built from existing
     // animation building blocks, following the same pattern CampSign uses
     // for its transition wipes. Easy to extend/edit once it's running.
-    ArrayColorMap vibeColors({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green, RGB::Blue,
-                               RGB::Indigo, RGB::Violet, RGB::Gold});
-
-    ScrollWipe upWipe(&canvas, &vibeColors, UP);
-    ScrollWipe downWipe(&canvas, &vibeColors, DOWN);
-    ScrollWipe leftWipe(&canvas, &vibeColors, LEFT);
-    ScrollWipe rightWipe(&canvas, &vibeColors, RIGHT);
-    upWipe.setExtraFrames(20);
-    downWipe.setExtraFrames(20);
-    leftWipe.setExtraFrames(20);
-    rightWipe.setExtraFrames(20);
-
-    FireworkWipe fireworkWipe(&canvas, &vibeColors);
-    PacWipe pacWipe(&canvas, &vibeColors);
-    RainbowWipe rainbowWipe(&canvas, &vibeColors);
+    ArrayColorMap vibeColors({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
+                              RGB::Blue, RGB::Indigo, RGB::Violet, RGB::Gold});
+    uint8_t rgbwgColors[] = {0, 1, 2, 3, 4};
 
     RandomAnimator vibeAnimator(&canvas, 30);
-    vibeAnimator.add(&upWipe);
-    vibeAnimator.add(&downWipe);
-    vibeAnimator.add(&leftWipe);
-    vibeAnimator.add(&rightWipe);
-    vibeAnimator.add(&fireworkWipe);
-    vibeAnimator.add(&pacWipe);
-    vibeAnimator.add(&rainbowWipe);
+
+    Marquees fancyMarq(&canvas, &vibeColors, 5, rgbwgColors, 20, RIGHT,
+                       canvas.getHeight());
+    fancyMarq.setName("FMarq");
+    fancyMarq.setFPS(40);
+    vibeAnimator.addTimed(&fancyMarq, 20000);
+
+    uint8_t rgColors[] = {3, 4};
+    Marquees rgMarq(&canvas, &vibeColors, 2, rgColors, 25, RIGHT,
+                    canvas.getHeight());
+    rgMarq.setName("RGMarq");
+    vibeAnimator.addTimed(&rgMarq, 30000);
+
+    ArrayColorMap icicleMap(8);
+    Icicles icicles(&canvas, &icicleMap, 6, 6, RGB(0, 255, 0));
+    icicles.setName("Icicles");
+    vibeAnimator.addTimed(&icicles, 20000);
 
     // ModeController boots into SignMode::Dark itself (see ModeController.h)
     // and clears the canvas as part of construction, so the sign starts dark
