@@ -35,6 +35,14 @@
 
 static Mailbox gMailbox;
 
+// cyw43 + all of BTStack (HCI/L2CAP/SM/ATT) plus our own packet handlers run
+// on core 1's stack, and need more than the 4KB the default
+// multicore_launch_core1() stack is limited to (it lives in SCRATCH_X, a
+// fixed-size SRAM bank -- PICO_CORE1_STACK_SIZE can't push it past that).
+// Give core 1 its own stack in regular SRAM instead, where it isn't
+// bank-limited.
+alignas(8) static uint32_t core1Stack[2048];  // 8 KB
+
 static void core1Entry() {
     BluetoothServer server(&gMailbox);
     server.run();  // never returns
@@ -61,7 +69,7 @@ int main() {
     // state machine" logic race that, so core 0 waits here until core 1
     // signals it's done.
     BtReadySignal::claim();
-    multicore_launch_core1(core1Entry);
+    multicore_launch_core1_with_stack(core1Entry, core1Stack, sizeof(core1Stack));
     BtReadySignal::waitForReady();
 
     // Build the panel grid for the sign. Each Panel is one pin's worth of
