@@ -29,6 +29,8 @@ target_link_libraries(StripTest
   hardware_pio
   hardware_timer
   hardware_clocks
+  pico_mem_ops
+  pico_platform
   pico_stdlib
 )
 

@@ -350,6 +350,7 @@ void Renderer::render() {
                 uint8_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s->getNumPixels(); j++, pp += 24, data++) {
                     uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
+                    // uint32_t val = pp == 0 ? 0 : processPixel(*data, s);
                     uint32_t val = processPixel(*data, s);
 
                     //
@@ -433,6 +434,16 @@ void Renderer::render() {
             }
         }
         dw.finish();
+
+        //
+        // Reset the state machine.
+                // Reset the PIO state machine before starting new transfer to prevent freeze
+        // This clears any stale state from the previous transfer (RP2350 fix)
+        pio_sm_set_enabled(pip->pio, pip->sm, false);
+        pio_sm_clear_fifos(pip->pio, pip->sm);
+        pio_sm_restart(pip->pio, pip->sm);
+        pio_sm_exec(pip->pio, pip->sm, pio_encode_jmp(pip->offset));  // Jump back to program start
+        pio_sm_set_enabled(pip->pio, pip->sm, true);
 
         //
         // We'll keep track of the time for the DMA ops.

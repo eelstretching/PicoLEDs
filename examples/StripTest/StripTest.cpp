@@ -12,10 +12,10 @@
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
-#define STRIP_LEN 200
-#define NUM_STRIPS 10
-#define START_PIN 2
-#define PANEL_WIDTH 10
+#define STRIP_LEN 256
+#define START_PIN 10
+#define NUM_STRIPS 8
+#define PANEL_WIDTH 20
 
 int main() {
     stdio_init_all();
@@ -23,14 +23,16 @@ int main() {
     //
     // Simple test for a few strips of pixels.
     Strip* strips[NUM_STRIPS];
-    Renderer renderer(16);
+    Renderer renderer(8);
     int ns = NUM_STRIPS;
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
-        strips[i] = new Strip(pin++, STRIP_LEN);
+        printf("Creating strip %d on pin %d\n", i, pin);
+        strips[i] = new Strip(pin++, STRIP_LEN, StripType::WS2812);
         renderer.add(strips[i]);
     }
     renderer.setup();
+    renderer.setBrightness(8);
 
     ArrayColorMap colorMap({RGB::Red, RGB::Orange, RGB::Yellow, RGB::Green,
                             RGB::Blue, RGB::Indigo, RGB::Violet, RGB::White,
@@ -64,7 +66,7 @@ int main() {
     renderer.render();
     sleep_ms(1000);
 
-    float fps = 30;
+    float fps = 20;
     float usPerFrame = 1e6 / fps;
     StopWatch frameWatch;
     uint32_t missedFrames = 0;
