@@ -1,197 +1,256 @@
-# Parallel-rendering flicker: code analysis
+# Parallel-rendering flicker: diagnosis and fix plan
 
-Analysis of `src/Renderer.cpp`, `src/ws2812.pio`, `src/ws2811.pio` against the reported
-symptom: with 16 strips on pins 2–17 (two parallel PIO programs) panels 15 and 16 flicker,
-but the same panels on pins 10–17 as a single 8-pin parallel program work perfectly.
+Investigation of the long-standing flicker on parallel-rendered panels, 2026-08-11/12.
+
+**Conclusion: this is not a firmware bug.** It is simultaneous-switching ground bounce in the
+SN74HCT245N level shifters. The bits leaving the Pico are provably correct.
 
 ---
 
-## 1. The thing that rules out most software explanations
+## 1. How we know it isn't the firmware
 
-For the two experiments, **the bytes going out to pins 10–17 are bit-for-bit identical**.
+### The data path is symmetric
 
-Tracing the run-splitting loop in `Renderer::setup()` (`src/Renderer.cpp:121-149`) with 16
-strips on pins 2–17 and `NUM_PARALLEL_PINS 8`:
+Tracing `Renderer::setup()` for 16 strips on pins 2–17 with `NUM_PARALLEL_PINS 8`:
 
 - group 0 → `startIndex=0, startPin=2, size=8`
 - group 1 → `startIndex=8, startPin=10, size=8`
 
-In the bit-planer, `stripBit = 1 << (i - pip->startIndex)` (`src/Renderer.cpp:354`) is
-relative to the run, so pin 10 → bit 0 … pin 17 → bit 7. And
-`sm_config_set_out_pins(base=10, count=8)` maps bit 0 → GPIO 10 … bit 7 → GPIO 17.
+`stripBit = 1 << (i - pip->startIndex)` is relative to the run, so pin 10 → bit 0 … pin 17 → bit 7,
+matching `sm_config_set_out_pins(base=10, count=8)`. That is byte-for-byte the same stream group 0
+gets when those eight panels are driven as a single group. **The bytes on the wire are identical in
+both configurations**, so nothing in the buffer layout can explain why one works and the other
+doesn't.
 
-That is exactly the mapping group 0 gets in the 8-strip test. Same buffer contents, same PIO
-program, same clkdiv, same 1.25 µs bit period. Each group also gets its own state machine,
-its own DMA channel, and its own buffer.
+Two things that could have broken that symmetry were checked and don't apply: the SDK handles
+RP2350 `GPIOBASE` translation itself (via the `pinhi` field in `pio_sm_set_config`), so passing
+absolute pin numbers is correct; and DMA starvation isn't credible at ~2% of bus capacity.
 
-**There is no per-pin, per-group asymmetry in the data.** Whatever changes for panels 15/16
-changes outside the byte stream.
+### The observation that settled it
 
-Two things that could have silently broken that symmetry were checked and neither applies:
+Slow-motion capture of the flash frame showed **one strip desyncing mid-chain while another strip
+in the same 8-pin group rendered perfectly**. Both are driven by the same state machine, the same
+`mov pins` instruction, the same clock edge, in the same instant. There is no mechanism by which the
+emitted bit stream can be wrong for one and right for the other.
 
-- **RP2350 `GPIOBASE` translation.** `setup()` calls
-  `pio_claim_free_sm_and_add_program_for_gpio_range(..., set_gpio_base=true)`, and PINCTRL
-  pin bases on RP2350 are *relative* to the PIO's GPIO base. But the SDK handles the
-  translation itself — `pio_get_default_sm_config()` sets `c.pinhi = -1` and
-  `pio_sm_set_config` XORs bit 4 of the base fields when `gpio_base` is 16. So passing
-  absolute pin numbers to `sm_config_set_out_pins` is correct.
-- **DMA starvation.** Each channel needs one byte per 1.25 µs. Even with four groups that is
-  3.2 M transfers/s against a 150 MHz bus — roughly 2% of capacity. The PIO can't be
-  starved here, and PIO output is independent of CPU/IRQ activity anyway.
+So the stream is correct and one panel is misreading a bit off its own data line. A single misread
+bit desynchronises everything downstream in that chain, which is why the corruption starts partway
+along and runs to the end, and why the corrupted region is dominated by red (`colorMap[0]`) as the
+chain re-locks.
+
+### Why it looks data-dependent
+
+The PIO program does this per bit:
+
+```
+out x, 8
+mov pins, !null   ; all 8 outputs rise together
+mov pins, x       ; a DATA-DEPENDENT subset falls
+mov pins, null    ; all 8 outputs fall together
+```
+
+The middle transition switches however many outputs carry a zero at that instant. When seven fall
+and one holds high, ground bounce is near worst-case and the output holding high is the one at
+risk. Which outputs those are is a function of the pixel data across all eight strips — so the
+worst-case combination recurs at a specific point in the rotate cycle, on whichever channel has the
+least margin.
+
+That is the phase-locking, and it is exactly what marginal signalling looks like. It is not evidence
+of a logic bug.
+
+### Why the hardware is marginal
+
+`SN74HCT245N` is DIP-20 with **one ground pin (10) and one Vcc pin (20) serving all eight outputs**,
+on perfboard with no ground plane, no local decoupling, and no series resistors. Eight outputs
+charging cable capacitance on the same edge, through a single pin with 5–10 nH of lead inductance,
+is a few hundred mA/ns — a few hundred millivolts of bounce on the chip's internal ground reference.
+
+The datasheet rates continuous current through Vcc or GND at ±70 mA. Eight simultaneous
+capacitive-charging currents transiently exceed that.
+
+This also explains every earlier observation: fine on one panel, fine on four, degrading as panels
+are added, and worst on whichever channels have the least margin.
 
 ---
 
-## 2. Real bugs found in the code
+## 2. Free software experiment — do this before any soldering
 
-None of these explain the 8-vs-16 symptom, but they are genuine and worth fixing.
+Set `NUM_PARALLEL_PINS` to **4** in `include/Renderer.h`.
 
-### 2.1 The semaphore is released before the data is on the wire
+That splits the eight pins across two independently-clocked state machines, so the 245's eight
+outputs no longer switch on a single edge — the switching spreads out in time and peak ground
+current roughly halves.
 
-`reset_delay_complete` is armed at *DMA completion* (`src/Renderer.cpp:59`), but DMA
-completion means "last byte is in the TX FIFO", not "last bit is on the pin". With
-`PIO_FIFO_JOIN_TX` the TX FIFO is 8 entries deep:
+**If ground bounce is the mechanism, 4 should be better than 8.** No rewiring, one `#define`.
 
-| path | autopull threshold | data per FIFO entry | outstanding at DMA-complete |
+Also revert `src/Renderer.cpp:294` from `GPIO_DRIVE_STRENGTH_2MA` back to `4MA` — see dead ends
+below.
+
+---
+
+## 3. Weekend hardware work
+
+### Parts to order
+
+| Part | Spec | Qty needed | Order |
 |---|---|---|---|
-| parallel | 8 bits | 1 bit-time (upper 24 bits of the word are discarded on refill) | 8 × 1.25 µs ≈ **10 µs** |
-| serial | 24 bits | 1 pixel | 8 × 30 µs = **240 µs** |
+| Decoupling cap | 100 nF ceramic X7R, 50 V, through-hole 2.54 mm pitch | 1 per 245 | 10 |
+| Bulk cap | 10 µF, 16 V+, electrolytic or ceramic | 1 per 245 | 5 |
+| Series resistors | 330 Ω, 1/4 W, through-hole | 8 per 245 | 25 |
 
-So on the parallel path the effective latch gap is 80 − 10 = 70 µs (fine, above the 50 µs
-spec). On the **serial** path the semaphore is released roughly 160 µs *before* the strip has
-finished receiving the frame.
+With 16 panels at 8 per shifter that's two 245s, so 2 × 100 nF, 2 × 10 µF, 16 × 330 Ω. Ordering
+spares is worth it.
 
-### 2.2 The per-frame state-machine reset can truncate the previous frame
+### Pinout reference (SN74HCT245N, DIP-20)
 
-`src/Renderer.cpp:446-450`:
+| Pin | Function |
+|---|---|
+| 1 | DIR |
+| 2–9 | A1–A8 |
+| 10 | GND |
+| 11–18 | B8–B1 (note the reversed order) |
+| 19 | /OE |
+| 20 | Vcc |
 
-```cpp
-pio_sm_set_enabled(pip->pio, pip->sm, false);
-pio_sm_clear_fifos(pip->pio, pip->sm);
-pio_sm_restart(pip->pio, pip->sm);
-pio_sm_exec(pip->pio, pip->sm, pio_encode_jmp(pip->offset));
-pio_sm_set_enabled(pip->pio, pip->sm, true);
-```
+With `DIR` high the part runs A→B, so **A (2–9) are inputs and B (11–18) are outputs**. Check which
+way yours is wired before fitting the resistors — they go on the *output* side.
 
-Combined with 2.1, a single-strip renderer running fast enough will `clear_fifos()` away the
-last ~5–8 pixels of the previous frame, mid-bit.
+### Step 1: decoupling (do this first, on its own)
 
-Note this predicts corruption in the **serial** case — the opposite of the reported symptom.
-And at StripTest's 20 fps there is ~42 ms of slack per frame, so it never fires there. It
-will bite OfficeSign at higher frame rates.
+For each 245:
 
-### 2.3 `gpio_put(pin, 0)` in the ISR does nothing
+1. Solder a 100 nF ceramic **directly across pins 10 and 20**, on the underside of the board, legs
+   trimmed as short as they will physically go. Pin to pin. Do **not** route it through perfboard
+   traces or take it to a distant ground rail — the whole point is minimising the loop area of cap,
+   pins, and return path, and a routed cap does nothing.
+2. Add a 10 µF bulk cap within about a centimetre of the chip, across the same supply.
 
-`src/Renderer.cpp:64-67`. The pads are muxed to PIO by `pio_gpio_init`, so SIO is not driving
-them and `gpio_put` has no effect on the pad. If that loop was added to force the lines idle
-low, it never worked.
+Then retest before doing anything else. This is the highest-value change and it may be sufficient
+on its own. Knowing whether it was is worth more than fixing everything at once.
 
-(The lines do idle low anyway: the last instruction executed is `mov pins, null`, and the SM
-then stalls at `out x, 8` waiting on an empty FIFO.)
+### Step 2: series resistors
 
-### 2.4 Buffer overflow if strips in one run have different lengths
+One 330 Ω in series with each output pin, fitted **at the chip** rather than out at the panel end.
 
-`pip->buffSize` comes from `strips[startIndex]` (`src/Renderer.cpp:258`), but the fill loop
-runs `s->getNumPixels()` iterations for *every* strip in the run. A longer strip later in a
-run writes past the end of its buffer — and straight into the next group's `calloc`'d buffer.
+The value is sized for limiting simultaneous switching current, not for impedance matching — 330 Ω
+holds each output to roughly 10 mA peak instead of 33 mA. The cost is edge rate, and it's
+affordable: into roughly 60 pF of cable plus LED input capacitance, 330 Ω gives about a 44 ns rise
+time against a 375 ns pulse.
 
-That would look exactly like "the other panel group flickers". Not the current case (all
-strips are `STRIP_LEN`), but a landmine for any mixed-size sign.
+Fit them on all eight outputs, not just the misbehaving channel. They help as much on the aggressor
+side as the victim side.
 
-### 2.5 `add_alarm_in_us` called from inside a DMA ISR
+### Step 3: ground returns
 
-`src/Renderer.cpp:59`. Heavyweight for an ISR, and if it ever fails to schedule, that group's
+Add more ground wires from the board to the panels, distributed through the data bundle rather than
+one shared return for everything. If you're using ribbon, alternating signal and ground is the easy
+way to get it.
+
+### Step 4: if still marginal
+
+Split the load across more packages — four channels per 245 halves the per-package switching
+current.
+
+### Testing between steps
+
+Run the same StripTest configuration each time and watch for the flash at the same rotation offset.
+Printing `frameWatch.count` every frame at a low FPS makes it countable. Changing one thing at a
+time is what makes the results mean anything — this investigation lost a cycle to several
+variables moving at once.
+
+---
+
+## 4. If you build a PCB
+
+Most of the above carries over, and a ground plane fixes the biggest contributor for free.
+
+**Changes:**
+
+- A solid ground pour on its own layer — not hatched, not a star arrangement. This eliminates the
+  high-inductance return paths that cause most of the trouble on perfboard.
+- SOIC rather than DIP: roughly a third of the lead inductance for the same part.
+- **Do not** move to a faster logic family. ACT/AHCT look like an upgrade but faster edges mean more
+  di/dt and worse ground bounce. HCT's slower edges are a feature here.
+
+**Still applies:** decoupling (100 nF right at the Vcc pin with its own via straight into the
+plane), series resistors (resistor arrays save space over eight discretes), and grounds distributed
+through the cable — the cable run is the part a PCB doesn't fix.
+
+**New for a board:**
+
+- Keep the LED supply current off the signal ground. Several amps of LED return sharing copper with
+  logic ground creates common-impedance coupling that no amount of decoupling will fix. Route it
+  separately and tie to signal ground at one point near the supply.
+- Design the mitigations in as depopulatable — footprints for the series resistors with 0 Ω links
+  fitted if they turn out to be unnecessary. A footprint costs nothing at design time; adding one
+  after the boards arrive costs a respin.
+- Bring a data line and a ground out to a scope header.
+
+---
+
+## 5. Firmware bugs still outstanding
+
+Found during the investigation. None of these cause the flicker, but they are real.
+
+### 5.1 Semaphore released before the data is on the wire
+
+`reset_delay_complete` is armed at DMA completion (`src/Renderer.cpp:65`), but that means "last byte
+is in the TX FIFO", not "last bit is on the pin". With `PIO_FIFO_JOIN_TX` the FIFO is 8 entries deep:
+
+| path | autopull threshold | data per entry | outstanding at DMA-complete |
+|---|---|---|---|
+| parallel | 32 bits | 4 bit-times | ~40 µs |
+| serial | 24 bits | 1 pixel | ~240 µs |
+
+At `RESET_TIME_US` of 300 both are currently safe, but the accounting is wrong in principle and the
+serial path has no margin if that value is ever reduced.
+
+### 5.2 Buffer overflow if strips in one run have different lengths
+
+`pip->buffSize` comes from `strips[startIndex]` (`src/Renderer.cpp:252`) but the fill loop runs
+`s->getNumPixels()` iterations for *every* strip in the run (`src/Renderer.cpp:355`). A longer strip
+later in a run writes past the end of its buffer and into the next group's allocation.
+
+Harmless today because all strips are the same length. It will bite the moment a sign is built from
+mixed-size panels, and the symptom will look exactly like "the other panel group flickers".
+
+### 5.3 `add_alarm_in_us` from inside a DMA ISR
+
+`src/Renderer.cpp:65`. Heavyweight for an ISR, and if it ever fails to schedule, that group's
 semaphore is never released and `render()` blocks forever. A deadline check
 (`busy_wait_until(dma_start + xfer_us + RESET_TIME_US)`) would be simpler and can't wedge.
 
-### 2.6 `pioPrograms[]` has internal linkage in a header
+### 5.4 Minor
 
-`include/Renderer.h:60` declares `static PIOProgram* pioPrograms[NUM_DMA_CHANNELS] = {0};`,
-so every translation unit that includes the header gets its own private copy. It works only
-because the ISR and all its users live in `Renderer.cpp`. Should be `extern` in the header
-plus one definition in the .cpp.
-
-### 2.7 Minor
-
-`examples/StripTest/StripTest.cpp:96` — printf has four format specifiers and three
+`examples/StripTest/StripTest.cpp` — the periodic printf has four format specifiers and three
 arguments.
 
----
+### Already fixed this session
 
-## 3. What is most likely actually happening
-
-Since the bitstream is provably identical, only two things genuinely differ between the
-8-strip and 16-strip configurations, and both are physical:
-
-**Twice the pins switching simultaneously.** `mov pins, !null` drives every pin in a group
-high on the same clock edge, and `mov pins, null` drives them all low, 800k times per second.
-Going from 8 to 16 pins doubles the peak di/dt through the Pico's supply and ground. And
-because the two SMs' fractional clock dividers (div = 18.75 at 150 MHz) run in arbitrary,
-drifting relative phase, the aggregate current spike *beats* — which presents as flicker
-rather than as steady corruption.
-
-**Twice the LEDs drawing current.** With only 8 strips registered, the other 8 panels receive
-no data and stay dark. 4096 LEDs even at brightness 8 is several amps, and the panels at the
-far end of the power distribution sag first.
-
-Both mechanisms predict "the last panels in the chain", and neither is visible from the code.
-Both are also distinct from the shared-ground issue already ruled out.
+- `pioPrograms[]` and `stripBlack` had internal linkage in headers, giving every translation unit
+  its own copy. Now `extern` with single definitions.
+- The per-frame PIO restart block in `render()` was removed. It was cargo-culted in from another
+  project and was actively harmful: `pio_sm_restart` clears the output shift *counter* but
+  explicitly not the OSR contents, so the state machine would shift out `threshold/8` stale
+  bit-planes at the start of every frame.
+- Parallel autopull threshold raised from 8 to 32 with word-sized DMA: a quarter as many DMA
+  transfers and a 4× deeper FIFO cushion, with the buffer layout unchanged.
+- The dead `gpio_put(pin, 0)` loop in the ISR was removed — the pads are muxed to PIO, so SIO wasn't
+  driving them and it never did anything.
 
 ---
 
-## 4. Experiments that discriminate, cheapest first
+## 6. Dead ends — don't revisit
 
-**A. Separate current from signalling.** Register all 16 strips — so 16 pins toggle, 2 SMs,
-identical DMA and PIO load — but `fill(black)` on 14 of them and light only panels 15/16.
+**Pico GPIO drive strength.** The Pico only drives the 245's CMOS inputs over a short trace. That
+load is trivial and 2 mA versus 8 mA barely changes it. All the current that matters is on the 245's
+output side. (The 2 mA setting currently in the tree was a bad suggestion and should go back to
+4 mA.)
 
-- Flicker gone → supply sag / LED current.
-- Flicker stays → signalling.
+**Cross-state-machine interference.** The theory that two parallel groups' independently-phased
+clock dividers were beating against each other. Ruled out by the frame capture: the victim and a
+healthy strip were in the *same* group, on the same state machine.
 
-**B. Separate SM count from pin count. No code changes needed.** Keep 16 strips and build
-once with `NUM_PARALLEL_PINS 8` (2 SMs) and once with `NUM_PARALLEL_PINS 4` (4 SMs). Same
-pins, same current, different number of independently-phased state machines.
-
-- Flicker tracks SM count → cross-SM interaction.
-- Identical → SM count is irrelevant; it's pin count or current.
-
-**C.** Drop brightness to 1–2 with all 16 panels lit. Vanishes → power.
-
-**D.** Change `GPIO_DRIVE_STRENGTH_4MA` → `GPIO_DRIVE_STRENGTH_2MA` at
-`src/Renderer.cpp:294`. Into level-shifter inputs 2 mA is plenty, and it halves the switching
-transient.
-
-Also worth adding to `addPIOProgram`: print `pio_get_index(pip->pio)` and `pip->sm` per
-group, to confirm both groups land on the same PIO. (The SDK searches PIO instances
-downward — `while (pio_num--)` in `pio_claim_free_sm_and_add_program_for_gpio_range` — so on
-RP2350 they will likely both be on PIO2.)
-
----
-
-## 5. The code change worth making regardless
-
-Put the whole contiguous run on **one state machine** with 32-bit bit-planes, the way
-pico-examples' `ws2812_parallel` does it:
-
-- PIO: `out x, 32` instead of `out x, 8`
-- `sm_config_set_out_shift(&c, true, true, 32)`
-- `sm_config_set_out_pins(base, count)` with count up to 32
-- `NUM_PARALLEL_PINS 32`
-- buffer becomes `uint32_t[numPixels * 24]`, DMA transfer size `DMA_SIZE_32`
-- `stripBit = 1u << (i - startIndex)` (already correct, just needs to be 32-bit)
-
-This removes the multi-SM variable entirely for anything up to 32 strips: one state machine,
-one DMA channel, every edge on every pin from the same clock, no phase drift between groups,
-and a quarter as many DMA transfers. Total memory is unchanged — one 24 KB buffer instead of
-four 6 KB ones.
-
-If the flicker survives that, it is electrical with no remaining software confound.
-
-### Cheaper alternative if 8-pin groups stay
-
-Set the parallel autopull threshold to 32 and DMA as `DMA_SIZE_32`. The existing byte buffer
-works verbatim under shift-right (byte 0 of a little-endian word shifts out first), and you
-get 4× fewer DMA transfers plus a 40 µs FIFO cushion instead of 10 µs.
-
-### Also
-
-Bump `RESET_TIME_US` from 80 to ~300 (`include/Renderer.h:22`). WS2812B-V5 and several
-current clones want >280 µs of latch time, and at these frame rates it costs nothing.
+**Bit-plane ordering and buffer layout.** Verified correct, including under the autopull threshold
+change — shifting right, the four `out x, 8` operations consume buffer bytes 0, 1, 2, 3 in that
+order, identical to the previous byte-at-a-time DMA.

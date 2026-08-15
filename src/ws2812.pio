@@ -75,7 +75,15 @@ static inline void ws2812_parallel_program_init(PIO pio, uint sm, uint offset,
 
     pio_sm_config c = ws2812_parallel_program_get_default_config(offset);
     sm_config_set_out_pins(&c, pin_base, pin_count);
-    sm_config_set_out_shift(&c, true, true, 8);
+    //
+    // Autopull at 32 rather than 8, so one FIFO word carries four bit-planes
+    // instead of one (at a threshold of 8 the other 24 bits of every word are
+    // discarded on refill). Shifting right, the state machine consumes the low
+    // byte first, which is buffer byte 0 on a little-endian core -- the same
+    // wire order as a byte-at-a-time DMA, so the buffer layout is unchanged.
+    // The DMA does a quarter as many transfers and the joined TX FIFO buffers
+    // 32 bit-times instead of 8.
+    sm_config_set_out_shift(&c, true, true, 32);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     float div = clock_get_hz(clk_sys) / (freq * ws2812_parallel_CYCLES_FOR_1_BIT);

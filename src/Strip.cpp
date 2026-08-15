@@ -6,6 +6,9 @@
 
 #include "pico/printf.h"
 
+//
+// The one and only instance, declared extern in Strip.h.
+RGB stripBlack(0, 0, 0);
 
 Strip::Strip(uint pin, uint numPixels, StripType type) : pin(pin), numPixels(numPixels), type(type) {
   data = new RGB[numPixels];

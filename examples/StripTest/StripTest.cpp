@@ -13,9 +13,10 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 256
-#define START_PIN 10
-#define NUM_STRIPS 8
-#define PANEL_WIDTH 20
+#define START_PIN 2
+#define NUM_STRIPS 1
+#define PANEL_WIDTH 16
+#define START_FILL_STRIP 0
 
 int main() {
     stdio_init_all();
@@ -53,7 +54,7 @@ int main() {
 
     //
     // Fill with color bands.
-    for (int s = 0; s < ns; s++) {
+    for (int s = START_FILL_STRIP; s < ns; s++) {
         Strip& strip = *strips[s];
         uint8_t cc = 0;
         for (int i = 0; i < strip.getNumPixels(); i++) {
@@ -66,7 +67,7 @@ int main() {
     renderer.render();
     sleep_ms(1000);
 
-    float fps = 20;
+    float fps = 40;
     float usPerFrame = 1e6 / fps;
     StopWatch frameWatch;
     uint32_t missedFrames = 0;
@@ -75,7 +76,7 @@ int main() {
     int currColorIndex = 0;
     while (1) {
         frameWatch.start();
-        for (int s = 0; s < ns; s++) {
+        for (int s = START_FILL_STRIP; s < ns; s++) {
             if (s % 2 == 0) {
                 strips[s]->rotate(LEFT);
             } else {
@@ -92,10 +93,12 @@ int main() {
             missedFrames++;
         }
 
+        // printf("Frame %d\n", frameWatch.count);        
+
         if (frameWatch.count % 200 == 0) {
             printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ",
 
-                   frameWatch.count, usPerFrame, frameWatch.getAverageTime());
+                   frameWatch.count, usPerFrame, frameWatch.getAverageTime(), 1e6 / frameWatch.getAverageTime());
 
             printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",

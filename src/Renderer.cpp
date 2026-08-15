@@ -11,6 +11,12 @@
 #include "ws2811.pio.h"
 #include "ws2812.pio.h"
 
+//
+// The one and only instance. Namespace-scope, so it's zero-initialized before
+// main() runs -- we count on being able to test which DMA channels need
+// management.
+PIOProgram* pioPrograms[NUM_DMA_CHANNELS] = {nullptr};
+
 /// @brief A comparator that we can use to sort strips by their pin number.
 /// @param s1 The first strip
 /// @param s2 The second strip
@@ -61,10 +67,6 @@ static inline void __isr dma_complete_handler() {
             //
             // Drive the pins for the strips low now that the data has been
             // sent.
-            for (int pin = pioPrograms[i]->startPin;
-                 pin < pioPrograms[i]->startPin + pioPrograms[i]->size; pin++) {
-                gpio_put(pin, 0);
-            }
             return;
         }
     }
@@ -239,26 +241,28 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // that the strips all have the same number of pixels, so we can just
     // use the size of the first one. Maybe better to pick the minimum
     // length one?
-    dma_channel_transfer_size tsize;
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex]->getNumPixels();
         pip->buffer = calloc(pip->buffSize, sizeof(uint32_t));
-
-        //
-        // We'll be DMAing 32 bits at a time.
-        tsize = DMA_SIZE_32;
+        pip->dmaCount = pip->buffSize;
     } else {
         //
         // Each pixel on the strip uses 24 bits of color, this array will
         // have ones where the strips have that bit of color.
         pip->buffSize = strips[startIndex]->getNumPixels() * 24;
-        pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
-
         //
-        // We'll be DMAing a byte at a time with data for 8 parallel
-        // channels.
-        tsize = DMA_SIZE_8;
+        // 24 bit-planes per pixel always divides by 4, so the bytes pack
+        // exactly into words with nothing left over. Allocating as words also
+        // guarantees the read address is aligned for a 32-bit DMA.
+        pip->dmaCount = pip->buffSize / 4;
+        pip->buffer = calloc(pip->dmaCount, sizeof(uint32_t));
     }
+
+    //
+    // Either way, we'll be DMAing 32 bits at a time. For a parallel program
+    // that's four bit-planes per transfer, each carrying one bit for every
+    // strip in the run.
+    dma_channel_transfer_size tsize = DMA_SIZE_32;
 
     //
     // Set up the DMA channel configuration.
@@ -287,7 +291,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // Set the drive strength on the pins.
     for (int i = 0; i < pinCount; i++) {
         pio_gpio_init(pip->pio, startPin + i);
-        gpio_set_drive_strength(startPin + i, GPIO_DRIVE_STRENGTH_4MA);
+        gpio_set_drive_strength(startPin + i, GPIO_DRIVE_STRENGTH_2MA);
     }
 
 }
@@ -436,21 +440,11 @@ void Renderer::render() {
         dw.finish();
 
         //
-        // Reset the state machine.
-                // Reset the PIO state machine before starting new transfer to prevent freeze
-        // This clears any stale state from the previous transfer (RP2350 fix)
-        pio_sm_set_enabled(pip->pio, pip->sm, false);
-        pio_sm_clear_fifos(pip->pio, pip->sm);
-        pio_sm_restart(pip->pio, pip->sm);
-        pio_sm_exec(pip->pio, pip->sm, pio_encode_jmp(pip->offset));  // Jump back to program start
-        pio_sm_set_enabled(pip->pio, pip->sm, true);
-
-        //
         // We'll keep track of the time for the DMA ops.
         pip->dma_start = time_us_64();
 
         dma_channel_set_read_addr(pip->dma_channel, pip->buffer, false);
-        dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
+        dma_channel_set_trans_count(pip->dma_channel, pip->dmaCount, true);
 
         pip->stats.finish();
     }

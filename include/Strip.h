@@ -17,7 +17,11 @@
 // @brief The type of strip we're dealing with.
 enum StripType { WS2812, WS2811 };
 
-static RGB stripBlack(0, 0, 0);
+//
+// @brief The color returned by reference when an out-of-range pixel is
+// requested. Declared extern so all translation units share one instance;
+// defined in Strip.cpp.
+extern RGB stripBlack;
 
 class Strip {
    protected:

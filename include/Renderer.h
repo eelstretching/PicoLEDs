@@ -19,7 +19,7 @@
  * RES time, specification says it needs at least 50 us, but some folks say it
  * can be as low as 9us!
  */
-#define RESET_TIME_US (80)
+#define RESET_TIME_US (300)
 #define NUM_PARALLEL_PINS 8
 
 class Renderer;
@@ -36,7 +36,14 @@ class PIOProgram {
     uint offset;
     int dma_channel;
     void* buffer;
+    //
+    // The number of elements in the buffer: pixels for a serial program,
+    // bit-plane bytes for a parallel one.
     uint32_t buffSize;
+    //
+    // The number of DMA transfers needed to send the buffer. Not the same as
+    // buffSize for a parallel program, where we DMA four bit-planes per word.
+    uint32_t dmaCount;
     StopWatch stats;
     uint32_t nblocked = 0;
     int startIndex = 0;
@@ -57,7 +64,7 @@ class PIOProgram {
 ///
 /// Make sure it's initialized to zeros, as we're counting on being able to test
 /// which DMA channels need management.
-static PIOProgram* pioPrograms[NUM_DMA_CHANNELS] = {0};
+extern PIOProgram* pioPrograms[NUM_DMA_CHANNELS];
 
 /// @brief A class for a thing that knows how to render a logical Strip to a
 /// physical strip.
