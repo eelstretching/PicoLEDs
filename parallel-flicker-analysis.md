@@ -7,6 +7,45 @@ SN74HCT245N level shifters. The bits leaving the Pico are provably correct.
 
 ---
 
+## 0. Status
+
+### Hardware map
+
+| Chip | Drives pins | Panels |
+|---|---|---|
+| 245 #1 | 2–9 | first 8 |
+| 245 #2 | 10–17 | second 8, includes the top-right four |
+
+### Done
+
+**Decoupling (step 1).** 100 nF soldered pin 10 to pin 20 on each 245, legs just long enough to make
+the stretch, plus a 10 µF nearby across the same supply.
+
+Result: **a clear improvement.** StripTest is now clean at 4, 8, and 12 panels. At 16 panels the
+last two panels of the top two rows still show persistent brightness changes.
+
+That maps exactly onto the hardware: at 12 panels, 245 #2 is driving only four outputs (pins 10–13);
+at 16 it drives all eight. So the residual failure is per-chip simultaneous switching on #2, not
+coupling between the two chips.
+
+Two changes in character since decoupling:
+
+- The disruption now lasts **multiple frames** instead of one. Not a new mechanism — consecutive
+  animation frames carry near-identical data, so a data-dependent trigger stays on screen as long as
+  the pattern does. StripTest previously scrolled one pixel per frame and swept the trigger past in
+  a single frame.
+- PanelTest shows a **colour and position shift together** — orange text rendering green and sitting
+  a few pixels over. That's a slip of about one byte: eight bits rotates the G/R/B channels and moves
+  the pixel boundaries at the same time.
+
+### Next
+
+1. `NUM_PARALLEL_PINS` 4 (free, no soldering) — see section 2.
+2. Series resistors (section 3, step 2). Requires resoldering the output side of both chips.
+3. Supply and ground wiring.
+
+---
+
 ## 1. How we know it isn't the firmware
 
 ### The data path is symmetric
@@ -38,25 +77,46 @@ bit desynchronises everything downstream in that chain, which is why the corrupt
 along and runs to the end, and why the corrupted region is dominated by red (`colorMap[0]`) as the
 chain re-locks.
 
-### Why it looks data-dependent
+### Why it looks data-dependent — and why black is the worst case
 
 The PIO program does this per bit:
 
 ```
 out x, 8
-mov pins, !null   ; all 8 outputs rise together
-mov pins, x       ; a DATA-DEPENDENT subset falls
-mov pins, null    ; all 8 outputs fall together
+mov pins, !null   ; all 8 outputs rise together, always, regardless of data
+mov pins, x       ; the lines carrying a 0 bit fall
+mov pins, null    ; the remaining lines fall
 ```
 
-The middle transition switches however many outputs carry a zero at that instant. When seven fall
-and one holds high, ground bounce is near worst-case and the output holding high is the one at
-risk. Which outputs those are is a function of the pixel data across all eight strips — so the
-worst-case combination recurs at a specific point in the rotate cycle, on whichever channel has the
-least margin.
+The rising edge is always all eight together. The **falling** edges are the data-dependent ones, and
+they're also the ones that matter: falling outputs discharge cable capacitance *into* the chip's
+ground pin, which is what lifts its internal ground reference.
 
-That is the phase-locking, and it is exactly what marginal signalling looks like. It is not evidence
-of a logic bug.
+So the peak simultaneous falling current is set by how correlated the eight strips' bits are at each
+instant:
+
+| Data | Bits per line | Falling edges at `mov pins, x` |
+|---|---|---|
+| All black | all zeros | **8** — worst case |
+| StripTest bands at brightness 8 (`0x000800`) | 1 bit set in 24 | ~8 most bit-times |
+| Rich, varied colour | mixed | ~4, with the other ~4 falling one instruction later |
+
+**Black still costs a full 24 bits on the wire.** The LEDs simply don't light at the end of it. It's
+the bit pattern that switches the shifter outputs, not the LED current — so mostly-black content is
+the *most* correlated switching pattern there is, not the easiest.
+
+### The observation that confirms this
+
+In PanelTest, **`fancyMarq` — the animation driving the most lit pixels — is the one that doesn't
+flicker at all**, while the animations with few non-black pixels do.
+
+That looks backwards until you apply the table above: rich varied data scatters the zero and one
+bits across the eight strips, so roughly half the outputs fall at the middle transition and half at
+the end. Two smaller current pulses instead of one big one, and roughly half the peak through the
+ground pin.
+
+Nothing but the simultaneous-switching model predicts that ordering. It is the cleanest single piece
+of evidence in the investigation, and it is not obvious enough to re-derive from scratch.
 
 ### Why the hardware is marginal
 
@@ -82,6 +142,10 @@ outputs no longer switch on a single edge — the switching spreads out in time 
 current roughly halves.
 
 **If ground bounce is the mechanism, 4 should be better than 8.** No rewiring, one `#define`.
+
+This is the same lever that makes `fancyMarq` clean, applied deliberately rather than relying on the
+content to supply it. Halving the outputs that can fall on a common edge is exactly what varied
+pixel data does by accident.
 
 Also revert `src/Renderer.cpp:294` from `GPIO_DRIVE_STRENGTH_2MA` back to `4MA` — see dead ends
 below.
@@ -115,7 +179,7 @@ spares is worth it.
 With `DIR` high the part runs A→B, so **A (2–9) are inputs and B (11–18) are outputs**. Check which
 way yours is wired before fitting the resistors — they go on the *output* side.
 
-### Step 1: decoupling (do this first, on its own)
+### Step 1: decoupling — DONE, see section 0
 
 For each 245:
 
@@ -128,9 +192,15 @@ For each 245:
 Then retest before doing anything else. This is the highest-value change and it may be sufficient
 on its own. Knowing whether it was is worth more than fixing everything at once.
 
-### Step 2: series resistors
+### Step 2: series resistors — next, and the biggest remaining lever
 
 One 330 Ω in series with each output pin, fitted **at the chip** rather than out at the panel end.
+This means resoldering the output side of both chips, so it's the expensive step in effort terms —
+run the `NUM_PARALLEL_PINS` test first, since it costs nothing and probes the same mechanism.
+
+Given the decoupling took you from failing at 8 panels to failing only at 16, this is the change
+most likely to close the remaining gap: it attacks the peak current directly rather than just
+supplying it locally.
 
 The value is sized for limiting simultaneous switching current, not for impedance matching — 330 Ω
 holds each output to roughly 10 mA peak instead of 33 mA. The cost is edge rate, and it's

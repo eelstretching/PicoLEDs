@@ -3,7 +3,7 @@
 
 #include "ArrayColorMap.h"
 #include "StopWatch.h"
-#include "Strip.h"
+#include "Panel.h"
 #include "colorutils.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
@@ -14,23 +14,26 @@
 
 #define STRIP_LEN 256
 #define START_PIN 2
-#define NUM_STRIPS 1
-#define PANEL_WIDTH 16
-#define START_FILL_STRIP 0
+#define NUM_PANELS 16
+#define BAND_WIDTH 8
+#define PANEL_WIDTH 32
+#define PANEL_HEIGHT 8
+
+#define START_FILL_PANEL 0
 
 int main() {
     stdio_init_all();
 
     //
     // Simple test for a few strips of pixels.
-    Strip* strips[NUM_STRIPS];
+    Panel* panels[NUM_PANELS];
     Renderer renderer(8);
-    int ns = NUM_STRIPS;
+    int ns = NUM_PANELS;
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         printf("Creating strip %d on pin %d\n", i, pin);
-        strips[i] = new Strip(pin++, STRIP_LEN, StripType::WS2812);
-        renderer.add(strips[i]);
+        panels[i] = new Panel(pin++, PANEL_WIDTH, PANEL_HEIGHT);
+        renderer.add(panels[i]);
     }
     renderer.setup();
     renderer.setBrightness(8);
@@ -41,25 +44,25 @@ int main() {
 
     for (int c = 0; c < colorMap.getUsed(); c++) {
         for (int i = 0; i < ns; i++) {
-            strips[i]->fill(colorMap.getColor(c));
+            panels[i]->fill(colorMap.getColor(c));
         }
         renderer.render();
         sleep_ms(250);
     }
     for (int i = 0; i < ns; i++) {
-        strips[i]->fill(colorMap.getBackground());
+        panels[i]->fill(colorMap.getBackground());
     }
     renderer.render();
     sleep_ms(100);
 
     //
     // Fill with color bands.
-    for (int s = START_FILL_STRIP; s < ns; s++) {
-        Strip& strip = *strips[s];
+    for (int s = START_FILL_PANEL; s < ns; s++) {
+        Strip& strip = *panels[s];
         uint8_t cc = 0;
         for (int i = 0; i < strip.getNumPixels(); i++) {
             strip.putPixel(colorMap.getColor(cc), i);
-            if ((i + 1) % PANEL_WIDTH == 0) {
+            if ((i + 1) % BAND_WIDTH == 0) {
                 cc = (cc + 1) % colorMap.getUsed();
             }
         }
@@ -67,20 +70,20 @@ int main() {
     renderer.render();
     sleep_ms(1000);
 
-    float fps = 40;
+    float fps = 10;
     float usPerFrame = 1e6 / fps;
     StopWatch frameWatch;
     uint32_t missedFrames = 0;
     int startPos = 0;
-    int width = PANEL_WIDTH;
+    int width = BAND_WIDTH;
     int currColorIndex = 0;
     while (1) {
         frameWatch.start();
-        for (int s = START_FILL_STRIP; s < ns; s++) {
+        for (int s = START_FILL_PANEL; s < ns; s++) {
             if (s % 2 == 0) {
-                strips[s]->rotateLeft();
+                panels[s]->rotateLeft();
             } else {
-                strips[s]->rotateRight();
+                panels[s]->rotateRight();
             }   
         }
 

@@ -122,7 +122,7 @@ int main() {
     const char* testText = "TEST hqgijPJ Testing the font rendering!";
     int stt = bdf2.getWidth(testText);
 
-    ScrollText t1(&canvas, &bdf, helloText, canvas.getWidth(), 4, xmasColors[0],
+    ScrollText t1(&canvas, &bdf, helloText, canvas.getWidth(), 18, xmasColors[0],
                   RenderAngle::RENDER_0);
     t1.setDirection(Direction::LEFT);
     t1.setClear(true);

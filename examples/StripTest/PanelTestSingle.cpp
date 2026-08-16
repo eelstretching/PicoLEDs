@@ -13,7 +13,7 @@
 #include "pico/types.h"
 
 #define STRIP_LEN 256
-#define NUM_STRIPS 1
+#define NUM_PANELS 1
 #define START_PIN 2
 #define PANEL_WIDTH 32
 #define PANEL_HEIGHT 8

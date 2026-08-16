@@ -28,8 +28,11 @@ class Panel : public Strip {
 
     void fill(const RGB& color);
 
-    void rotateRight();
-    void rotateLeft();
+    void rotateRight() override;
+    void rotateLeft() override;
+
+    void fillColumn(int x, const RGB& color);
+    void fillRow(int y, const RGB& color);
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }

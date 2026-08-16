@@ -99,6 +99,9 @@ class Strip {
     /// @param n the number of pixels to fill
     void fill(const RGB& color, uint start, uint n);
 
+    virtual void rotateLeft();
+    virtual void rotateRight();
+
     /// @brief Rotate a section of the strip to the right by one pixel.
     /// @param start the starting pixel of the section to rotate
     /// @param end the ending pixel of the section to rotate, exclusive

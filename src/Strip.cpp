@@ -59,6 +59,14 @@ void Strip::fill(const RGB& color, uint start, uint n) {
   }
 }
 
+void Strip::rotateLeft() {
+  rotateLeft(0, numPixels);
+}
+
+void Strip::rotateRight() {
+  rotateRight(0, numPixels);
+}
+
 void Strip::rotateRight(int start, int end) {
   //
   // A place to put the data from the rightmost pixel.
