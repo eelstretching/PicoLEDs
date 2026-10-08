@@ -56,6 +56,50 @@ void Panel::fill(const RGB& color) {
     }
 }
 
-void Panel::rotateLeft() {}
+void Panel::fillColumn(int x, const RGB& color) {
+    if (x < 0 || x >= width) return;
+    for (int y = 0; y < height; y++) {
+        set(x, y, color);
+    }
+}
 
-void Panel::rotateRight() {}
+void Panel::fillRow(int y, const RGB& color) {
+    if (y < 0 || y >= height) return;
+    for (int x = 0; x < width; x++) {
+        set(x, y, color);
+    }
+}
+
+//
+// The panel is wired serpentine, so neighboring columns run in opposite
+// directions in the pixel data. Shifting the raw data by a column would flip
+// every column upside down, so we move pixels by their (x, y) position instead.
+void Panel::rotateLeft() {
+    RGB tmp[height];
+    for (int y = 0; y < height; y++) {
+        tmp[y] = get(0, y);
+    }
+    for (int x = 0; x < width - 1; x++) {
+        for (int y = 0; y < height; y++) {
+            set(x, y, get(x + 1, y));
+        }
+    }
+    for (int y = 0; y < height; y++) {
+        set(width - 1, y, tmp[y]);
+    }
+}
+
+void Panel::rotateRight() {
+    RGB tmp[height];
+    for (int y = 0; y < height; y++) {
+        tmp[y] = get(width - 1, y);
+    }
+    for (int x = width - 1; x > 0; x--) {
+        for (int y = 0; y < height; y++) {
+            set(x, y, get(x - 1, y));
+        }
+    }
+    for (int y = 0; y < height; y++) {
+        set(0, y, tmp[y]);
+    }
+}

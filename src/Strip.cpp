@@ -6,6 +6,9 @@
 
 #include "pico/printf.h"
 
+//
+// The one and only instance, declared extern in Strip.h.
+RGB stripBlack(0, 0, 0);
 
 Strip::Strip(uint pin, uint numPixels, StripType type) : pin(pin), numPixels(numPixels), type(type) {
   data = new RGB[numPixels];
@@ -54,6 +57,14 @@ void Strip::fill(const RGB& color, uint start, uint n) {
   for(int i = 0; i < n; i++) {
     *dp++ = color;
   }
+}
+
+void Strip::rotateLeft() {
+  rotateLeft(0, numPixels);
+}
+
+void Strip::rotateRight() {
+  rotateRight(0, numPixels);
 }
 
 void Strip::rotateRight(int start, int end) {
