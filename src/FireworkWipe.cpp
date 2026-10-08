@@ -27,7 +27,7 @@ FireworkWipe::FireworkWipe(Canvas* canvas, ColorMap *colorMap, Firework **fw, in
 }
 
 void FireworkWipe::init() {
-    for (int i = 0; i < canvas->getHeight(); i++) {
+    for (int i = 0; i < nf; i++) {
         fw[i]->halfFlare();
         fw[i]->setState(FillState::START_EXPLOSION);
     }
@@ -35,7 +35,7 @@ void FireworkWipe::init() {
 
 bool FireworkWipe::step() {
     bool keepGoing = true;
-    for (int i = 0; i < canvas->getHeight(); i++) {
+    for (int i = 0; i < nf; i++) {
         fw[i]->step();
         if (fw[i]->getState() == FillState::RESET) {
             //

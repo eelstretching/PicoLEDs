@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "colorutils.h"
 #include "math8.h"
 #include "pico.h"
 #include "pico/platform.h"
@@ -39,13 +40,15 @@ bool Fire::step() {
 
     // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
     if (random8() < sparking) {
-        int y = random8(7);
+        int y = random8(MIN(n, 7));
         heat[y] = qadd8(heat[y], random8(160, 255));
     }
 
     // Step 4.  Map from heat cells to LED colors
     for (int j = 0; j < n; j++) {
-        canvas->set(x + j, row, heat[j]);
+        RGB color = usePalette ? ColorFromPalette(palette, scale8(heat[j], 240))
+                               : HeatColor(heat[j]);
+        canvas->set(x + j, row, color);
     }
     aw.finish();
     return true;

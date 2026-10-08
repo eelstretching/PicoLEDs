@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Animation.h"
+#include "colorutils.h"
 
 class Fire : public Animation {
     /// @brief The row that we'll be animating
@@ -31,11 +32,31 @@ class Fire : public Animation {
     // Default 120, suggested range 50-200.
     uint sparking;
 
-   public:
-    Fire(Canvas *canvas, ColorMap *colorMap, uint row)
-        : Fire(canvas, colorMap, row, 0, canvas->getWidth(), 55, 120){};
+    /// @brief The palette to color with, if usePalette is set.
+    RGBPalette16 palette;
 
-    Fire(Canvas *canvas, ColorMap *colorMap, uint row, uint x, uint n, uint cooling, uint sparking);
+    bool usePalette = false;
+
+   public:
+    /// @brief A fire that burns along a whole row of the canvas.
+    Fire(Canvas *canvas, ColorMap *colorMap, uint row)
+        : Fire(canvas, colorMap, 0, canvas->getWidth(), row, 55, 120){};
+
+    /// @brief A fire that burns along part of a row.
+    /// @param x where along the row the fire starts
+    /// @param n how many pixels long the fire is
+    /// @param row the row to burn in
+    /// @param cooling how much the air cools as it rises (default 55)
+    /// @param sparking the chance out of 255 of a new spark (default 120)
+    Fire(Canvas *canvas, ColorMap *colorMap, uint x, uint n, uint row, uint cooling, uint sparking);
+
+    /// @brief Color the fire with a palette instead of the default black-body
+    /// heat colors. The coolest heat maps to the start of the palette and the
+    /// hottest to near the end, as in FastLED's Fire2012WithPalette.
+    void setPalette(const RGBPalette16 &palette) {
+        this->palette = palette;
+        usePalette = true;
+    };
 
     ~Fire();
 

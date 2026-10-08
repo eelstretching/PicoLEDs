@@ -125,16 +125,19 @@ class Firework : public Animation {
     void startExplosion();
 
     /// @brief  Get the color of the flare as it slows and cools
-    /// @param val between 0 and 255
+    /// @param val between 0 and 255, hotter is faster
     /// @return an appropriate color for the given temperature.
-    virtual uint8_t getFlareColor(uint val);
+    virtual RGB getFlareColor(uint val);
 
-    /// @brief Gets a color for a given point in the explosion. By default, we'll do fire colors.
-    /// @param val The value of the pixel for HSV
-    /// @param c1 A first color to time the explosion
-    /// @param c2 A second color to time the explosion
-    /// @return an RGB value we can use in the firework
-    virtual uint8_t getColor(float val, uint c1, uint c2);
+    /// @brief Gets a color for a spark in the explosion. By default sparks go
+    /// from white to yellow while hotter than c1, yellow to red between c1 and
+    /// c2, and red to black below c2. c1 and c2 drop as the explosion goes
+    /// on, so the whole explosion cools over time.
+    /// @param val The heat of the spark, 0 to 255
+    /// @param c1 Above this, the spark is white to yellow
+    /// @param c2 Below this, the spark is red to black
+    /// @return the color for the spark
+    virtual RGB getColor(float val, float c1, float c2);
 
     /// @brief The flare explodes.
     void explode();
