@@ -11,6 +11,12 @@
 #include "ws2811.pio.h"
 #include "ws2812.pio.h"
 
+//
+// The one and only instance. Namespace-scope, so it's zero-initialized before
+// main() runs -- we count on being able to test which DMA channels need
+// management.
+PIOProgram* pioPrograms[NUM_DMA_CHANNELS] = {nullptr};
+
 /// @brief A comparator that we can use to sort strips by their pin number.
 /// @param s1 The first strip
 /// @param s2 The second strip
@@ -277,14 +283,10 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // being DMA'd. Most examples seem to do this, as I guess we can be
     // modifying the existing pixels while the last bunch are being
     // non-blockingly DMAed to the PIO block.
-    dma_channel_transfer_size tsize;
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex]->getNumPixels();
         pip->buffer = calloc(pip->buffSize, sizeof(uint32_t));
-
-        //
-        // We'll be DMAing 32 bits at a time.
-        tsize = DMA_SIZE_32;
+        pip->dmaCount = pip->buffSize;
     } else {
         //
         // Each pixel on the strip uses 24 bits of color, this array will
@@ -296,13 +298,19 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
             maxPixels = MAX(maxPixels, strips[i]->getNumPixels());
         }
         pip->buffSize = maxPixels * 24;
-        pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
-
         //
-        // We'll be DMAing a byte at a time with data for 8 parallel
-        // channels.
-        tsize = DMA_SIZE_8;
+        // 24 bit-planes per pixel always divides by 4, so the bytes pack
+        // exactly into words with nothing left over. Allocating as words also
+        // guarantees the read address is aligned for a 32-bit DMA.
+        pip->dmaCount = pip->buffSize / 4;
+        pip->buffer = calloc(pip->dmaCount, sizeof(uint32_t));
     }
+
+    //
+    // Either way, we'll be DMAing 32 bits at a time. For a parallel program
+    // that's four bit-planes per transfer, each carrying one bit for every
+    // strip in the run.
+    dma_channel_transfer_size tsize = DMA_SIZE_32;
 
     //
     // Set up the DMA channel configuration.
@@ -449,7 +457,7 @@ void Renderer::render() {
         pip->dma_start = time_us_64();
 
         dma_channel_set_read_addr(pip->dma_channel, pip->buffer, false);
-        dma_channel_set_trans_count(pip->dma_channel, pip->buffSize, true);
+        dma_channel_set_trans_count(pip->dma_channel, pip->dmaCount, true);
 
         pip->stats.finish();
     }
