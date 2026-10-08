@@ -21,6 +21,7 @@
 #include "Marquees.h"
 #include "Spiral.h"
 #include "Strip.h"
+#include "TwinkleFox.h"
 #include <ScrollTexts.h>
 #include <FontTwoP.h>
 
@@ -109,6 +110,19 @@ int main() {
     ColorCone cone(&canvas, &xmasColors);
     cone.setName("Cone");
     animator.addTimed(&cone, 10000);
+
+    //
+    // Twinkling lights, cycling through the holiday palettes.
+    TwinkleFox twinkle(&canvas);
+    twinkle.setName("Twinkle");
+    animator.addTimed(&twinkle, 60000);
+
+    //
+    // Twinkling lights in our own Christmas colors.
+    TwinkleFox xmasTwinkle(&canvas, 5);
+    xmasTwinkle.addPalette(&xmasColors);
+    xmasTwinkle.setName("XmasTwinkle");
+    animator.addTimed(&xmasTwinkle, 30000);
 
     Marquees fancyMarq(&canvas, &xmasColors, 5, rgbwgColors, 20, RIGHT,
                        canvas.getHeight());

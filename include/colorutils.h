@@ -865,7 +865,7 @@ class RGBPalette16 {
     }
     RGBPalette16(const int rhs[16]) {
         for(int i = 0; i < 16; i++) {
-            entries[0] = rhs[i];
+            entries[i] = rhs[i];
         }
     }
 

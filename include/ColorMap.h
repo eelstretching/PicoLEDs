@@ -6,6 +6,7 @@
 #include <initializer_list>
 
 #include "color.h"
+#include "colorutils.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
@@ -38,6 +39,19 @@ class ColorMap {
     virtual uint8_t getIndex(RGB& color) { return 0;};
     virtual uint8_t getIndex(HSV& color) { return 0;};
     virtual void setBrightness(uint8_t value) {};
+
+    /// @brief Fills a 16-entry palette with the colors in this map, spread
+    /// evenly across the palette in order. A map with red, green and white
+    /// gives a palette that's about a third each red, green and white. Read
+    /// with ColorFromPalette and NOBLEND, that picks one of the map's colors;
+    /// with LINEARBLEND, it slides smoothly from one color to the next.
+    /// @param pal the palette to fill
+    void toPalette(RGBPalette16& pal) {
+        uint8_t n = getUsed();
+        for (int k = 0; k < 16; k++) {
+            pal.entries[k] = n == 0 ? background : getColor((k * n) / 16);
+        }
+    }
 };
 
 
