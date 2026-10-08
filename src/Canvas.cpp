@@ -167,7 +167,12 @@ bool Canvas::set(int x, int y, const RGB& color) {
     return true;
 }
 
-const RGB& Canvas::get(uint x, uint y) { return rows[x]->get(y); }
+const RGB& Canvas::get(uint x, uint y) {
+    if (y >= rows.size()) {
+        return background;
+    }
+    return rows[y]->get(x);
+}
 
 void Canvas::fillRow(uint row, const RGB& color) {
     if (row >= rows.size() || row < 0) {
