@@ -6,6 +6,10 @@
 #include "ArrayColorMap.h"
 #include "pico/platform.h"
 
+#ifdef PICOLEDS_SIM
+#include "sim_hooks.h"
+#endif
+
 void Row::set(int x, const RGB& color) {
     switch (dir) {
         case StripDirection::FORWARDS:
@@ -560,6 +564,12 @@ void Canvas::shiftDown(int x, int y, uint w, uint h, int n) {
 
 void Canvas::show(uint8_t brightness) {
     renderer.setBrightness(brightness);
+#ifdef PICOLEDS_SIM
+    //
+    // Let the desktop simulator know which canvas this renderer is drawing,
+    // so it can show the canvas instead of the raw strips.
+    picoleds_sim_canvas_show(this);
+#endif
     stats.start();
     renderer.render();
     stats.finish();
