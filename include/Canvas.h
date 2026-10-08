@@ -136,6 +136,10 @@ class Canvas {
 
     uint8_t getBrightness() { return renderer.getBrightness(); };
 
+    /// @brief Turns temporal dithering on or off for this canvas. See
+    /// Renderer::setDithering
+    void setDithering(bool dithering) { renderer.setDithering(dithering); };
+
     /// @brief Sets a pixel on this canvas to the given color
     /// @param x the x co-ordinate of the pixel
     /// @param y the y co-ordinate of the pixel

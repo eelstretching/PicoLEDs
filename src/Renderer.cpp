@@ -86,6 +86,10 @@ PIOProgram::~PIOProgram() {
 }
 
 Renderer::~Renderer() {
+    for (uint8_t* e : ditherError) {
+        free(e);
+    }
+    ditherError.clear();
     for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
         PIOProgram* pip = pioPrograms[i];
         if(pip == nullptr || pip->renderer != this) {
@@ -102,7 +106,44 @@ Renderer::~Renderer() {
     }
 }
 
+/// @brief Transposes an 8x8 block of bits held in two words, where the rows
+/// of the block are the bytes of x then y, most significant byte first, and
+/// the columns run from bit 7 to bit 0. From Hacker's Delight, section 7-3.
+static inline void transpose8(uint32_t& x, uint32_t& y) {
+    uint32_t t;
+    t = (x ^ (x >> 7)) & 0x00AA00AA;
+    x = x ^ t ^ (t << 7);
+    t = (y ^ (y >> 7)) & 0x00AA00AA;
+    y = y ^ t ^ (t << 7);
+    t = (x ^ (x >> 14)) & 0x0000CCCC;
+    x = x ^ t ^ (t << 14);
+    t = (y ^ (y >> 14)) & 0x0000CCCC;
+    y = y ^ t ^ (t << 14);
+    t = (x & 0xF0F0F0F0) | ((y >> 4) & 0x0F0F0F0F);
+    y = ((x << 4) & 0xF0F0F0F0) | (y & 0x0F0F0F0F);
+    x = t;
+}
+
 void Renderer::add(Strip *strip) { strips.push_back(strip); }
+
+void Renderer::setupDithering() {
+    if (ditherError.size() == strips.size()) {
+        return;
+    }
+    //
+    // We start each remainder at a random value rather than zero. Otherwise
+    // every pixel showing the same color would step up and down in lockstep,
+    // and a dim fill would visibly pulse as a whole instead of shimmering
+    // invisibly.
+    for (int i = ditherError.size(); i < strips.size(); i++) {
+        int n = strips[i]->getNumPixels() * 3;
+        uint8_t* e = (uint8_t*)malloc(n);
+        for (int j = 0; j < n; j++) {
+            e[j] = random8();
+        }
+        ditherError.push_back(e);
+    }
+}
 
 void Renderer::setup() {
     if (setupDone) {
@@ -235,10 +276,7 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
     // Now we'll need a buffer where we can put the pixels while they're
     // being DMA'd. Most examples seem to do this, as I guess we can be
     // modifying the existing pixels while the last bunch are being
-    // non-blockingly DMAed to the PIO block. We're naively assuming here
-    // that the strips all have the same number of pixels, so we can just
-    // use the size of the first one. Maybe better to pick the minimum
-    // length one?
+    // non-blockingly DMAed to the PIO block.
     dma_channel_transfer_size tsize;
     if (pip->size == 1) {
         pip->buffSize = strips[startIndex]->getNumPixels();
@@ -251,7 +289,13 @@ void Renderer::addPIOProgram(int startIndex, int startPin, int pinCount) {
         //
         // Each pixel on the strip uses 24 bits of color, this array will
         // have ones where the strips have that bit of color.
-        pip->buffSize = strips[startIndex]->getNumPixels() * 24;
+        // Size the buffer for the longest strip in the run, so that a
+        // longer strip later in the run can't write past the end of it.
+        uint maxPixels = 0;
+        for (int i = startIndex; i < startIndex + pinCount; i++) {
+            maxPixels = MAX(maxPixels, strips[i]->getNumPixels());
+        }
+        pip->buffSize = maxPixels * 24;
         pip->buffer = calloc(pip->buffSize, sizeof(uint8_t));
 
         //
@@ -296,6 +340,9 @@ void Renderer::render() {
     if (!setupDone) {
         setup();
     }
+    if (dithering) {
+        setupDithering();
+    }
     for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
         PIOProgram* pip = pioPrograms[i];
         if(pip == nullptr || pip->renderer != this) {
@@ -324,111 +371,74 @@ void Renderer::render() {
             Strip *s = strips[pip->startIndex];
             RGB* data = s->getData();
             uint32_t* pb = (uint32_t*)pip->buffer;
+            uint8_t* err = dithering ? ditherError[pip->startIndex] : nullptr;
             for (int i = 0; i < s->getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO
                 // program will be pulling 24 bits and it wants those 24
                 // bits in the most significant place.
-                *pb = processPixel(*data, s) << 8u;
+                if (err != nullptr) {
+                    *pb = processPixel(*data, s, err) << 8u;
+                    err += 3;
+                } else {
+                    *pb = processPixel(*data, s) << 8u;
+                }
             }
         } else {
-            memset(pip->buffer, 0, pip->buffSize * sizeof(uint8_t));
             //
             // We'll need to turn the data for multiple strips into bit
-            // planes.
-            for (int i = pip->startIndex, sn = 0;
-                 i < pip->startIndex + pip->size; i++, sn++) {
-                Strip *s = strips[i];
-                RGB* data = s->getData();
-                uint32_t pp = 0;
-
+            // planes: byte k of a pixel's 24 has bit n set when bit 23-k of
+            // strip n's color is set. Rather than test and set those bits one
+            // at a time, we gather one color byte from each of the (up to) 8
+            // strips into an 8x8 block of bits and transpose the block, which
+            // gives us 8 output bytes in about a dozen operations. Strips
+            // we don't have, or that are shorter than the others, contribute
+            // zeros.
+            int np = pip->buffSize / 24;
+            int size = pip->size;
+            Strip* ss[NUM_PARALLEL_PINS];
+            RGB* data[NUM_PARALLEL_PINS];
+            int len[NUM_PARALLEL_PINS];
+            uint8_t* err[NUM_PARALLEL_PINS];
+            for (int sn = 0; sn < size; sn++) {
+                ss[sn] = strips[pip->startIndex + sn];
+                data[sn] = ss[sn]->getData();
+                len[sn] = ss[sn]->getNumPixels();
+                err[sn] = dithering ? ditherError[pip->startIndex + sn] : nullptr;
+            }
+            uint8_t* pb = (uint8_t*)pip->buffer;
+            for (int j = 0; j < np; j++, pb += 24) {
                 //
-                // If there is a one bit at this position in the strips
-                // array, we'll always be or'ing in the same bit, so let's
-                // just make it now. But remember that we need to start from
-                // 0 for this program!
-                uint8_t stripBit = 1 << (i - pip->startIndex);
-                for (int j = 0; j < s->getNumPixels(); j++, pp += 24, data++) {
-                    uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
-                    uint32_t val = processPixel(*data, s);
-
+                // For each of the three color bytes, lo holds the byte from
+                // strips 0-3 and hi holds the byte from strips 4-7, with
+                // strip n's byte in bits 8n..8n+7 of its word.
+                uint32_t hi[3] = {0, 0, 0};
+                uint32_t lo[3] = {0, 0, 0};
+                for (int sn = 0; sn < size; sn++) {
+                    if (j >= len[sn]) {
+                        continue;
+                    }
+                    uint32_t val;
+                    if (err[sn] != nullptr) {
+                        val = processPixel(data[sn][j], ss[sn], err[sn] + 3 * j);
+                    } else {
+                        val = processPixel(data[sn][j], ss[sn]);
+                    }
+                    uint32_t* w = sn < 4 ? lo : hi;
+                    int shift = 8 * (sn & 3);
+                    w[0] |= ((val >> 16) & 0xFF) << shift;
+                    w[1] |= ((val >> 8) & 0xFF) << shift;
+                    w[2] |= (val & 0xFF) << shift;
+                }
+                for (int c = 0; c < 3; c++) {
+                    transpose8(hi[c], lo[c]);
                     //
-                    // Unrolling the inner loop to save some ops. There's
-                    // probably some crazy Duff's Device way to do this, but
-                    // this is simple and it cuts about a third of the time
-                    // in this loop.
-                    if (val & 0x00800000) {
-                        pipbuff[0] |= stripBit;
-                    }
-                    if (val & 0x00400000) {
-                        pipbuff[1] |= stripBit;
-                    }
-                    if (val & 0x00200000) {
-                        pipbuff[2] |= stripBit;
-                    }
-                    if (val & 0x00100000) {
-                        pipbuff[3] |= stripBit;
-                    }
-                    if (val & 0x00080000) {
-                        pipbuff[4] |= stripBit;
-                    }
-                    if (val & 0x00040000) {
-                        pipbuff[5] |= stripBit;
-                    }
-                    if (val & 0x00020000) {
-                        pipbuff[6] |= stripBit;
-                    }
-                    if (val & 0x00010000) {
-                        pipbuff[7] |= stripBit;
-                    }
-                    if (val & 0x00008000) {
-                        pipbuff[8] |= stripBit;
-                    }
-                    if (val & 0x00004000) {
-                        pipbuff[9] |= stripBit;
-                    }
-                    if (val & 0x00002000) {
-                        pipbuff[10] |= stripBit;
-                    }
-                    if (val & 0x00001000) {
-                        pipbuff[11] |= stripBit;
-                    }
-                    if (val & 0x00000800) {
-                        pipbuff[12] |= stripBit;
-                    }
-                    if (val & 0x00000400) {
-                        pipbuff[13] |= stripBit;
-                    }
-                    if (val & 0x00000200) {
-                        pipbuff[14] |= stripBit;
-                    }
-                    if (val & 0x00000100) {
-                        pipbuff[15] |= stripBit;
-                    }
-                    if (val & 0x00000080) {
-                        pipbuff[16] |= stripBit;
-                    }
-                    if (val & 0x00000040) {
-                        pipbuff[17] |= stripBit;
-                    }
-                    if (val & 0x00000020) {
-                        pipbuff[18] |= stripBit;
-                    }
-                    if (val & 0x00000010) {
-                        pipbuff[19] |= stripBit;
-                    }
-                    if (val & 0x00000008) {
-                        pipbuff[20] |= stripBit;
-                    }
-                    if (val & 0x00000004) {
-                        pipbuff[21] |= stripBit;
-                    }
-                    if (val & 0x00000002) {
-                        pipbuff[22] |= stripBit;
-                    }
-                    if (val & 0x00000001) {
-                        pipbuff[23] |= stripBit;
-                    }
+                    // The transpose leaves the bytes most significant first,
+                    // so swap them into memory order.
+                    uint32_t a = __builtin_bswap32(hi[c]);
+                    uint32_t b = __builtin_bswap32(lo[c]);
+                    memcpy(pb + 8 * c, &a, 4);
+                    memcpy(pb + 8 * c + 4, &b, 4);
                 }
             }
         }
