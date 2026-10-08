@@ -1,3 +1,10 @@
+# OfficeSign talks Bluetooth through the CYW43 radio, so it can only be built
+# for boards that have one (pico_w, pico2_w). Skip it for everything else.
+if (NOT PICO_CYW43_SUPPORTED)
+  message(STATUS "Skipping OfficeSign: board ${PICO_BOARD} has no CYW43 wireless chip")
+  return()
+endif()
+
 pico_sdk_init()
 
 add_executable(OfficeSign
