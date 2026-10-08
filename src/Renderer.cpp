@@ -86,6 +86,10 @@ PIOProgram::~PIOProgram() {
 }
 
 Renderer::~Renderer() {
+    for (uint8_t* e : ditherError) {
+        free(e);
+    }
+    ditherError.clear();
     for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
         PIOProgram* pip = pioPrograms[i];
         if(pip == nullptr || pip->renderer != this) {
@@ -103,6 +107,25 @@ Renderer::~Renderer() {
 }
 
 void Renderer::add(Strip *strip) { strips.push_back(strip); }
+
+void Renderer::setupDithering() {
+    if (ditherError.size() == strips.size()) {
+        return;
+    }
+    //
+    // We start each remainder at a random value rather than zero. Otherwise
+    // every pixel showing the same color would step up and down in lockstep,
+    // and a dim fill would visibly pulse as a whole instead of shimmering
+    // invisibly.
+    for (int i = ditherError.size(); i < strips.size(); i++) {
+        int n = strips[i]->getNumPixels() * 3;
+        uint8_t* e = (uint8_t*)malloc(n);
+        for (int j = 0; j < n; j++) {
+            e[j] = random8();
+        }
+        ditherError.push_back(e);
+    }
+}
 
 void Renderer::setup() {
     if (setupDone) {
@@ -296,6 +319,9 @@ void Renderer::render() {
     if (!setupDone) {
         setup();
     }
+    if (dithering) {
+        setupDithering();
+    }
     for(int i = 0; i < NUM_DMA_CHANNELS; i++) {
         PIOProgram* pip = pioPrograms[i];
         if(pip == nullptr || pip->renderer != this) {
@@ -324,12 +350,18 @@ void Renderer::render() {
             Strip *s = strips[pip->startIndex];
             RGB* data = s->getData();
             uint32_t* pb = (uint32_t*)pip->buffer;
+            uint8_t* err = dithering ? ditherError[pip->startIndex] : nullptr;
             for (int i = 0; i < s->getNumPixels(); i++, pb++, data++) {
                 //
                 // Note that we're shifting by 8 here because the PIO
                 // program will be pulling 24 bits and it wants those 24
                 // bits in the most significant place.
-                *pb = processPixel(*data, s) << 8u;
+                if (err != nullptr) {
+                    *pb = processPixel(*data, s, err) << 8u;
+                    err += 3;
+                } else {
+                    *pb = processPixel(*data, s) << 8u;
+                }
             }
         } else {
             memset(pip->buffer, 0, pip->buffSize * sizeof(uint8_t));
@@ -341,6 +373,7 @@ void Renderer::render() {
                 Strip *s = strips[i];
                 RGB* data = s->getData();
                 uint32_t pp = 0;
+                uint8_t* err = dithering ? ditherError[i] : nullptr;
 
                 //
                 // If there is a one bit at this position in the strips
@@ -350,7 +383,13 @@ void Renderer::render() {
                 uint8_t stripBit = 1 << (i - pip->startIndex);
                 for (int j = 0; j < s->getNumPixels(); j++, pp += 24, data++) {
                     uint8_t* pipbuff = &((uint8_t*)pip->buffer)[pp];
-                    uint32_t val = processPixel(*data, s);
+                    uint32_t val;
+                    if (err != nullptr) {
+                        val = processPixel(*data, s, err);
+                        err += 3;
+                    } else {
+                        val = processPixel(*data, s);
+                    }
 
                     //
                     // Unrolling the inner loop to save some ops. There's

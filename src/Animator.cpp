@@ -31,13 +31,13 @@ void Animator::printStats() {
     uint64_t runTime = time_us_64() - startTime;
     printf(
         "%d frames run, running %.1fs %.2f us/frame at %d fps %.2f us/step, %.2f us/dst %.2f "
-        "us/show %.2f us/frame %d missed frames\n",
+        "us/show %.2f us/frame %d missed frames %d refreshes\n",
         getFrameCount(), runTime / 1000000.0, 
         getUsPerFrame(), getFPS(),
         getAverageStepTimeUS(), 
         getAverageDataPrepTimeUS(),
         getAverageShowTimeUS(), getAverageFrameTimeUS(),
-        getMissedFrames());
+        getMissedFrames(), getRefreshCount());
 }
 
 bool Animator::step() {
@@ -78,7 +78,28 @@ bool Animator::step() {
     // super-precise here.
     uint64_t lus = frameWatch.getLastTime();
     if (lus < usPerFrame) {
-        sleep_us(usPerFrame - lus);
+        uint64_t frameEnd = time_us_64() + (usPerFrame - lus);
+        //
+        // If we're dithering, then we want to spend the time until the next
+        // frame re-sending this frame, since each send rounds a little
+        // differently and it's the average over sends that gets the in-between
+        // levels right. We'll stop when another send wouldn't finish before
+        // the next frame is due.
+        if (canvas->getRenderer()->getDithering()) {
+            uint64_t now = time_us_64();
+            uint64_t last = 0;
+            while (now + last < frameEnd) {
+                canvas->show();
+                refreshCount++;
+                uint64_t after = time_us_64();
+                last = after - now;
+                now = after;
+            }
+        }
+        uint64_t now = time_us_64();
+        if (now < frameEnd) {
+            sleep_us(frameEnd - now);
+        }
     } else {
         missedFrames++;
     }

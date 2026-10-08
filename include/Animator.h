@@ -24,6 +24,10 @@ class Animator {
 
     uint frameCount = 0;
 
+    /// @brief The number of extra times we've re-sent a frame between steps
+    /// to keep dithering going.
+    uint refreshCount = 0;
+
     StopWatch frameWatch;
     StopWatch showWatch;
     StopWatch stepWatch;
@@ -68,6 +72,8 @@ class Animator {
     float getAverageDataPrepTimeUS() {return canvas->getRenderer()->getAverageDataSetupTime();}
 
     uint getFrameCount() { return frameCount; };
+
+    uint getRefreshCount() { return refreshCount; };
 
     float getUsPerFrame() { return usPerFrame; };
 

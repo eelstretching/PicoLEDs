@@ -99,6 +99,7 @@ int main() {
         canvas.add(strips[i]);
     }
     canvas.setBrightness(BRIGHTNESS);
+    canvas.setDithering(true);
     canvas.setup();
     canvas.clear();
     canvas.show();
