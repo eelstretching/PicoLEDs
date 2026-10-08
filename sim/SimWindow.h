@@ -15,10 +15,13 @@ enum SimView {
     /// @brief Turned so x goes up, the way a MegaTree's strands run from the
     /// ground to the top, and y goes across, around the tree.
     VIEW_TREE,
-    /// @brief Looking down on a MegaTree from above: each canvas row is a
-    /// strand, running from the outside (x = 0, the bottom of the tree) to the
-    /// middle (the top).
+    /// @brief Looking down on a MegaTree from above, with the street at the
+    /// bottom: each canvas row is a strand, running from the outside (x = 0,
+    /// the bottom of the tree) to the middle (the top).
     VIEW_RADIAL,
+    /// @brief A MegaTree seen from the street: a cone, with each strand going
+    /// from the base up to the top.
+    VIEW_FRONT,
     VIEW_COUNT
 };
 

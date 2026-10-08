@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <map>
@@ -38,6 +39,7 @@ struct Options {
     bool gamma = true;
     uint32_t seed = 1;
     SimView view = VIEW_FLAT;
+    int arc = 180;
 };
 
 Options opts;
@@ -137,51 +139,104 @@ int pickScale(int w, int h) {
     return std::max(2, std::min(s, 16));
 }
 
-/// @brief Draws a MegaTree as seen from above. Each row of the frame is a
-/// strand, spread evenly around the circle with row 0 at the bottom of the
-/// picture and the rows going counterclockwise. Along a strand, x = 0 is the
-/// bottom of the tree, at the outside, and the last pixel is the top, at the
-/// middle.
-void drawRadial(const Frame& f, int size, std::vector<uint8_t>& out) {
-    out.assign((size_t)size * size * 3, 0);
-    float cx = size / 2.0f, cy = size / 2.0f;
+/// @brief Draws one LED as a soft-edged dot. Where dots overlap, the brighter
+/// one wins. (Light really adds up, but this is close enough.)
+void plotDot(std::vector<uint8_t>& out, int W, int H, float px, float py,
+             float r, const uint8_t* cc) {
+    int x0 = std::max(0, (int)floorf(px - r - 1));
+    int x1 = std::min(W - 1, (int)ceilf(px + r + 1));
+    int y0 = std::max(0, (int)floorf(py - r - 1));
+    int y1 = std::min(H - 1, (int)ceilf(py + r + 1));
+    for (int sy = y0; sy <= y1; sy++) {
+        for (int sx = x0; sx <= x1; sx++) {
+            float dist = hypotf(sx + 0.5f - px, sy + 0.5f - py);
+            float a = std::min(1.0f, std::max(0.0f, r - dist + 0.5f));
+            if (a <= 0) {
+                continue;
+            }
+            uint8_t* p = &out[((size_t)sy * W + sx) * 3];
+            for (int k = 0; k < 3; k++) {
+                p[k] = std::max(p[k], (uint8_t)(cc[k] * a + 0.5f));
+            }
+        }
+    }
+}
+
+/// @brief The angle of strand (row) y around the tree, in radians. 0 is
+/// toward the street (the bottom of the radial view, the middle of the front
+/// view). The strands are spread evenly over opts.arc degrees, with row 0 at
+/// the left end as you look from the street.
+float strandAngle(int y, int strands) {
+    float arc = opts.arc * (float)M_PI / 180;
+    return -arc / 2 + arc * (y + 0.5f) / strands;
+}
+
+/// @brief Draws a MegaTree as seen from above, with the street at the bottom.
+/// Along a strand, x = 0 is the bottom of the tree, at the outside, and the
+/// last pixel is the top, in the middle.
+void drawRadial(const Frame& f, int size, int H, std::vector<uint8_t>& out) {
+    out.assign((size_t)size * H * 3, 0);
+    //
+    // When the strands only go halfway around (or less), the back half of the
+    // picture would be empty, so it gets left off.
+    float cx = size / 2.0f, cy = H < size ? 10.0f : size / 2.0f;
     float outer = size / 2.0f - 6;
     float inner = outer * 0.04f;
     float step = f.w > 1 ? (outer - inner) / (f.w - 1) : 0;
     //
     // Dots as big as the space between LEDs along a strand, but never so big
     // that neighboring strands run together at the outside.
-    float arc = 2 * (float)M_PI * outer / std::max(f.h, 1);
+    float arc = (float)opts.arc / 360 * 2 * (float)M_PI * outer / std::max(f.h, 1);
     float r = std::max(1.0f, std::min(step, arc) * 0.45f);
     for (int y = 0; y < f.h; y++) {
-        float theta = -(float)M_PI / 2 + 2 * (float)M_PI * y / f.h;
-        float ux = cosf(theta), uy = sinf(theta);
+        float phi = strandAngle(y, f.h);
+        //
+        // phi = 0 points down the screen, toward the street, and the strands
+        // run left to right across the bottom as phi goes up.
+        float ux = sinf(phi), uy = cosf(phi);
         for (int x = 0; x < f.w; x++) {
             uint8_t cc[3];
             ledColor(&f.rgb[((size_t)y * f.w + x) * 3], cc);
             float d = outer - x * step;
-            // Screen y goes down, so up is minus.
-            float px = cx + ux * d, py = cy - uy * d;
-            int x0 = std::max(0, (int)floorf(px - r - 1));
-            int x1 = std::min(size - 1, (int)ceilf(px + r + 1));
-            int y0 = std::max(0, (int)floorf(py - r - 1));
-            int y1 = std::min(size - 1, (int)ceilf(py + r + 1));
-            for (int sy = y0; sy <= y1; sy++) {
-                for (int sx = x0; sx <= x1; sx++) {
-                    float dist = hypotf(sx + 0.5f - px, sy + 0.5f - py);
-                    float a = std::min(1.0f, std::max(0.0f, r - dist + 0.5f));
-                    if (a <= 0) {
-                        continue;
-                    }
-                    //
-                    // LEDs near the middle overlap, and overlapping light adds
-                    // up, but we'll settle for the brightest one winning.
-                    uint8_t* p = &out[((size_t)sy * size + sx) * 3];
-                    for (int k = 0; k < 3; k++) {
-                        p[k] = std::max(p[k], (uint8_t)(cc[k] * a + 0.5f));
-                    }
+            plotDot(out, size, H, cx + ux * d, cy + uy * d, r, cc);
+        }
+    }
+}
+
+/// @brief Draws a MegaTree as seen from the end of the driveway: a cone seen
+/// side on, so each strand runs from its spot on the base up to the top. The
+/// strands toward the sides are foreshortened, as they would be. With an arc
+/// over 180 degrees, the strands on the back are drawn dimmer and behind.
+void drawFront(const Frame& f, int W, int H, std::vector<uint8_t>& out) {
+    out.assign((size_t)W * H * 3, 0);
+    float base = W / 2.0f - 8;
+    float bottom = H - 8.0f, top = 8.0f;
+    float step = f.w > 1 ? (bottom - top) / (f.w - 1) : 0;
+    float r = std::max(1.0f, std::min(step, 2 * base / std::max(f.h, 1)) * 0.45f);
+    //
+    // Back to front, so nearer strands are drawn over farther ones.
+    std::vector<int> order(f.h);
+    for (int y = 0; y < f.h; y++) {
+        order[y] = y;
+    }
+    std::sort(order.begin(), order.end(), [&](int a, int b) {
+        return cosf(strandAngle(a, f.h)) < cosf(strandAngle(b, f.h));
+    });
+    for (int y : order) {
+        float phi = strandAngle(y, f.h);
+        bool back = cosf(phi) < -0.01f;
+        for (int x = 0; x < f.w; x++) {
+            uint8_t cc[3];
+            ledColor(&f.rgb[((size_t)y * f.w + x) * 3], cc);
+            if (back) {
+                for (int k = 0; k < 3; k++) {
+                    cc[k] = cc[k] * 2 / 5;
                 }
             }
+            float h = f.w > 1 ? (float)x / (f.w - 1) : 0;
+            float px = W / 2.0f + sinf(phi) * base * (1 - h);
+            float py = bottom - x * step;
+            plotDot(out, W, H, px, py, r, cc);
         }
     }
 }
@@ -207,10 +262,17 @@ void draw(const Frame& f, SimView view, std::vector<uint8_t>& out, int& W,
             rasterize(t, scale, out);
             break;
         }
+        case VIEW_FRONT: {
+            H = opts.scale > 0 ? opts.scale * f.w : recording ? 480 : 800;
+            W = H * 3 / 4;
+            drawFront(f, W, H, out);
+            break;
+        }
         case VIEW_RADIAL: {
             int size = opts.scale > 0 ? opts.scale * 2 * f.w : recording ? 480 : 800;
-            W = H = size;
-            drawRadial(f, size, out);
+            W = size;
+            H = opts.arc <= 180 ? size / 2 + 10 : size;
+            drawRadial(f, size, H, out);
             break;
         }
         default: {
@@ -308,7 +370,10 @@ void usage(const char* prog) {
             "  --wrap N        for programs without a Canvas, fold each strip into\n"
             "                  rows of N pixels (default 100 for strips over 150)\n"
             "  --view V        flat (the canvas as is), tree (x going up, like a\n"
-            "                  MegaTree's strands), or radial (a MegaTree from above)\n"
+            "                  MegaTree's strands), radial (a MegaTree from above),\n"
+            "                  or front (a MegaTree from the street)\n"
+            "  --arc N         how far around the MegaTree its strands go, in\n"
+            "                  degrees, for radial and front (default 180)\n"
             "  --seed N        random seed, for repeatable runs (default 1)\n"
             "  --no-gamma      show raw color values instead of how LEDs look\n",
             prog);
@@ -416,7 +481,7 @@ void picoleds_sim_frame(int width, int height, const uint8_t* rgb,
     }
 }
 
-const char* const simViewNames[VIEW_COUNT] = {"flat", "tree", "radial"};
+const char* const simViewNames[VIEW_COUNT] = {"flat", "tree", "radial", "front"};
 
 SimView picoleds_sim_initial_view() { return opts.view; }
 
@@ -469,6 +534,8 @@ int main(int argc, char** argv) {
                 return 2;
             }
             opts.view = (SimView)n;
+        } else if (a == "--arc") {
+            opts.arc = std::max(1, std::min(360, atoi(next())));
         } else if (a == "--no-gamma") {
             opts.gamma = false;
         } else {

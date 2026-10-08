@@ -32,7 +32,7 @@ In the window:
 | --- | --- |
 | **→** | Stop and single step. The first press stops the animation; each press after that shows the next frame. |
 | **space** | Pause, or go back to running after pausing or stepping. |
-| **v** | Switch views: flat, tree, radial (see below). **1**, **2** and **3** pick one directly. |
+| **v** | Switch views: flat, tree, radial, front (see below). **1** to **4** pick one directly. |
 | **q** or **Esc** | Quit. |
 
 The program's clock stops while it's paused or stepping, so the animation
@@ -56,7 +56,8 @@ time and a minute of animation takes a few seconds to record.
 | `--gif FILE` | Record to an animated GIF instead of opening a window. |
 | `--seconds N` | How much of the animation to record (default 10). |
 | `--scale N` | Screen pixels per LED (default: as big as fits). |
-| `--view V` | Start in a view: `flat` (the default), `tree` or `radial`. GIFs are recorded in this view. |
+| `--view V` | Start in a view: `flat` (the default), `tree`, `radial` or `front`. GIFs are recorded in this view. |
+| `--arc N` | How far around the MegaTree its strands go, in degrees, for the radial and front views (default 180, the half facing the street). |
 | `--seed N` | Seed for `get_rand_32()`, so random animations repeat (default 1). |
 | `--wrap N` | For programs that use strips without a `Canvas`, fold each strip into rows of N pixels (default 100 for strips over 150). |
 | `--no-gamma` | Show raw color values. See below. |
@@ -87,17 +88,23 @@ target_include_directories(LeapingArches PRIVATE arches/include)
 
 ## What you're looking at
 
-There are three views:
+There are four views. The last two treat each row of the canvas as a MegaTree
+strand, with x = 0 at the bottom of the tree, and spread the strands evenly
+over `--arc` degrees (180 by default, the half facing the street), with row 0
+at the left end as you look from the street.
 
 * **flat** shows the canvas the way the animation sees it: x to the right, y
   up, and (0, 0) at the bottom left.
 * **tree** turns it the way a MegaTree hangs: x goes up the strands from the
   ground, and y goes across, around the tree. (0, 0) is still at the bottom
   left.
-* **radial** is a MegaTree from above. Each row of the canvas is a strand,
-  spread evenly around the circle, with row 0 pointing toward the bottom of
-  the window and the rows going counterclockwise. x = 0, the bottom of the
-  tree, is at the outside, and the top of the tree is in the middle.
+* **radial** is a MegaTree from above, with the street at the bottom of the
+  window. The bottom of each strand is at the outside and the top of the tree
+  is in the middle.
+* **front** is a MegaTree from the end of the driveway: a cone seen side on,
+  each strand running from its spot on the base up to the top, with the ones
+  toward the sides foreshortened. If `--arc` is over 180, the strands on the
+  back are drawn dimmer, behind the ones in front.
 
 Also:
 

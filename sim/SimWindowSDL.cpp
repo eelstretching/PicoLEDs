@@ -121,6 +121,7 @@ int run(const char* path) {
                     case SDLK_1:
                     case SDLK_2:
                     case SDLK_3:
+                    case SDLK_4:
                         view = (SimView)(e.key.keysym.sym - SDLK_1);
                         redraw = true;
                         break;
