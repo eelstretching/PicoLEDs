@@ -8,6 +8,7 @@ add_executable(RenderTest RenderTest.cpp)
 add_executable(MultiRender MultiRender.cpp)
 add_executable(DimTest DimTest.cpp)
 add_executable(PanelTestSingle PanelTestSingle.cpp)
+add_executable(BitPlaneBench BitPlaneBench.cpp)
 
 pico_set_program_name(StripTest "StripTest")
 pico_set_program_version(StripTest "0.1")
@@ -128,3 +129,25 @@ target_link_libraries(MultiRender
 )
 
 pico_add_extra_outputs(MultiRender)
+
+pico_enable_stdio_uart(BitPlaneBench 1)
+pico_enable_stdio_usb(BitPlaneBench 1)
+
+# Add the standard include files to the build
+target_include_directories(BitPlaneBench PRIVATE
+  ../../src
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+)
+
+# Add any user requested libraries
+target_link_libraries(BitPlaneBench
+  PicoLEDs
+  hardware_dma
+  hardware_pio
+  hardware_timer
+  hardware_clocks
+  pico_stdlib
+)
+
+pico_add_extra_outputs(BitPlaneBench)
