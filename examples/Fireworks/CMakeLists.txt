@@ -57,3 +57,10 @@ target_link_libraries(Fireworks
 
 pico_add_extra_outputs(Fireworks)
 
+
+add_executable(Fireworks2D Fireworks2D.cpp)
+pico_set_program_name(Fireworks2D "Fireworks2D")
+pico_enable_stdio_uart(Fireworks2D 1)
+pico_enable_stdio_usb(Fireworks2D 0)
+target_link_libraries(Fireworks2D PicoLEDs pico_stdlib pico_rand)
+pico_add_extra_outputs(Fireworks2D)

@@ -1,6 +1,7 @@
 #include "ArrayColorMap.h"
 #include "Firework.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 #include "color.h"
@@ -34,7 +35,7 @@ ColorMap *Firework::getColorMap() {
     // leaves some room at the end for a few more colors if we need them. Borrowed
     // this form HeatColor from FastLED.
     for(int i = 0; i < 64; i++) {
-        cm->addColor(RGB(i <<= 2, 0, 0));
+        cm->addColor(RGB(i << 2, 0, 0));
     }
     for(int i = 64; i < 128; i++) {
         cm->addColor(RGB(255, (i - 64) << 2, 0));
@@ -126,7 +127,7 @@ void Firework::startExplosion() {
             s->vel *= 1.4;
         }
         // set colors before scaling velocity to keep them bright
-        s->val = constrain(abs(s->vel) * 500, 0, 255);
+        s->val = constrain(fabsf(s->vel) * 500, 0, 255);
         // proportional to height
         s->vel *= s->pos / canvas->getWidth();
     }
@@ -136,23 +137,35 @@ void Firework::startExplosion() {
     state = EXPLODING;
 }
 
-uint8_t Firework::getFlareColor(uint val) {
-    return (uint8_t) val / 2;
+/// @brief The same black body colors as getColorMap: 0-63 black to red, 64-127
+/// red to yellow, 128-191 yellow to white.
+static RGB heatIndexColor(int i) {
+    i = MAX(0, MIN(i, 191));
+    if (i < 64) {
+        return RGB(i << 2, 0, 0);
+    } else if (i < 128) {
+        return RGB(255, (i - 64) << 2, 0);
+    }
+    return RGB(255, 255, (i - 128) << 2);
 }
 
-uint8_t Firework::getColor(float val, uint c1, uint c2) {
+RGB Firework::getFlareColor(uint val) {
+    return heatIndexColor(val / 2);
+}
+
+RGB Firework::getColor(float val, float c1, float c2) {
     if (val > c1) {
         //
-        // Something from the hot part of the map, from 128 to 192
-        return (uint8_t) (((uint) (255 * (val - c1))) % 64) + 128;
-    } else if (val < c2) {  
+        // Hot: yellow to white.
+        return heatIndexColor(128 + (int)(63 * (val - c1) / (255 - c1)));
+    } else if (val < c2) {
         //
-        // Something from the cool end of the map, from 0 to 64
-        return (uint8_t) ((255 * val) / c2) % 64;
-    } else {  
+        // Cool: black to red.
+        return heatIndexColor((int)(63 * val / c2));
+    } else {
         //
-        // Something in the middle, fade from yellow to red.
-        return (uint8_t) ((uint) (((255 * (val - c2)) / (c1 - c2))) % 64) + 64;
+        // In the middle: red to yellow.
+        return heatIndexColor(64 + (int)(63 * (val - c2) / (c1 - c2)));
     }
 }
 
@@ -162,6 +175,7 @@ void Firework::explode() {
         return;
     }
 
+    canvas->clearRow(row);
     for (int i = 0; i < numSparks; i++) {
         Spark* s = &explosion[i];
         s->pos += s->vel;
@@ -173,6 +187,10 @@ void Firework::explode() {
     //
     // As sparks burn out they fall slower
     dyingGravity *= .995;
+    //
+    // And the whole explosion cools.
+    c1 *= .99;
+    c2 *= .99;
     explosionSteps++;
 }
 
@@ -199,6 +217,6 @@ bool Firework::step() {
     }
     //
     // By default, we're a never ending animation.
-    return false;
+    return true;
 }
 

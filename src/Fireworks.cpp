@@ -19,13 +19,13 @@ Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap, Firework **fw, int nf) 
 }
 
 void Fireworks::init() {
-    for (int i = 0; i < canvas->getHeight(); i++) {
+    for (int i = 0; i < nf; i++) {
         fw[i]->init();
     }
 }
 
 bool Fireworks::step() {
-    for (int i = 0; i < canvas->getHeight(); i++) {
+    for (int i = 0; i < nf; i++) {
         fw[i]->step();
     }
     return true;

@@ -102,6 +102,33 @@ static inline uint8_t scale8_video(uint8_t i, fract8 scale) {
     return (((int)i * (int)scale) >> 8) + ((i && scale) ? 1 : 0);
 }
 
+/// @brief A fast 8-bit sine approximation, from FastLED's sin8_C.
+/// @param theta the angle, with 0-255 being one full turn
+/// @return the sine of the angle, scaled to 0-255 with 128 at zero
+static inline uint8_t sin8(uint8_t theta) {
+    static const uint8_t b_m16_interleave[] = {0, 49, 49, 41, 90, 27, 117, 10};
+    uint8_t offset = theta;
+    if (theta & 0x40) {
+        offset = (uint8_t)255 - offset;
+    }
+    offset &= 0x3F;
+    uint8_t secoffset = offset & 0x0F;
+    if (theta & 0x40) {
+        ++secoffset;
+    }
+    uint8_t section = offset >> 4;
+    const uint8_t* p = b_m16_interleave + section * 2;
+    uint8_t b = p[0];
+    uint8_t m16 = p[1];
+    uint8_t mx = (m16 * secoffset) >> 4;
+    int8_t y = mx + b;
+    if (theta & 0x80) {
+        y = -y;
+    }
+    y += 128;
+    return y;
+}
+
 static inline uint8_t lerp8by8(uint8_t a, uint8_t b, fract8 frac) {
     uint8_t result;
     if (b > a) {
