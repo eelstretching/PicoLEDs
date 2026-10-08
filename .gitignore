@@ -54,3 +54,6 @@ dkms.conf
 # Pi Pico
 **/build/*
 **/generated/*
+
+# Desktop simulator
+build-sim/

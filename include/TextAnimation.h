@@ -20,7 +20,7 @@ class TextElement {
     int y;
     bool waiting;
     uint width;
-    const RGB& color;
+    RGB color;
 };
 
 class TextAnimation : public Animation {
