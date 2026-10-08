@@ -6,7 +6,7 @@ bool available() { return false; }
 
 int run(const char* title) { return 1; }
 
-void waitWhilePaused() {}
+uint64_t waitToShow() { return 0; }
 
 void programFinished() {}
 
