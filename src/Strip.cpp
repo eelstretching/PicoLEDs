@@ -84,13 +84,13 @@ void Strip::rotate(Direction direction) {
     case RIGHT:
     case UP:
       tmp = data[numPixels - 1];
-      memcpy(&data[1], &data[0], (numPixels - 1) * sizeof(RGB));
+      memmove(&data[1], &data[0], (numPixels - 1) * sizeof(RGB));
       data[0] = tmp;
       break;
     case LEFT:
     case DOWN:
       tmp = data[0];
-      memcpy(&data[0], &data[1], (numPixels - 1) * sizeof(RGB));
+      memmove(&data[0], &data[1], (numPixels - 1) * sizeof(RGB));
       data[numPixels - 1] = tmp;
       break;
 

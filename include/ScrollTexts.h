@@ -17,7 +17,7 @@ class ScrollText : public Animation {
     uint8_t frameWait;
     const char *text;
     Font *font;
-    const RGB& color;
+    RGB color;
     RenderAngle angle;
     bool clear;
     bool frameDelay;
