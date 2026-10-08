@@ -16,10 +16,12 @@
 #include "pico/types.h"
 
 /*
- * RES time, specification says it needs at least 50 us, but some folks say it
- * can be as low as 9us!
+ * RES time. The original WS2812 and WS2811 datasheets say at least 50 us, but
+ * newer parts (WS2812B-V5 and friends) want 280 us or more. We also start
+ * timing when the DMA finishes, which is up to 8 bits (about 10 us) before the
+ * PIO program has actually shifted the last of the data out of its FIFO.
  */
-#define RESET_TIME_US (80)
+#define RESET_TIME_US (300)
 #define NUM_PARALLEL_PINS 8
 
 class Renderer;
