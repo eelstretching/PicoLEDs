@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <mutex>
@@ -36,6 +38,8 @@ struct Options {
     bool window = true;
     bool gamma = true;
     uint32_t seed = 1;
+    SimView view = VIEW_FLAT;
+    int arc = 180;
 };
 
 Options opts;
@@ -52,6 +56,11 @@ bool recording = false;
 uint64_t vnow = 0;
 auto realStart = std::chrono::steady_clock::now();
 
+/// @brief Time spent paused or waiting for a step in the window, which the
+/// program shouldn't see pass, or the Animator would think it was running
+/// late.
+std::atomic<uint64_t> stoppedUS(0);
+
 void advance(uint64_t us);
 
 // --- Frames ------------------------------------------------------------------
@@ -65,6 +74,20 @@ struct Frame {
 };
 
 uint8_t gammaLUT[256];
+
+/// @brief Gets the screen color for an LED color.
+void ledColor(const uint8_t* c, uint8_t* out) {
+    if (c[0] == 0 && c[1] == 0 && c[2] == 0) {
+        //
+        // Pixels that are off are a faint gray, so you can see where the LEDs
+        // are.
+        out[0] = out[1] = out[2] = 18;
+        return;
+    }
+    for (int k = 0; k < 3; k++) {
+        out[k] = gammaLUT[c[k]];
+    }
+}
 
 /// @brief Draws a frame of LEDs as round dots on a black background, with the
 /// bottom row of the canvas at the bottom of the image.
@@ -89,14 +112,8 @@ void rasterize(const Frame& f, int scale, std::vector<uint8_t>& out) {
     for (int y = 0; y < f.h; y++) {
         int top = (f.h - 1 - y) * scale;
         for (int x = 0; x < f.w; x++) {
-            const uint8_t* c = &f.rgb[((size_t)y * f.w + x) * 3];
-            uint8_t cc[3] = {gammaLUT[c[0]], gammaLUT[c[1]], gammaLUT[c[2]]};
-            if (c[0] == 0 && c[1] == 0 && c[2] == 0) {
-                //
-                // Pixels that are off are a faint gray, so you can see where
-                // the LEDs are.
-                cc[0] = cc[1] = cc[2] = 18;
-            }
+            uint8_t cc[3];
+            ledColor(&f.rgb[((size_t)y * f.w + x) * 3], cc);
             for (int dy = 0; dy < scale; dy++) {
                 uint8_t* p = &out[(((size_t)top + dy) * W + x * scale) * 3];
                 for (int dx = 0; dx < scale; dx++) {
@@ -122,6 +139,152 @@ int pickScale(int w, int h) {
     return std::max(2, std::min(s, 16));
 }
 
+/// @brief Draws one LED as a soft-edged dot. Where dots overlap, the brighter
+/// one wins. (Light really adds up, but this is close enough.)
+void plotDot(std::vector<uint8_t>& out, int W, int H, float px, float py,
+             float r, const uint8_t* cc) {
+    int x0 = std::max(0, (int)floorf(px - r - 1));
+    int x1 = std::min(W - 1, (int)ceilf(px + r + 1));
+    int y0 = std::max(0, (int)floorf(py - r - 1));
+    int y1 = std::min(H - 1, (int)ceilf(py + r + 1));
+    for (int sy = y0; sy <= y1; sy++) {
+        for (int sx = x0; sx <= x1; sx++) {
+            float dist = hypotf(sx + 0.5f - px, sy + 0.5f - py);
+            float a = std::min(1.0f, std::max(0.0f, r - dist + 0.5f));
+            if (a <= 0) {
+                continue;
+            }
+            uint8_t* p = &out[((size_t)sy * W + sx) * 3];
+            for (int k = 0; k < 3; k++) {
+                p[k] = std::max(p[k], (uint8_t)(cc[k] * a + 0.5f));
+            }
+        }
+    }
+}
+
+/// @brief The angle of strand (row) y around the tree, in radians. 0 is
+/// toward the street (the bottom of the radial view, the middle of the front
+/// view). The strands are spread evenly over opts.arc degrees, with row 0 at
+/// the left end as you look from the street.
+float strandAngle(int y, int strands) {
+    float arc = opts.arc * (float)M_PI / 180;
+    return -arc / 2 + arc * (y + 0.5f) / strands;
+}
+
+/// @brief Draws a MegaTree as seen from above, with the street at the bottom.
+/// Along a strand, x = 0 is the bottom of the tree, at the outside, and the
+/// last pixel is the top, in the middle.
+void drawRadial(const Frame& f, int size, int H, std::vector<uint8_t>& out) {
+    out.assign((size_t)size * H * 3, 0);
+    //
+    // When the strands only go halfway around (or less), the back half of the
+    // picture would be empty, so it gets left off.
+    float cx = size / 2.0f, cy = H < size ? 10.0f : size / 2.0f;
+    float outer = size / 2.0f - 6;
+    float inner = outer * 0.04f;
+    float step = f.w > 1 ? (outer - inner) / (f.w - 1) : 0;
+    //
+    // Dots as big as the space between LEDs along a strand, but never so big
+    // that neighboring strands run together at the outside.
+    float arc = (float)opts.arc / 360 * 2 * (float)M_PI * outer / std::max(f.h, 1);
+    float r = std::max(1.0f, std::min(step, arc) * 0.45f);
+    for (int y = 0; y < f.h; y++) {
+        float phi = strandAngle(y, f.h);
+        //
+        // phi = 0 points down the screen, toward the street, and the strands
+        // run left to right across the bottom as phi goes up.
+        float ux = sinf(phi), uy = cosf(phi);
+        for (int x = 0; x < f.w; x++) {
+            uint8_t cc[3];
+            ledColor(&f.rgb[((size_t)y * f.w + x) * 3], cc);
+            float d = outer - x * step;
+            plotDot(out, size, H, cx + ux * d, cy + uy * d, r, cc);
+        }
+    }
+}
+
+/// @brief Draws a MegaTree as seen from the end of the driveway: a cone seen
+/// side on, so each strand runs from its spot on the base up to the top. The
+/// strands toward the sides are foreshortened, as they would be. With an arc
+/// over 180 degrees, the strands on the back are drawn dimmer and behind.
+void drawFront(const Frame& f, int W, int H, std::vector<uint8_t>& out) {
+    out.assign((size_t)W * H * 3, 0);
+    float base = W / 2.0f - 8;
+    float bottom = H - 8.0f, top = 8.0f;
+    float step = f.w > 1 ? (bottom - top) / (f.w - 1) : 0;
+    float r = std::max(1.0f, std::min(step, 2 * base / std::max(f.h, 1)) * 0.45f);
+    //
+    // Back to front, so nearer strands are drawn over farther ones.
+    std::vector<int> order(f.h);
+    for (int y = 0; y < f.h; y++) {
+        order[y] = y;
+    }
+    std::sort(order.begin(), order.end(), [&](int a, int b) {
+        return cosf(strandAngle(a, f.h)) < cosf(strandAngle(b, f.h));
+    });
+    for (int y : order) {
+        float phi = strandAngle(y, f.h);
+        bool back = cosf(phi) < -0.01f;
+        for (int x = 0; x < f.w; x++) {
+            uint8_t cc[3];
+            ledColor(&f.rgb[((size_t)y * f.w + x) * 3], cc);
+            if (back) {
+                for (int k = 0; k < 3; k++) {
+                    cc[k] = cc[k] * 2 / 5;
+                }
+            }
+            float h = f.w > 1 ? (float)x / (f.w - 1) : 0;
+            float px = W / 2.0f + sinf(phi) * base * (1 - h);
+            float py = bottom - x * step;
+            plotDot(out, W, H, px, py, r, cc);
+        }
+    }
+}
+
+/// @brief Draws a frame in the given view.
+void draw(const Frame& f, SimView view, std::vector<uint8_t>& out, int& W,
+          int& H) {
+    switch (view) {
+        case VIEW_TREE: {
+            Frame t;
+            t.w = f.h;
+            t.h = f.w;
+            t.rgb.resize(f.rgb.size());
+            for (int y = 0; y < f.h; y++) {
+                for (int x = 0; x < f.w; x++) {
+                    memcpy(&t.rgb[((size_t)x * t.w + y) * 3],
+                           &f.rgb[((size_t)y * f.w + x) * 3], 3);
+                }
+            }
+            int scale = pickScale(t.w, t.h);
+            W = t.w * scale;
+            H = t.h * scale;
+            rasterize(t, scale, out);
+            break;
+        }
+        case VIEW_FRONT: {
+            H = opts.scale > 0 ? opts.scale * f.w : recording ? 480 : 800;
+            W = H * 3 / 4;
+            drawFront(f, W, H, out);
+            break;
+        }
+        case VIEW_RADIAL: {
+            int size = opts.scale > 0 ? opts.scale * 2 * f.w : recording ? 480 : 800;
+            W = size;
+            H = opts.arc <= 180 ? size / 2 + 10 : size;
+            drawRadial(f, size, H, out);
+            break;
+        }
+        default: {
+            int scale = pickScale(f.w, f.h);
+            W = f.w * scale;
+            H = f.h * scale;
+            rasterize(f, scale, out);
+            break;
+        }
+    }
+}
+
 // --- Recording ---------------------------------------------------------------
 
 GifWriter gif;
@@ -134,15 +297,15 @@ void writePending(uint64_t until) {
     double cs = (until - pendingStart) / 10000.0 + carryCS;
     int delay = (int)lround(cs);
     carryCS = cs - delay;
+    std::vector<uint8_t> img;
+    int w, h;
+    draw(pending, opts.view, img, w, h);
     if (!gif.getFrameCount()) {
-        int scale = pickScale(pending.w, pending.h);
-        if (!gif.open(opts.gif, pending.w * scale, pending.h * scale)) {
+        if (!gif.open(opts.gif, w, h)) {
             fprintf(stderr, "Can't write %s\n", opts.gif.c_str());
             exit(1);
         }
     }
-    std::vector<uint8_t> img;
-    rasterize(pending, pickScale(pending.w, pending.h), img);
     gif.addFrame(img.data(), delay);
 }
 
@@ -169,8 +332,7 @@ void record(const Frame& f) {
         //
         // Browsers show GIF frames shorter than 2/100 s for much longer than
         // asked, so anything that brief gets replaced by what comes next.
-        if (now - pendingStart + carryCS * 10000 >= 20000 || f.w != pending.w ||
-            f.h != pending.h) {
+        if (now - pendingStart + carryCS * 10000 >= 20000) {
             writePending(now);
             pendingStart = now;
         }
@@ -207,6 +369,11 @@ void usage(const char* prog) {
             "  --scale N       screen pixels per LED (default: fit the screen)\n"
             "  --wrap N        for programs without a Canvas, fold each strip into\n"
             "                  rows of N pixels (default 100 for strips over 150)\n"
+            "  --view V        flat (the canvas as is), tree (x going up, like a\n"
+            "                  MegaTree's strands), radial (a MegaTree from above),\n"
+            "                  or front (a MegaTree from the street)\n"
+            "  --arc N         how far around the MegaTree its strands go, in\n"
+            "                  degrees, for radial and front (default 180)\n"
             "  --seed N        random seed, for repeatable runs (default 1)\n"
             "  --no-gamma      show raw color values instead of how LEDs look\n",
             prog);
@@ -227,14 +394,14 @@ uint64_t time_us_64(void) {
     }
     return std::chrono::duration_cast<std::chrono::microseconds>(
                std::chrono::steady_clock::now() - realStart)
-        .count();
+               .count() -
+           stoppedUS;
 }
 
 void sleep_us(uint64_t us) {
     if (virtualTime) {
         advance(us);
     } else {
-        SimWindow::waitWhilePaused();
         std::this_thread::sleep_for(std::chrono::microseconds(us));
     }
 }
@@ -296,7 +463,16 @@ void picoleds_sim_frame(int width, int height, const uint8_t* rgb,
         record(f);
         advance(sendTimeUS);
     } else {
+        bool changed;
         {
+            std::lock_guard<std::mutex> g(frameLock);
+            changed = f.w != latest.w || f.h != latest.h || f.rgb != latest.rgb;
+        }
+        //
+        // Only a new picture counts as a step; the re-sends that dithering
+        // does don't.
+        if (changed) {
+            stoppedUS += SimWindow::waitToShow();
             std::lock_guard<std::mutex> g(frameLock);
             latest = std::move(f);
             latestCount++;
@@ -305,13 +481,16 @@ void picoleds_sim_frame(int width, int height, const uint8_t* rgb,
     }
 }
 
-// Used by SimWindow to fetch the newest frame.
-bool picoleds_sim_latest(uint64_t& seen, int& w, int& h, int& scale,
-                         std::vector<uint8_t>& img) {
+const char* const simViewNames[VIEW_COUNT] = {"flat", "tree", "radial", "front"};
+
+SimView picoleds_sim_initial_view() { return opts.view; }
+
+bool picoleds_sim_latest(uint64_t& seen, bool force, SimView view, int& w,
+                         int& h, std::vector<uint8_t>& img) {
     Frame f;
     {
         std::lock_guard<std::mutex> g(frameLock);
-        if (latestCount == seen) {
+        if (latestCount == seen && !force) {
             return false;
         }
         seen = latestCount;
@@ -320,10 +499,7 @@ bool picoleds_sim_latest(uint64_t& seen, int& w, int& h, int& scale,
     if (f.w == 0 || f.h == 0) {
         return false;
     }
-    scale = pickScale(f.w, f.h);
-    w = f.w * scale;
-    h = f.h * scale;
-    rasterize(f, scale, img);
+    draw(f, view, img, w, h);
     return true;
 }
 
@@ -347,6 +523,19 @@ int main(int argc, char** argv) {
             opts.wrap = atoi(next());
         } else if (a == "--seed") {
             opts.seed = strtoul(next(), nullptr, 10);
+        } else if (a == "--view") {
+            std::string v = next();
+            int n = 0;
+            while (n < VIEW_COUNT && v != simViewNames[n]) {
+                n++;
+            }
+            if (n == VIEW_COUNT) {
+                usage(argv[0]);
+                return 2;
+            }
+            opts.view = (SimView)n;
+        } else if (a == "--arc") {
+            opts.arc = std::max(1, std::min(360, atoi(next())));
         } else if (a == "--no-gamma") {
             opts.gamma = false;
         } else {
