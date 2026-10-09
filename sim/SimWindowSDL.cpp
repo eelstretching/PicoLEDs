@@ -80,6 +80,14 @@ int run(const char* path) {
         fprintf(stderr, "Can't start SDL: %s\n", SDL_GetError());
         return 1;
     }
+    printf(
+        "Keys:\n"
+        "  right arrow  stop, then step one frame per press\n"
+        "  space        pause, or run again after pausing or stepping\n"
+        "  v            next view (flat, tree, radial, front)\n"
+        "  1 2 3 4      flat, tree, radial, front view\n"
+        "  q, Esc       quit\n");
+    fflush(stdout);
     std::string name = path;
     size_t slash = name.find_last_of('/');
     if (slash != std::string::npos) {
