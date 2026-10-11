@@ -9,8 +9,6 @@
 #include "Direction.h"
 #include "FillLine.h"
 
-enum FillState { FILLING, FLASHING };
-
 class LinesFill : public Animation {
 
     /// @brief The number of color bands to use.

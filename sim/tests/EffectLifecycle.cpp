@@ -38,6 +38,7 @@
 #include "Fireworks2D.h"
 #include "FontTwoP.h"
 #include "Icicles.h"
+#include "LinesFill.h"
 #include "Marquees.h"
 #include "PacChase.h"
 #include "PacWipe.h"
@@ -56,10 +57,6 @@
 #include "TextAnimation.h"
 #include "TwinkleFox.h"
 #include "XmasTree.h"
-
-// LinesFill and Firework both define a FillState, so LinesFill is made in a
-// file of its own.
-Animation* makeLinesFill(Canvas* canvas, ColorMap* colorMap, uint8_t* colors);
 
 //
 // Heap accounting. Every new and delete in the program goes through these, so
@@ -193,7 +190,7 @@ int main() {
         icicleMap = ArrayColorMap(8);
         return new Icicles(canvas, &icicleMap, 10, 6, RGB(128, 128, 128));
     });
-    check("LinesFill", [&] { return makeLinesFill(canvas, &colors, colorIndices); });
+    check("LinesFill", [&] { return new LinesFill(canvas, &colors, 5, colorIndices, UP, 1); });
     check("Marquees", [&] { return new Marquees(canvas, &colors, 5, colorIndices, 20, RIGHT); });
     check("PacChase", [&] { return new PacChase(canvas); });
     check("PacWipe", [&] { return new PacWipe(canvas, &colors); });

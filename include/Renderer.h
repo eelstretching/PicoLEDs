@@ -30,6 +30,8 @@ class Renderer;
 /// one or more strips.
 class PIOProgram {
    public:
+    /// @brief Waits for the last frame to finish sending, then gives back the
+    /// state machine, PIO program space, DMA channel and buffer.
     ~PIOProgram();
     Renderer* renderer;
     pio_program_t* pio_program;
@@ -103,6 +105,8 @@ class Renderer {
     Renderer(uint8_t brightness = 32) : brightness(brightness) {}
 
     ~Renderer();
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
 
     void setBrightness(uint8_t brightness) { this->brightness = brightness; };
 

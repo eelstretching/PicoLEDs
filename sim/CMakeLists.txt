@@ -128,8 +128,7 @@ endforeach()
 # Builds every animation, runs it, deletes it, and checks it freed all its
 # memory. See tests/EffectLifecycle.cpp. It has its own main(), so it doesn't
 # use the simulator's.
-add_executable(EffectLifecycle ${PICOLEDS_SIM_DIR}/tests/EffectLifecycle.cpp
-  ${PICOLEDS_SIM_DIR}/tests/MakeLinesFill.cpp)
+add_executable(EffectLifecycle ${PICOLEDS_SIM_DIR}/tests/EffectLifecycle.cpp)
 target_link_libraries(EffectLifecycle PRIVATE PicoLEDsSim)
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_FLAGS -fsanitize=address)
