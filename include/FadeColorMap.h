@@ -12,7 +12,6 @@ class FadeColorMap : public ArrayColorMap {
 
    public:
     FadeColorMap(ColorMap* baseMap, uint8_t nColors, uint8_t nSteps, uint8_t fadeFactor = 40);
-    ~FadeColorMap();
     
 };
 

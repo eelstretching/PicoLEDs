@@ -13,6 +13,10 @@ class Animator {
     Canvas* canvas;
     std::vector<Animation*> animations;
 
+    /// @brief The TimedAnimation wrappers that addTimed made, which we delete.
+    /// The animations themselves belong to whoever added them.
+    std::vector<Animation*> owned;
+
     int pos = 0;
 
     int fps = 30;
@@ -43,6 +47,9 @@ class Animator {
     /// @param canvas the canvas we're animating on
     /// @param fps the number of frames per second to display.
     Animator(Canvas* canvas, int fps) : canvas(canvas) { setFPS(fps); };
+    virtual ~Animator();
+    Animator(const Animator&) = delete;
+    Animator& operator=(const Animator&) = delete;
     /// @brief Adds an animation to the end of our list.
     /// @param a the animation to add.
     void add(Animation* a);

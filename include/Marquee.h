@@ -30,6 +30,9 @@ class Marquee : Animation {
                 this->colors[i] = colorMap->getColor(colors[i]);
             }
           }
+    ~Marquee() { delete[] colors; }
+    Marquee(const Marquee&) = delete;
+    Marquee& operator=(const Marquee&) = delete;
 
     bool step() override;
 };

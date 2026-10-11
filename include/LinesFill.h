@@ -39,7 +39,9 @@ class LinesFill : public Animation {
     LinesFill(Canvas *canvas, ColorMap *colorMap, int nColors, uint8_t *colors, Direction direction = UP,
              int stepSize = 1);
 
-    ~LinesFill() {};
+    ~LinesFill();
+    LinesFill(const LinesFill&) = delete;
+    LinesFill& operator=(const LinesFill&) = delete;
 
     bool step() override;
 

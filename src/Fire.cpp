@@ -22,10 +22,10 @@ Fire::Fire(Canvas *canvas,
       cooling(cooling),
       sparking(sparking) {
     end = MIN(x + n, canvas->getWidth());
-    heat = (uint8_t *)calloc(n, sizeof(uint8_t));
+    heat = new uint8_t[n]();
 }
 
-Fire::~Fire() { free(heat); }
+Fire::~Fire() { delete[] heat; }
 
 bool Fire::step() {
     aw.start();

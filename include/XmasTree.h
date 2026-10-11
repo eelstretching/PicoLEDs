@@ -107,6 +107,10 @@ enum TreeState {
     BLINKING,
 };
 
+/// @brief How many ornaments and lights XmasTree has places for.
+#define MAX_ORNAMENTS 9
+#define MAX_LIGHTS 18
+
 class XmasTree : public Animation {
     Ribbon* ribbon;
     Xpm* ornament;
@@ -114,12 +118,18 @@ class XmasTree : public Animation {
     Ornament** ornaments;
     uint8_t nLights;
     Light** lights;
+    /// @brief The colors the lights cycle through. The lights point at this,
+    /// so it has to live as long as they do.
+    uint8_t lightColors[3];
     TreeState state;
     uint8_t showDelay;
     uint8_t el;
 
    public:
     XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights);
+    ~XmasTree();
+    XmasTree(const XmasTree&) = delete;
+    XmasTree& operator=(const XmasTree&) = delete;
     void init() override;
     bool step() override;
 };

@@ -59,6 +59,8 @@ class Fire : public Animation {
     };
 
     ~Fire();
+    Fire(const Fire&) = delete;
+    Fire& operator=(const Fire&) = delete;
 
     bool step();
 };

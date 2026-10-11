@@ -31,6 +31,10 @@ Marquees::Marquees(Canvas* canvas, ColorMap *colorMap, int nColors, uint8_t *col
             }
             break;
     }
+    //
+    // The parameter hides our member, so save what we actually made, or step()
+    // and the destructor won't see any of them.
+    this->nMarquees = nMarquees;
 }
 
 Marquees::~Marquees() {

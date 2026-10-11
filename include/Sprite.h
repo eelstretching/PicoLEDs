@@ -25,6 +25,8 @@ class Sprite : public Animation {
 
     //
     // A local color map we might want for rendering variants of the same pixmap.
+    // Allocated with new[] by subclasses that want one, and freed by us. The
+    // frames, on the other hand, belong to whoever added them.
     RGB *myColors = nullptr;
 
    public:
@@ -48,7 +50,11 @@ class Sprite : public Animation {
     Sprite(Canvas *canvas, int startX, int startY, int deltaX, int deltaY)
         : Animation(canvas, nullptr), startX(startX), startY(startY), deltaX(deltaX), deltaY(deltaY) {};
     void add(Xpm *frame);
+    /// @brief Copies another sprite's frames (which are shared, not copied)
+    /// and start position. The copy doesn't get the other's myColors.
     Sprite(Sprite &o);
+    Sprite& operator=(const Sprite&) = delete;
+    ~Sprite() { delete[] myColors; }
     std::vector<Xpm *> &getFrames() { return frames; };
     
     void setStartPosition(int startX, int startY) {

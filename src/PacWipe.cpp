@@ -19,6 +19,15 @@ PacWipe::PacWipe(Canvas* canvas, ColorMap* colorMap)
                            pupilColor, 0, 1, Direction::RIGHT);
 }
 
+PacWipe::~PacWipe() {
+    for (int i = 0; i < 5; i++) {
+        delete sprites[i];
+    }
+    delete[] sprites;
+    delete ghostFrames[0];
+    delete ghostFrames[1];
+}
+
 void PacWipe::init() {
     curr = sprites[random8(0, 4)];
     if (curr == sprites[0]) {

@@ -31,6 +31,15 @@ LinesFill::LinesFill(Canvas* canvas, ColorMap *colorMap, int nColors, uint8_t *c
     }
 }
 
+LinesFill::~LinesFill() {
+    //
+    // Lines that finished have already been deleted and set to nullptr.
+    for (int i = 0; i < nLines; i++) {
+        delete lines[i];
+    }
+    delete[] lines;
+}
+
 void LinesFill::init() {
     canvas->clear();
     uint16_t startPos;

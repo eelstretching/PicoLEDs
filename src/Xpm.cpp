@@ -20,6 +20,9 @@ uint8_t hextoi(char c1, char c2) { return hextoi(c1) << 4 | hextoi(c2); }
 
 Xpm::Xpm(const char* xpm[]) {
     char holder[3];
+    //
+    // No background color unless the pixmap has a B in it.
+    backgroundColorIndex = 255;
 
     //
     // width, height, and number of colors.
@@ -91,11 +94,17 @@ Xpm::Xpm(const char* xpm[]) {
     delete[] cc;
 }
 
-Xpm::Xpm(const Xpm& other) : nc(other.nc), h(other.h), w(other.w) {
+Xpm::Xpm(const Xpm& other)
+    : nc(other.nc), h(other.h), w(other.w), backgroundColorIndex(other.backgroundColorIndex) {
     pixels = new uint8_t[w*h];
     memcpy(pixels, other.pixels, w*h*sizeof(uint8_t));
     colors = new RGB[nc];
     memcpy(colors, other.colors, nc*sizeof(RGB));
+}
+
+Xpm::~Xpm() {
+    delete[] colors;
+    delete[] pixels;
 }
 
 bool Xpm::render(Canvas *canvas, uint x, uint y) {

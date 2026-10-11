@@ -28,6 +28,11 @@ Firework::Firework(Canvas* canvas, ColorMap *colorMap, uint row) : Animation(can
     explosion = new Spark[canvas->getWidth() / EXPLOSION_DIVISOR];
 }
 
+Firework::~Firework() {
+    delete[] flare;
+    delete[] explosion;
+}
+
 ColorMap *Firework::getColorMap() {
     ColorMap *cm = new ArrayColorMap(255);
     //

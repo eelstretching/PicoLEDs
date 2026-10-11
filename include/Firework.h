@@ -86,6 +86,9 @@ class Firework : public Animation {
     /// @param canvas The canvas where we'll be drawing
     /// @param row The row we'll be drawing in
     Firework(Canvas *canvas, ColorMap *colorMap, uint row);
+    ~Firework();
+    Firework(const Firework&) = delete;
+    Firework& operator=(const Firework&) = delete;
 
     /// @brief Gets a color map that we can use for fireworks. The higher the index, the "hotter" the color.
     /// @return A pointer to a color map that we allocate internally. Delete it when you're done with it!

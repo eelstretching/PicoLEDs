@@ -49,11 +49,14 @@ class Strip {
 
     StripType type;
 
-    Strip() {};
+    Strip() : data(nullptr), numPixels(0), pos(0) {};
 
    public:
 
     Strip(uint pin, uint num_pixels, StripType type = WS2811);
+    virtual ~Strip() { delete[] data; }
+    Strip(const Strip&) = delete;
+    Strip& operator=(const Strip&) = delete;
 
     /// @brief Gets the type of strip this is.
     StripType getType() { return type; }

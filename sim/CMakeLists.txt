@@ -124,3 +124,20 @@ foreach(PROGRAM ${SIM_PROGRAMS})
   get_filename_component(NAME ${PROGRAM} NAME_WE)
   picoleds_sim_program(${NAME} ${PROGRAM})
 endforeach()
+
+# Builds every animation, runs it, deletes it, and checks it freed all its
+# memory. See tests/EffectLifecycle.cpp. It has its own main(), so it doesn't
+# use the simulator's.
+add_executable(EffectLifecycle ${PICOLEDS_SIM_DIR}/tests/EffectLifecycle.cpp
+  ${PICOLEDS_SIM_DIR}/tests/MakeLinesFill.cpp)
+target_link_libraries(EffectLifecycle PRIVATE PicoLEDsSim)
+include(CheckCXXSourceCompiles)
+set(CMAKE_REQUIRED_FLAGS -fsanitize=address)
+set(CMAKE_REQUIRED_LINK_OPTIONS -fsanitize=address)
+check_cxx_source_compiles("int main() { return 0; }" PICOLEDS_SIM_HAVE_ASAN)
+unset(CMAKE_REQUIRED_FLAGS)
+unset(CMAKE_REQUIRED_LINK_OPTIONS)
+if(PICOLEDS_SIM_HAVE_ASAN)
+  target_compile_options(EffectLifecycle PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+  target_link_options(EffectLifecycle PRIVATE -fsanitize=address)
+endif()

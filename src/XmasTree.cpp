@@ -107,9 +107,12 @@ XmasTree::XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights)
 
     ribbon = new Ribbon(canvas, 0, 5);
     ornament = new Xpm(ornaPixMap);
-    nOrnaments = 9;
-    ornaments = new Ornament*[9];
-    for (int i = 0; i < 9; i++) {
+    //
+    // The ornament and light positions below are laid out by hand, so we
+    // always make all of them, and only show as many as we were asked for.
+    this->nOrnaments = MIN(nOrnaments, MAX_ORNAMENTS);
+    ornaments = new Ornament*[MAX_ORNAMENTS];
+    for (int i = 0; i < MAX_ORNAMENTS; i++) {
         ornaments[i] = new Ornament(canvas, ornament);
     }
     ornaments[0]->setXY(17, 7);
@@ -122,13 +125,12 @@ XmasTree::XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights)
     ornaments[7]->setXY(77, 15);
     ornaments[8]->setXY(77, 19);
     
-    nLights = 18;
-    lights = new Light*[nLights];
-    uint8_t lightColors[3];
+    this->nLights = MIN(nLights, MAX_LIGHTS);
+    lights = new Light*[MAX_LIGHTS];
     for (int i = 0; i < 3; i++) {
         lightColors[i] = colorMap->getRandomColor();
     }
-    for (int i = 0; i < nLights; i++) {
+    for (int i = 0; i < MAX_LIGHTS; i++) {
         lights[i] = new Light(canvas, lightColors, 3, 30 + random8(30));
     }
     lights[0]->setXY(10, 5);
@@ -149,6 +151,22 @@ XmasTree::XmasTree(Canvas* canvas, uint8_t nOrnaments, uint8_t nLights)
     lights[15]->setXY(40, 35);
     lights[16]->setXY(55, 40);
     lights[17]->setXY(70, 35);
+}
+
+XmasTree::~XmasTree() {
+    for (int i = 0; i < MAX_ORNAMENTS; i++) {
+        delete ornaments[i];
+    }
+    delete[] ornaments;
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        delete lights[i];
+    }
+    delete[] lights;
+    delete ornament;
+    delete ribbon;
+    //
+    // We made our own color map, so it's ours to free.
+    delete colorMap;
 }
 
 void XmasTree::init() {

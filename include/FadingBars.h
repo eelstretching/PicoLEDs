@@ -43,6 +43,9 @@ class FadingBars : public Animation {
 
    public:
     FadingBars(Canvas* canvas, ColorMap *colorMap, uint8_t barWidth, uint8_t nColors);
+    ~FadingBars();
+    FadingBars(const FadingBars&) = delete;
+    FadingBars& operator=(const FadingBars&) = delete;
     virtual void init() override;
     virtual bool step() override;
 };

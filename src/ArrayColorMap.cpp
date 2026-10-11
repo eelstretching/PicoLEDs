@@ -41,6 +41,19 @@ ArrayColorMap::ArrayColorMap(const ArrayColorMap& rhs)
     memcpy(entries, rhs.entries, sizeof(RGB) * rhs.size);
 }
 
+ArrayColorMap& ArrayColorMap::operator=(const ArrayColorMap& rhs) {
+    if (this != &rhs) {
+        RGB* copy = new RGB[rhs.size];
+        memcpy(copy, rhs.entries, sizeof(RGB) * rhs.size);
+        delete[] entries;
+        entries = copy;
+        size = rhs.size;
+        p = rhs.p;
+        background = rhs.background;
+    }
+    return *this;
+}
+
 ArrayColorMap::~ArrayColorMap() { delete[] entries; }
 
 RGB ArrayColorMap::operator[](uint8_t index) {

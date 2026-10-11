@@ -18,6 +18,9 @@ class PacWipe : public Animation {
 
    public:
     PacWipe(Canvas* canvas, ColorMap* colorMap);
+    ~PacWipe();
+    PacWipe(const PacWipe&) = delete;
+    PacWipe& operator=(const PacWipe&) = delete;
     void init();
     bool step();
 };
