@@ -13,10 +13,18 @@ class FireworkWipe : public Animation {
     Firework **fw;
     /// @brief The number of fireworks.
     int nf;
+    /// @brief Whether we made the fireworks (and so delete them), or borrowed
+    /// them from whoever passed them in.
+    bool ownsFireworks;
 
    public:
     FireworkWipe(Canvas *canvas, ColorMap *colorMap);
+    /// @brief Uses fireworks that someone else made. They still belong to
+    /// the caller, who has to keep them around until this is deleted.
     FireworkWipe(Canvas *canvas, ColorMap *colorMap, Firework **fw, int nf);
+    ~FireworkWipe();
+    FireworkWipe(const FireworkWipe&) = delete;
+    FireworkWipe& operator=(const FireworkWipe&) = delete;
     void init();
     bool step();
     void finish();

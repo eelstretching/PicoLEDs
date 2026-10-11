@@ -9,6 +9,7 @@ add_executable(MultiRender MultiRender.cpp)
 add_executable(DimTest DimTest.cpp)
 add_executable(PanelTestSingle PanelTestSingle.cpp)
 add_executable(BitPlaneBench BitPlaneBench.cpp)
+add_executable(LifecycleStress LifecycleStress.cpp)
 
 pico_set_program_name(StripTest "StripTest")
 pico_set_program_version(StripTest "0.1")
@@ -151,3 +152,17 @@ target_link_libraries(BitPlaneBench
 )
 
 pico_add_extra_outputs(BitPlaneBench)
+
+# Makes and deletes strips, renderers, canvases and animations over and over,
+# checking that nothing leaks. Watch its output over USB or the UART.
+pico_set_program_name(LifecycleStress "LifecycleStress")
+pico_enable_stdio_uart(LifecycleStress 1)
+pico_enable_stdio_usb(LifecycleStress 1)
+target_link_libraries(LifecycleStress
+  PicoLEDs
+  hardware_dma
+  hardware_pio
+  hardware_watchdog
+  pico_stdlib
+)
+pico_add_extra_outputs(LifecycleStress)

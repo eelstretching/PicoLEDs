@@ -75,6 +75,9 @@ class Icicle : public Animation {
     /// @param color The brightest color of the icicle.
     Icicle(Canvas* canvas, ColorMap* colorMap, uint pos, uint length,
            Direction direction, RGB color = RGB::White);
+    ~Icicle();
+    Icicle(const Icicle&) = delete;
+    Icicle& operator=(const Icicle&) = delete;
 
     void setPos(uint pos);
 
@@ -103,6 +106,8 @@ class Icicles : public Animation {
 
     /// @brief Destructor for the icicles animation.
     ~Icicles();
+    Icicles(const Icicles&) = delete;
+    Icicles& operator=(const Icicles&) = delete;
 
     void init() override;
 

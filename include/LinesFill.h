@@ -9,8 +9,6 @@
 #include "Direction.h"
 #include "FillLine.h"
 
-enum FillState { FILLING, FLASHING };
-
 class LinesFill : public Animation {
 
     /// @brief The number of color bands to use.
@@ -39,7 +37,9 @@ class LinesFill : public Animation {
     LinesFill(Canvas *canvas, ColorMap *colorMap, int nColors, uint8_t *colors, Direction direction = UP,
              int stepSize = 1);
 
-    ~LinesFill() {};
+    ~LinesFill();
+    LinesFill(const LinesFill&) = delete;
+    LinesFill& operator=(const LinesFill&) = delete;
 
     bool step() override;
 

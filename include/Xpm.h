@@ -34,6 +34,8 @@ class Xpm {
     /// @param xpm the definition of the pixmap.
     Xpm(const char* xpm[]);
     Xpm(const Xpm& other);
+    Xpm& operator=(const Xpm&) = delete;
+    ~Xpm();
 
     /// @brief render this pixmap onto a canvas
     /// @param canvas the canvas to render on

@@ -79,7 +79,12 @@ class PacChase : public Animation {
     Sprite **pilled;
     Sprite *g1;
     Sprite *g2;
+    /// @brief The frames for the ghosts after Pac-Man eats the pill.
+    Xpm *pilledFrames[2];
     Xpm *pill;
+    /// @brief Whether we made Pac-Man and the ghosts (and so delete them), or
+    /// borrowed them from a PacWipe.
+    bool ownsSprites;
     uint8_t piw;
     uint8_t state;
     uint8_t dotColorIndex;
@@ -87,7 +92,12 @@ class PacChase : public Animation {
     
     public:
     PacChase(Canvas *canvas);
+    /// @brief Borrows Pac-Man and the ghosts from a wipe, which has to outlive
+    /// this chase.
     PacChase(PacWipe *wipe);
+    ~PacChase();
+    PacChase(const PacChase&) = delete;
+    PacChase& operator=(const PacChase&) = delete;
     void setup();
     void drawDot(int i);
     void init();

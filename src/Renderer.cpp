@@ -36,8 +36,10 @@ static int64_t reset_delay_complete(alarm_id_t id, void* data) {
     //
     // Reset the alarm, and release the semaphore.
     pip->alarm = 0;
-    sem_release(&pip->sem);
     pip->dma_time += (time_us_64() - pip->dma_start);
+    //
+    // Release last: once the semaphore is free, the program may be deleted.
+    sem_release(&pip->sem);
     return 0;
 }
 
@@ -81,11 +83,25 @@ static inline void __isr dma_complete_handler() {
 static bool isr_installed = false;
 
 PIOProgram::~PIOProgram() {
-    pio_sm_set_enabled(pio, sm, false);
-    pio_sm_unclaim(pio, sm);
-    pio_remove_program(pio, pio_program, offset);
+    //
+    // Wait for the last frame to finish: its DMA, and the reset alarm after
+    // it, which releases the semaphore. Otherwise the alarm would go off after
+    // we're gone and write to freed memory. A frame takes a few milliseconds
+    // at most, so if we've waited this long something else is wrong, and we'll
+    // cancel the alarm ourselves.
+    if (!sem_acquire_timeout_ms(&sem, 100) && alarm != 0) {
+        cancel_alarm(alarm);
+        alarm = 0;
+    }
+    //
+    // Stop the channel's interrupt before aborting it, since an abort can
+    // raise one (RP2040-E13), and clear anything already pending.
+    dma_channel_set_irq0_enabled(dma_channel, false);
     dma_channel_abort(dma_channel);
+    dma_channel_acknowledge_irq0(dma_channel);
     dma_channel_unclaim(dma_channel);
+    pio_sm_set_enabled(pio, sm, false);
+    pio_remove_program_and_unclaim_sm(pio_program, pio, sm, offset);
     if (buffer) {
         free(buffer);
     }
@@ -101,11 +117,21 @@ Renderer::~Renderer() {
         if(pip == nullptr || pip->renderer != this) {
             continue;
         }
-        delete pip;
+        //
+        // Take it out of the table first, so the interrupt handler stops
+        // looking at it while we take it apart.
         pioPrograms[i] = nullptr;
+        delete pip;
     }   
     strips.clear();
-    if (isr_installed) {
+    //
+    // The interrupt handler is shared by every renderer, so only take it out
+    // when the last one with any programs is gone.
+    bool anyLeft = false;
+    for (int i = 0; i < NUM_DMA_CHANNELS; i++) {
+        anyLeft = anyLeft || pioPrograms[i] != nullptr;
+    }
+    if (isr_installed && !anyLeft) {
         irq_set_enabled(DMA_IRQ_0, false);
         irq_remove_handler(DMA_IRQ_0, dma_complete_handler);
         isr_installed = false;
@@ -153,6 +179,12 @@ void Renderer::setupDithering() {
 
 void Renderer::setup() {
     if (setupDone) {
+        return;
+    }
+    if (strips.empty()) {
+        //
+        // Nothing to render.
+        setupDone = true;
         return;
     }
 

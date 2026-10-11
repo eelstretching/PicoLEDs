@@ -17,6 +17,7 @@ class ArrayColorMap : public ColorMap {
     ArrayColorMap(std::initializer_list<RGB> rhs);
     ArrayColorMap(std::initializer_list<HSV> rhs);
     ArrayColorMap(const ArrayColorMap& rhs);
+    ArrayColorMap& operator=(const ArrayColorMap& rhs);
     ~ArrayColorMap();
     virtual uint8_t getSize() { return size; };
     virtual uint8_t getUsed() { return p; };

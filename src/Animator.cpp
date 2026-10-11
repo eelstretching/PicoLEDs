@@ -2,10 +2,17 @@
 
 #include "TimedAnimation.h"
 
+Animator::~Animator() {
+    for (auto a : owned) {
+        delete a;
+    }
+}
+
 void Animator::add(Animation* a) { animations.push_back(a); }
 
 void Animator::addTimed(Animation* a, int durationMS) {
     TimedAnimation* ta = new TimedAnimation(a, durationMS);
+    owned.push_back(ta);
     animations.push_back(ta);
 }
 

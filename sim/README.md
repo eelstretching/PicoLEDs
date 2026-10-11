@@ -86,6 +86,23 @@ picoleds_sim_program(LeapingArches LeapingArches.cpp ${ARCHES})
 target_include_directories(LeapingArches PRIVATE arches/include)
 ```
 
+## Checking animations for leaks
+
+`EffectLifecycle` makes every animation in the library, runs it, deletes it,
+and checks that it gave back all the memory it took, so a show can make
+animations as it goes rather than all up front. It prints how much heap each
+one uses while it runs (a bit more than on the Pico, where pointers are
+smaller):
+
+```sh
+cmake --build build-sim --target EffectLifecycle
+./build-sim/EffectLifecycle
+```
+
+It ends with `No leaks`, or lists the ones that leaked and exits with an
+error. When you add an animation to the library, add a `check()` line for it
+in `sim/tests/EffectLifecycle.cpp`.
+
 ## What you're looking at
 
 There are four views. The last two treat each row of the canvas as a MegaTree

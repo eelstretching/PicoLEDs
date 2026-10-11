@@ -18,6 +18,8 @@ class Marquees : public Animation {
     Marquees(Canvas *canvas, ColorMap *colorMap, int nColors, uint8_t *colors, int width, Direction direction, int nMarquees = -1);
 
     ~Marquees();
+    Marquees(const Marquees&) = delete;
+    Marquees& operator=(const Marquees&) = delete;
 
     bool step() override;
 

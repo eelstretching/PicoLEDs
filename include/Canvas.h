@@ -107,7 +107,9 @@ class Canvas {
    public:
     Canvas(uint width);
 
-    ~Canvas();
+    virtual ~Canvas();
+    Canvas(const Canvas&) = delete;
+    Canvas& operator=(const Canvas&) = delete;
 
     Renderer* getRenderer() { return &renderer; };
 

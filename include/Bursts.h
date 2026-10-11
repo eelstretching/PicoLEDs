@@ -27,6 +27,8 @@ class Bursts : public Animation {
     public:
     Bursts(Canvas *canvas, RGB backGround, uint8_t maxBursts, RGB burstColor, uint8_t tailLen);
     ~Bursts();
+    Bursts(const Bursts&) = delete;
+    Bursts& operator=(const Bursts&) = delete;
     virtual void init() override;
     virtual bool step() override;
 };

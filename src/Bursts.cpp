@@ -34,7 +34,7 @@ bool Burst::step() {
 
 Bursts::Bursts(Canvas* canvas, RGB backGround, uint8_t maxBursts,
                RGB burstColor, uint8_t tailLen)
-    : Animation(canvas, nullptr, 50), maxBursts(maxBursts), tailLen(tailLen) {
+    : Animation(canvas, nullptr, 50), maxBursts(maxBursts), nBursts(0), tailLen(tailLen) {
     colorMap = new ArrayColorMap(16);
     colorMap->setBackground(backGround);
     //
@@ -52,11 +52,18 @@ Bursts::~Bursts() {
     for (int i = 0; i < maxBursts; i++) {
         delete bursts[i];
     }
-    delete bursts;
+    delete[] bursts;
+    //
+    // We made our own color map, so it's ours to free.
+    delete colorMap;
 }
 
 void Bursts::init() {
-    int nBursts = MAX(random8(maxBursts) + 2, maxBursts);
+    //
+    // Never more bursts than we made. MIN is a macro that would call random8()
+    // twice, so pick the number first.
+    int n = random8(maxBursts) + 2;
+    nBursts = MIN(n, maxBursts);
     for (int i = 0; i < nBursts; i++) {
         bursts[i]->init();
     }

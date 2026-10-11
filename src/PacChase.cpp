@@ -6,7 +6,7 @@
 
 #define PILL_POSITION 40
 
-PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
+PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr), ownsSprites(true) {
     //
     // Make a color map for this animation.
     ghostFrames[0] = new Xpm(ghost1);
@@ -22,7 +22,7 @@ PacChase::PacChase(Canvas *canvas) : Animation(canvas, nullptr) {
 
 /// @brief A constructor that lets us borrow the bitmaps from a pac-man wipe.
 /// @param wipe The wipe we'll borrow from.
-PacChase::PacChase(PacWipe *wipe) : Animation(wipe->canvas, nullptr) {
+PacChase::PacChase(PacWipe *wipe) : Animation(wipe->canvas, nullptr), ownsSprites(false) {
     canvas = wipe->canvas;
     pacMan = wipe->sprites[0];
     ghosts = &(wipe->sprites[1]);
@@ -34,20 +34,38 @@ void PacChase::setup() {
     ghw = ghosts[0]->getWidth();
     pilled = new Sprite *[2];
     pilled[0] = new Sprite(canvas, 0, 0, 0, 0);
-    Xpm *pil1 = new Xpm(pilled1);
-    pilled[0]->add(pil1);
-    pilled[0]->add(pil1);
-    pilled[0]->add(pil1);
-    pilled[0]->add(pil1);
-    Xpm *pil2 = new Xpm(pilled2);
-    pilled[0]->add(pil2);
-    pilled[0]->add(pil2);
-    pilled[0]->add(pil2);
-    pilled[0]->add(pil2);
+    pilledFrames[0] = new Xpm(pilled1);
+    pilled[0]->add(pilledFrames[0]);
+    pilled[0]->add(pilledFrames[0]);
+    pilled[0]->add(pilledFrames[0]);
+    pilled[0]->add(pilledFrames[0]);
+    pilledFrames[1] = new Xpm(pilled2);
+    pilled[0]->add(pilledFrames[1]);
+    pilled[0]->add(pilledFrames[1]);
+    pilled[0]->add(pilledFrames[1]);
+    pilled[0]->add(pilledFrames[1]);
     pilled[1] = new Sprite(*pilled[0]);
     piw = pilled[0]->getWidth();
     state = PLAIN;
     pill = new Xpm(power);
+}
+
+PacChase::~PacChase() {
+    delete pilled[0];
+    delete pilled[1];
+    delete[] pilled;
+    delete pilledFrames[0];
+    delete pilledFrames[1];
+    delete pill;
+    if (ownsSprites) {
+        delete pacMan;
+        for (int i = 0; i < 4; i++) {
+            delete ghosts[i];
+        }
+        delete[] ghosts;
+        delete ghostFrames[0];
+        delete ghostFrames[1];
+    }
 }
 
 void PacChase::drawDot(int i) {

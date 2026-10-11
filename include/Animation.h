@@ -9,6 +9,13 @@
 
 /// @brief Animation base class with a virtual function for stepping the
 /// animation.
+///
+/// Who owns what: an animation frees everything it allocates itself, so it can
+/// be made with new when the show needs it and deleted afterwards. Anything you
+/// hand it by pointer (the canvas, a color map, a list of color indices, the
+/// animations you add() to a MultiAnimation or Animator, ScrollTexts and
+/// TextElements) still belongs to you, and has to outlive the animation.
+/// Animations that own memory can't be copied.
 class Animation {
     friend class Animator;
 

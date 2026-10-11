@@ -20,7 +20,9 @@ class ColorMap {
    public:
     ColorMap() {}
     ColorMap(RGB background) : background(background) {};
-    ~ColorMap() {};
+    /// @brief Virtual, so deleting a map through a ColorMap pointer frees
+    /// whatever the derived map allocated.
+    virtual ~ColorMap() {};
 
     virtual uint8_t getSize() { return 0; };
     virtual uint8_t getUsed() { return 0; };

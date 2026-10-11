@@ -162,6 +162,8 @@ Icicle::Icicle(Canvas* canvas, ColorMap* colorMap, uint pos, uint length,
     drip = new Drip(canvas, colorMap, pos, length, 5, direction);
 }
 
+Icicle::~Icicle() { delete drip; }
+
 void Icicle::setPos(uint pos) {
     this->pos = pos;
     drip->setPos(pos);

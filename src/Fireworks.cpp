@@ -2,7 +2,7 @@
 
 #include "pico/printf.h"
 
-Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap, 60) {
+Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, colorMap, 60), ownsFireworks(true) {
     //
     // We'll make enough fireworks for the height of the canvas.
     nf = canvas->getHeight();
@@ -15,7 +15,17 @@ Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap) : Animation(canvas, col
    }
 }
 
-Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap, Firework **fw, int nf) : Animation(canvas, colorMap), fw(fw), nf(nf) {
+Fireworks::Fireworks(Canvas* canvas, ColorMap *colorMap, Firework **fw, int nf) : Animation(canvas, colorMap), fw(fw), nf(nf), ownsFireworks(false) {
+}
+
+Fireworks::~Fireworks() {
+    if (!ownsFireworks) {
+        return;
+    }
+    for (int i = 0; i < nf; i++) {
+        delete fw[i];
+    }
+    delete[] fw;
 }
 
 void Fireworks::init() {

@@ -69,6 +69,14 @@ FadingBars::FadingBars(Canvas* canvas,
     }
 }
 
+FadingBars::~FadingBars() {
+    for (int i = 0; i < nBars; i++) {
+        delete bars[i];
+    }
+    delete[] bars;
+    delete fadeMap;
+}
+
 void FadingBars::init() {
     for (int i = 0; i < nBars; i++) {
         bars[i]->init();
