@@ -10,8 +10,8 @@ void MapAnimator::set(int key) {
         if (keys[i] == key) {
             pos = i;
             curr = i;
-            animations[pos]->init();
-            setFPS(animations[pos]->getFPS());
+            uint64_t now = clockUs();
+            startAnimation(animations[pos], now - now % usPerFrame + usPerFrame);
             return;
         }
     }

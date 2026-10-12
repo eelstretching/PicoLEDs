@@ -31,6 +31,14 @@ class TimedAnimation : public Animation {
     /// time.
     bool step() override;
     int getFPS() override { return animation->getFPS(); };
+    void startClock(uint64_t now) override {
+        Animation::startClock(now);
+        animation->startClock(now);
+    }
+    void setFrameTime(uint64_t now) override {
+        Animation::setFrameTime(now);
+        animation->setFrameTime(now);
+    }
     const char* getName() override { snprintf(name, 20, "T %s %.1f", animation->getName(), duration/1000000.0); return name; };
 };
 

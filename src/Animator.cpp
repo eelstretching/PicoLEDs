@@ -17,21 +17,42 @@ void Animator::addTimed(Animation* a, int durationMS) {
 }
 
 void Animator::setFPS(int fps) {
-    this->fps = fps;
+    this->fps = fps > 0 ? fps : kDefaultFPS;
     //
     // There's a million microseconds in a second.
-    usPerFrame = 1e6 / fps;
+    usPerFrame = 1000000 / this->fps;
 }
 
 void Animator::init() {
     pos = 0;
     animationChanged();
-    Animation* f = animations[pos];
-    if(f == nullptr) {
+    if (animations.empty() || animations[pos] == nullptr) {
         return;
     }
-    setFPS(f->getFPS());
-    f->init();
+    uint64_t now = clockUs();
+    startAnimation(animations[pos], now - now % usPerFrame);
+}
+
+void Animator::startAnimation(Animation* a, uint64_t at) {
+    a->startClock(at);
+    a->init();
+    //
+    // Owed exactly one step on its first frame.
+    int sfps = a->getFPS();
+    uint32_t period = sfps > 0 ? 1000000 / sfps : 0;
+    stepOwedUs = period > usPerFrame ? period - usPerFrame : 0;
+}
+
+int Animator::stepsDue(Animation* a) {
+    int sfps = a->getFPS();
+    if (sfps <= 0) {
+        return 1;
+    }
+    uint32_t period = 1000000 / sfps;
+    stepOwedUs += usPerFrame;
+    int n = stepOwedUs / period;
+    stepOwedUs -= n * period;
+    return n > kMaxStepsPerFrame ? kMaxStepsPerFrame : n;
 }
 
 void Animator::printStats() {
@@ -51,20 +72,29 @@ bool Animator::step() {
     if (animations.size() == 0) {
         return false;
     }
+    uint64_t now = clockUs();
+    frameTime = now - now % usPerFrame;
+
     //
-    // Take a step on the current animation. If that animation finishes, then
-    // get ready for the next one in the list, looping around to the start of
-    // the list if we've reached the end.
+    // Step the current animation as many times as it's due this frame (often
+    // once, maybe none or a few for animations with their own step rate). If
+    // it finishes, get ready for the next one in the list, looping around to
+    // the start of the list if we've reached the end.
     frameWatch.start();
     stepWatch.start();
     bool changed = false;
-    if (!animations[pos]->step()) {
-        animations[pos]->finish();
-        pos = (pos + 1) % animations.size();
-        changed = true;
+    Animation* a = animations[pos];
+    int n = stepsDue(a);
+    for (int i = 0; i < n; i++) {
+        a->setFrameTime(frameTime);
+        if (!a->step()) {
+            a->finish();
+            pos = (pos + 1) % animations.size();
+            changed = true;
+            break;
+        }
     }
     stepWatch.finish();
-    // canvas->clearColumn(0);
     showWatch.start();
     canvas->show();
     showWatch.finish();
@@ -73,42 +103,48 @@ bool Animator::step() {
 
     //
     // We'll do this out here to avoid flashes due to color map changes in
-    // init().
+    // init(). The new animation's first step is on the next frame.
     if (changed) {
         animationChanged();
-        animations[pos]->init();
-        setFPS(animations[pos]->getFPS());
+        startAnimation(animations[pos], frameTime + usPerFrame);
     }
 
-    //
-    // Sleep until it's time for the next frame. We're not trying to be
-    // super-precise here.
-    uint64_t lus = frameWatch.getLastTime();
-    if (lus < usPerFrame) {
-        uint64_t frameEnd = time_us_64() + (usPerFrame - lus);
-        //
-        // If we're dithering, then we want to spend the time until the next
-        // frame re-sending this frame, since each send rounds a little
-        // differently and it's the average over sends that gets the in-between
-        // levels right. We'll stop when another send wouldn't finish before
-        // the next frame is due.
-        if (canvas->getRenderer()->getDithering()) {
-            uint64_t now = time_us_64();
-            uint64_t last = 0;
-            while (now + last < frameEnd) {
-                canvas->show();
-                refreshCount++;
-                uint64_t after = time_us_64();
-                last = after - now;
-                now = after;
-            }
-        }
-        uint64_t now = time_us_64();
-        if (now < frameEnd) {
-            sleep_us(frameEnd - now);
-        }
-    } else {
-        missedFrames++;
-    }
+    waitForNextFrame();
     return true;
+}
+
+void Animator::waitForNextFrame() {
+    uint64_t next = frameTime + usPerFrame;
+    uint64_t now = clockUs();
+    if (now >= next) {
+        //
+        // Late. The next step() starts right away, on the frame we're in now.
+        missedFrames++;
+        return;
+    }
+    if (next - now > usPerFrame) {
+        //
+        // The clock jumped backwards (a shared clock stepping to correct
+        // itself). Line up with the new clock's next frame.
+        next = now - now % usPerFrame + usPerFrame;
+    }
+    //
+    // If we're dithering, then we want to spend the time until the next frame
+    // re-sending this frame, since each send rounds a little differently and
+    // it's the average over sends that gets the in-between levels right. We'll
+    // stop when another send wouldn't finish before the next frame is due.
+    if (canvas->getRenderer()->getDithering()) {
+        uint64_t last = 0;
+        while (now + last < next) {
+            canvas->show();
+            refreshCount++;
+            uint64_t after = clockUs();
+            last = after - now;
+            now = after;
+        }
+    }
+    now = clockUs();
+    if (now < next) {
+        sleep_us(next - now);
+    }
 }
