@@ -166,3 +166,16 @@ target_link_libraries(LifecycleStress
   pico_stdlib
 )
 pico_add_extra_outputs(LifecycleStress)
+
+# Bench bring-up for a bank board: 8 outputs on GP2-GP9, each one telling
+# itself apart from the others. Watch its output over USB or the UART.
+add_executable(BankTest BankTest.cpp)
+pico_set_program_name(BankTest "BankTest")
+pico_enable_stdio_uart(BankTest 1)
+pico_enable_stdio_usb(BankTest 1)
+target_link_libraries(BankTest
+  PicoLEDs
+  pico_cyw43_arch_none
+  pico_stdlib
+)
+pico_add_extra_outputs(BankTest)
