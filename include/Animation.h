@@ -31,7 +31,16 @@ class Animation {
 
     char name[20];
 
+    /// @brief How many times a second this animation wants step() called, or
+    /// 0 for an animation that goes by the clock instead (see elapsedUs()).
     uint8_t fps = 30;
+
+    /// @brief The Animator's clock, in microseconds, when this animation
+    /// started, and at its latest step. See elapsedUs() and getFrameUs().
+    uint64_t startUs = 0;
+    uint64_t nowUs = 0;
+    /// @brief Microseconds since the previous step.
+    uint32_t frameUs = 0;
 
    public:
     /// @brief Default constructor
@@ -41,9 +50,20 @@ class Animation {
     Animation(Canvas *canvas, ColorMap *colorMap);
     Animation(Canvas *canvas, ColorMap *colorMap, uint8_t fps);
 
-    /// @brief Gets the frames-per-second this animation requires. Default
-    /// is 30.
-    /// @return the FPS this animation needs.
+    /// @brief Gets how many times a second this animation wants to be
+    /// stepped. Default is 30.
+    ///
+    /// The Animator draws frames at one fixed rate for the whole show, and
+    /// steps each animation as often as this asks: a 20 fps animation every
+    /// other frame at 40 frames a second, a 60 fps one alternately once and
+    /// twice per frame. That keeps older animations, which move a fixed amount
+    /// per step, running at the speed they always have.
+    ///
+    /// New animations should return 0 instead: they're stepped exactly once
+    /// per frame and work out how far to move from getFrameUs() and
+    /// elapsedUs(), stating their speeds per second, so they look the same at
+    /// any frame rate. Starlight is an example.
+    /// @return steps per second, or 0 for a clock-driven animation.
     virtual int getFPS() { return fps; };
 
     virtual void setFPS(uint8_t fps) { this->fps = fps; };
@@ -69,6 +89,32 @@ class Animation {
     /// @brief Finishes the animation. Can be used to clear up, etc.
     virtual void finish(){};
 
+    /// @brief Called by the Animator just before init(), with its clock.
+    /// Animations that wrap others pass it on.
+    virtual void startClock(uint64_t now) {
+        startUs = now;
+        nowUs = now;
+        frameUs = 0;
+    }
+
+    /// @brief Called by the Animator before each step() with the time of the
+    /// frame being drawn. A second step in the same frame sees a frameUs of 0,
+    /// and the clock never goes backwards here even if the Animator's does.
+    virtual void setFrameTime(uint64_t now) {
+        if (now <= nowUs) {
+            frameUs = 0;
+            return;
+        }
+        frameUs = (uint32_t)(now - nowUs);
+        nowUs = now;
+    }
+
+    /// @brief Microseconds since this animation started (its last init()).
+    uint64_t elapsedUs() const { return nowUs - startUs; }
+
+    /// @brief Microseconds since the previous step: how far to move this step.
+    uint32_t getFrameUs() const { return frameUs; }
+
     Canvas *getCanvas() { return canvas; };
 };
 
@@ -88,6 +134,20 @@ class MultiAnimation : public Animation {
     void init() override {
         for (auto a : animations) {
             a->init();
+        }
+    }
+
+    void startClock(uint64_t now) override {
+        Animation::startClock(now);
+        for (auto a : animations) {
+            a->startClock(now);
+        }
+    }
+
+    void setFrameTime(uint64_t now) override {
+        Animation::setFrameTime(now);
+        for (auto a : animations) {
+            a->setFrameTime(now);
         }
     }
 

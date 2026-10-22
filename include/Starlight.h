@@ -29,11 +29,17 @@ class Starlight : public Animation {
     /// for a pixel that isn't glinting.
     std::vector<uint8_t> glints;
 
-    /// @brief Glints owed but not started yet, in 1/256ths of a glint.
+    /// @brief Glints due but not started yet.
     uint owed = 0;
 
     /// @brief Where the swells are, out of 65536 of a full cycle.
     uint16_t swell = 0;
+
+    /// @brief The leftover fractions of what was due last frame, in millionths,
+    /// carried over to the next; see due() in Starlight.cpp.
+    uint32_t glintCarry = 0;
+    uint32_t phaseCarry = 0;
+    uint32_t swellCarry = 0;
 
    public:
     /// @param canvas the canvas to draw on

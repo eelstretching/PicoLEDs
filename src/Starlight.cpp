@@ -3,9 +3,22 @@
 #include "colorutils.h"
 #include "math8.h"
 
-/// @brief How far a glint moves through its rise and fall each frame. At 30
-/// fps it takes about 0.8 s to rise and 1.6 s to fade.
-#define GLINT_STEP 3
+/// @brief How far a glint moves through its 256-step rise and fall each
+/// second: about 0.8 s to rise and 1.6 s to fade.
+#define GLINT_SPEED 90
+
+/// @brief How fast the swells move, in 1/65536ths of a cycle per second: two
+/// swells pass about every eight seconds.
+#define SWELL_SPEED 8100
+
+/// @brief How much of something moving at ratePerSecond is due in frameUs
+/// microseconds, carrying the fraction over to the next frame so nothing is
+/// lost to rounding at any frame rate.
+static uint32_t due(uint32_t ratePerSecond, uint32_t frameUs, uint32_t& carry) {
+    uint64_t total = (uint64_t)ratePerSecond * frameUs + carry;
+    carry = (uint32_t)(total % 1000000);
+    return (uint32_t)(total / 1000000);
+}
 
 /// @brief Eases in and out, so a glint starts and ends gently: slow at 0 and
 /// 255, fastest in the middle.
@@ -27,7 +40,7 @@ static uint8_t glintBrightness(uint8_t phase) {
 
 Starlight::Starlight(Canvas* canvas, const RGB& glow, const RGB& glint,
                      uint glintsPerSecond)
-    : Animation(canvas, nullptr),
+    : Animation(canvas, nullptr, 0),
       glow(glow),
       glint(glint),
       glintsPerSecond(glintsPerSecond) {}
@@ -36,6 +49,9 @@ void Starlight::init() {
     glints.assign(canvas->getWidth() * canvas->getHeight(), 0);
     owed = 0;
     swell = 0;
+    glintCarry = 0;
+    phaseCarry = 0;
+    swellCarry = 0;
 }
 
 bool Starlight::step() {
@@ -49,19 +65,22 @@ bool Starlight::step() {
     //
     // Start the glints that are due this frame on pixels that aren't already
     // glinting.
-    owed += glintsPerSecond * 256 / MAX(getFPS(), 1);
-    while (owed >= 256) {
-        owed -= 256;
+    // Starlight goes by the clock (its fps is 0), so it looks the same at any
+    // frame rate: everything moves by how much time has passed.
+    owed += due(glintsPerSecond, getFrameUs(), glintCarry);
+    while (owed > 0) {
+        owed--;
         uint p = random16(glints.size());
         if (glints[p] == 0) {
             glints[p] = 1;
         }
     }
+    uint32_t glintStep = due(GLINT_SPEED, getFrameUs(), phaseCarry);
 
     //
     // The swells go up the canvas (along x, which is up the strands on a
     // MegaTree), two at a time, taking about eight seconds to pass.
-    swell += 270;
+    swell += due(SWELL_SPEED, getFrameUs(), swellCarry);
     uint8_t swellPhase = swell >> 8;
 
     //
@@ -83,7 +102,7 @@ bool Starlight::step() {
             uint8_t& g = glints[y * w + x];
             if (g != 0) {
                 c = blend(c, glint, glintBrightness(g));
-                g = g > 255 - GLINT_STEP ? 0 : g + GLINT_STEP;
+                g = g + glintStep > 255 ? 0 : g + glintStep;
             }
             canvas->set(x, y, c);
         }

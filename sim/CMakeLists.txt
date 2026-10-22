@@ -140,3 +140,8 @@ if(PICOLEDS_SIM_HAVE_ASAN)
   target_compile_options(EffectLifecycle PRIVATE -fsanitize=address -fno-omit-frame-pointer)
   target_link_options(EffectLifecycle PRIVATE -fsanitize=address)
 endif()
+
+# Checks frame pacing and step rates on a pretend clock. See
+# tests/AnimatorPacing.cpp.
+add_executable(AnimatorPacing ${PICOLEDS_SIM_DIR}/tests/AnimatorPacing.cpp)
+target_link_libraries(AnimatorPacing PRIVATE PicoLEDsSim)

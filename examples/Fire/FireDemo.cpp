@@ -41,7 +41,7 @@ int main() {
         fires.add(&f[i]);
     }
 
-    Animator animator(&canvas, 5);
+    Animator animator(&canvas);
     animator.add(&fires);
     animator.init();
 
