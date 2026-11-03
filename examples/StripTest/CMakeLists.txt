@@ -15,7 +15,7 @@ pico_set_program_name(StripTest "StripTest")
 pico_set_program_version(StripTest "0.1")
 
 pico_enable_stdio_uart(StripTest 1)
-pico_enable_stdio_usb(StripTest 0)
+pico_enable_stdio_usb(StripTest 1)
 
 # Add the standard include files to the build
 target_include_directories(StripTest PRIVATE
