@@ -9,16 +9,47 @@
 #include "hardware/pio.h"
 #include "pico/printf.h"
 #include "pico/stdio.h"
+#include "pico/stdio_usb.h"
 #include "pico/stdlib.h"
 #include "pico/types.h"
 
+//
+// Any of these can be overridden from CMake. On the LED processor board
+// (PICO_BOARD=led_processor_board) the default is all 32 outputs, GPIO 0-31
+// (J5-J8), with seed pixels' red-green-blue color order.
+#ifndef STRIP_LEN
 #define STRIP_LEN 200
+#endif
+#ifdef LED_PROCESSOR_BOARD
+#ifndef NUM_STRIPS
+#define NUM_STRIPS 32
+#endif
+#ifndef START_PIN
+#define START_PIN 0
+#endif
+#ifndef COLOR_ORDER
+#define COLOR_ORDER ColorOrder::ORGB
+#endif
+#else
+#ifndef NUM_STRIPS
 #define NUM_STRIPS 10
+#endif
+#ifndef START_PIN
 #define START_PIN 2
+#endif
+#endif
 #define PANEL_WIDTH 10
 
 int main() {
     stdio_init_all();
+    //
+    // Give the laptop a moment to open the USB serial port so the banner
+    // isn't lost.
+    for (int i = 0; i < 30 && !stdio_usb_connected(); i++) {
+        sleep_ms(100);
+    }
+    printf("StripTest: %d strips on GP%d-GP%d, %d pixels each\n", NUM_STRIPS,
+           START_PIN, START_PIN + NUM_STRIPS - 1, STRIP_LEN);
 
     //
     // Simple test for a few strips of pixels.
@@ -28,6 +59,9 @@ int main() {
     int pin = START_PIN;
     for (int i = 0; i < ns; i++) {
         strips[i] = new Strip(pin++, STRIP_LEN);
+#ifdef COLOR_ORDER
+        strips[i]->setColorOrder(COLOR_ORDER);
+#endif
         renderer.add(strips[i]);
     }
     renderer.setup();
@@ -91,9 +125,11 @@ int main() {
         }
 
         if (frameWatch.count % 200 == 0) {
-            printf("%d frames, %.2f us/frame, %.2f us frame time  %.1f fps ",
-
-                   frameWatch.count, usPerFrame, frameWatch.getAverageTime());
+            float avg = frameWatch.getAverageTime();
+            printf("%u frames, %.2f us/frame budget, %.2f us frame time, "
+                   "%.1f fps max, %u missed ",
+                   frameWatch.count, usPerFrame, avg, 1e6 / avg,
+                   missedFrames);
 
             printf("%d blocked ", renderer.getBlockedCount());
             printf("%.2f us per DMA\n",
