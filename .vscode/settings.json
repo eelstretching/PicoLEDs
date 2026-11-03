@@ -1,6 +1,9 @@
 {
     "cmake.options.statusBarVisibility": "hidden",
     "cmake.options.advanced": {
+        "configurePreset": {
+            "statusBarVisibility": "visible"
+        },
         "build": {
             "statusBarVisibility": "hidden"
         },
