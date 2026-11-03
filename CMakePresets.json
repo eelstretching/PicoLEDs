@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "pico2_w",
+      "displayName": "Pico 2 W",
+      "description": "Pico 2 W (the default board), builds into build/",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": { "PICO_BOARD": "pico2_w" }
+    },
+    {
+      "name": "processor-board",
+      "displayName": "LED processor board",
+      "description": "RP2350B LED processor board, builds into build-pb/. Needs led-processor-board checked out next to PicoLEDs.",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build-pb",
+      "cacheVariables": {
+        "PICO_BOARD": "led_processor_board",
+        "PICO_BOARD_HEADER_DIRS": "${sourceDir}/../led-processor-board/firmware/boards"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "pico2_w", "displayName": "Pico 2 W", "configurePreset": "pico2_w" },
+    { "name": "processor-board", "displayName": "LED processor board", "configurePreset": "processor-board" }
+  ]
+}
