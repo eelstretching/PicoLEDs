@@ -27,6 +27,7 @@
 #include "Bouncer.h"
 #include "Bursts.h"
 #include "Canvas.h"
+#include "ClassicLights.h"
 #include "ColorBars.h"
 #include "ColorCone.h"
 #include "FadeColorMap.h"
@@ -174,6 +175,9 @@ int main() {
     check("BarberPole", [&] { return new BarberPole(canvas, &colors, 4); });
     check("Bouncer", [&] { return new Bouncer(canvas, &colors, RGB::Red, 3, 3); });
     check("Bursts", [&] { return new Bursts(canvas, RGB::Black, 6, RGB::White, 5); });
+    check("ClassicLights", [&] {
+        return new ClassicLights(canvas, ClassicLights::Multicolor, ClassicMode::TWINKLE);
+    });
     check("ColorBars", [&] { return new ColorBars(canvas, &colors, 5, 4); });
     check("ColorCone", [&] { return new ColorCone(canvas, &colors); });
     check("FadingBars", [&] { return new FadingBars(canvas, &colors, 10, 4); });
@@ -225,6 +229,9 @@ int main() {
         rt->add(&te);
         return rt;
     });
+    ClassicLights warm(canvas, {ClassicLights::WarmWhite});
+    warm.init();  // so its own memory is already there
+    check("CrossFade", [&] { return new CrossFade(&warm, 3000); });
     RainbowWipe rw(canvas, &colors);
     check("MultiAnimation", [&] {
         MultiAnimation* ma = new MultiAnimation(canvas, &colors);

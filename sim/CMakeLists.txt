@@ -107,6 +107,7 @@ set(PICOLEDS_SIM_EXAMPLES
   PanelTest:PanelTest/PanelTest.cpp
   SimpleLEDs:SimpleLEDs/SimpleLEDs.cpp
   StripTest:StripTest/StripTest.cpp
+  IndoorTree:IndoorTree/IndoorTree.cpp
 )
 foreach(EXAMPLE ${PICOLEDS_SIM_EXAMPLES})
   string(REPLACE ":" ";" PARTS ${EXAMPLE})
