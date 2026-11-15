@@ -18,6 +18,7 @@
 //   GP4 (pin 6)  -> ribbon 6  -> output 3
 //   GP5 (pin 7)  -> ribbon 8  -> output 4
 //   GP6 (pin 9)  -> ribbon 10 -> output 5
+//   GP7 (pin 10) -> ribbon 12 -> output 6, the star on top (see IndoorStar.h)
 //
 // Ribbon odd pins 1-11 to Pico ground, 13 to 3V3 (pin 36), 15 to VBUS
 // (pin 40). Strands that aren't plugged in don't matter, so NUM_STRANDS 5
@@ -31,6 +32,7 @@
 #include "Canvas.h"
 #include "ClassicLights.h"
 #include "HolidayPalettes.h"
+#include "IndoorStar.h"
 #include "Starlight.h"
 #include "Strip.h"
 #include "TwinkleFox.h"
@@ -42,6 +44,12 @@
 #define NUM_STRANDS 5
 #define START_PIN 2
 #define STRAND_LEN 200
+//
+// The seed pixel star on top of the tree, on its own output after the
+// strands. Set STAR_PIN to -1 if there's no star.
+#ifndef STAR_PIN
+#define STAR_PIN (START_PIN + NUM_STRANDS)
+#endif
 //
 // Out of 255. Seed pixels are bright, and this is a living room: 40 is a
 // cozy glow, and keeps five strands to tens of watts even at full white.
@@ -94,6 +102,16 @@ int main() {
         Strip* s = new Strip(START_PIN + i, STRAND_LEN);
         s->setColorOrder(ColorOrder::ORGB);
         canvas.add(s);
+    }
+    //
+    // The star goes straight to the renderer rather than onto the canvas, so
+    // the tree's animations don't draw on it; we draw it ourselves.
+    IndoorStar* star = nullptr;
+    if (STAR_PIN >= 0) {
+        Strip* s = new Strip(STAR_PIN, IndoorStar::length());
+        s->setColorOrder(ColorOrder::ORGB);
+        canvas.getRenderer()->add(s);
+        star = new IndoorStar(s);
     }
     canvas.setBrightness(BRIGHTNESS);
     //
@@ -148,11 +166,20 @@ int main() {
     printf("IndoorTree: %d strands on GP%d-GP%d, %d pixels each, brightness %d\n",
            NUM_STRANDS, START_PIN, START_PIN + NUM_STRANDS - 1, STRAND_LEN,
            BRIGHTNESS);
+    if (star != nullptr) {
+        printf("Star on GP%d: %d pixels on the strand, %d showing\n", STAR_PIN,
+               IndoorStar::length(), (int)star->getPixels().size());
+    }
 
     animator.init();
     bool ledOn = false;
     uint64_t nextBlink = 0;
     while (true) {
+        //
+        // Draw the star first, so it goes out with the tree's next frame.
+        if (star != nullptr) {
+            star->draw(time_us_64());
+        }
         animator.step();
         if (led && time_us_64() >= nextBlink) {
             ledOn = !ledOn;
