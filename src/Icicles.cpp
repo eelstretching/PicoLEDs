@@ -173,10 +173,6 @@ void Icicle::init() { drip->init(); }
 
 bool Icicle::step() {
     //
-    // Step the drip.
-    drip->step();
-
-    //
     // Draw the icicle
     for (uint i = 0; i < length; i++) {
         switch (direction) {
@@ -194,6 +190,11 @@ bool Icicle::step() {
                 break;
         }
     }
+
+    //
+    // Step the drip after the icicle, so the bright drip is drawn on top of
+    // the icicle body instead of being overwritten by it.
+    drip->step();
     return true;
 }
 
