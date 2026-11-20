@@ -179,3 +179,15 @@ target_link_libraries(BankTest
   pico_stdlib
 )
 pico_add_extra_outputs(BankTest)
+
+# One strip on any pin, with the pin (p <pin>) and pixel count (n <num>) set
+# over USB serial. Boots on GP35 (the topper) on the processor board.
+add_executable(PinStrip PinStrip.cpp)
+pico_set_program_name(PinStrip "PinStrip")
+pico_enable_stdio_uart(PinStrip 1)
+pico_enable_stdio_usb(PinStrip 1)
+target_link_libraries(PinStrip
+  PicoLEDs
+  pico_stdlib
+)
+pico_add_extra_outputs(PinStrip)
